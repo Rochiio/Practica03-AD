@@ -21,5 +21,4 @@ data class Stringer(
     val automatic: TypeMachine,
     val maximumTension: Int,
     val minimumTension: Int
-){
-}
+)
