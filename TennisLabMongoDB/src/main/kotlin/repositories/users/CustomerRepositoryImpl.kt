@@ -1,4 +1,4 @@
-package repositories.usuarios
+package repositories.users
 
 import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow

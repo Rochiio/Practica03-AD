@@ -1,4 +1,4 @@
-package repositories.maquinas
+package repositories.machines
 
 import model.machines.Stringer
 import org.litote.kmongo.Id

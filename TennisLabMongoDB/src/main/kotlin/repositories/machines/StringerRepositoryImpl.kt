@@ -1,4 +1,4 @@
-package repositories.maquinas
+package repositories.machines
 
 import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow

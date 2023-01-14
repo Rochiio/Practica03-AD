@@ -1,4 +1,4 @@
-package repositories.usuarios
+package repositories.users
 
 import model.users.Customer
 import org.litote.kmongo.Id
