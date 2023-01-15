@@ -7,13 +7,14 @@ import model.orders.tasks.Task
 import model.users.Customer
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
+import org.litote.kmongo.newId
 import util.serializer.LocalDateSerializer
 import java.time.LocalDate
 
 @Serializable
 data class Order(
     @BsonId @Contextual
-    var id: Id<Order>,
+    var id: Id<Order> = newId<Order>(),
     var state: Status,
     @Serializable(with = LocalDateSerializer::class)
     val entryDate: LocalDate?,
