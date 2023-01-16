@@ -5,6 +5,7 @@ import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
+import java.util.Properties
 
 //TODO cambiar
 private val logger = KotlinLogging.logger {}
@@ -19,6 +20,7 @@ object MongoDbManager {
     // Podemos coger los datos de properties o de un fichero de configuración
 
     // Para Mongo Atlas
+    private val properties = Properties()
     private const val MONGO_TYPE = "mongodb+srv://" //"mongodb://" // "mongodb+srv://"
     private const val HOST = "cluster0.pgdqg.mongodb.net" //"localhost" // "cluster0.pgdqg.mongodb.net"
     private const val PORT = 27017
@@ -44,11 +46,18 @@ object MongoDbManager {
 
     init {
         logger.debug("Inicializando conexion a MongoDB")
+        properties.load(javaClass.classLoader.getResourceAsStream("application.properties"))
 
-        println("Inicializando conexion a MongoDB -> $MONGO_URI$OPTIONS")
+        println(
+            "Inicializando conexion a MongoDB -> ${properties.getProperty("mongo.conecction")}"
+        )
         mongoClient =
-            KMongo.createClient("$MONGO_URI$OPTIONS")
+            KMongo.createClient(properties.getProperty("mongo.conecction").toString())
                 .coroutine
-        database = mongoClient.getDatabase("tennislab")
+        database = mongoClient.getDatabase("tennisLab")
+        /*mongoClient =
+            KMongo.createClient("mongodb+srv://moha:1234@tennislabcluster.jgjryxb.mongodb.net/tennisLab")
+                .coroutine
+        database = mongoClient.getDatabase("tennislab")*/
     }
 }

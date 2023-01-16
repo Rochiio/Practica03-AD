@@ -3,7 +3,9 @@ package repositories.orders
 import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow
 import model.orders.tasks.Task
+import model.users.Customer
 import mu.KotlinLogging
+import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.setTo
 import java.util.*
 
@@ -31,7 +33,7 @@ class TaskRepositoryImpl : TaskRepository {
     override suspend fun delete(item: Task): Boolean {
         logger.debug { "Eliminando tarea: $item" }
         return dbMongo.getCollection<Task>()
-            .updateOneById(item.id, Task::available.setTo(false)).wasAcknowledged()
+            .updateOneById(item.id, "{${MongoOperator.set}:{'available' : false}}").wasAcknowledged()
     }
 
     override suspend fun findAll(): Flow<Task> {
