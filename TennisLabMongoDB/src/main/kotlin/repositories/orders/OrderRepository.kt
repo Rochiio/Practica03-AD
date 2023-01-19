@@ -1,4 +1,8 @@
 package repositories.orders
 
-interface OrderRepository {
+import model.orders.Order
+import repositories.ICRUD
+import java.util.*
+
+interface OrderRepository : ICRUD<Order, UUID>{
 }

@@ -19,8 +19,9 @@ fun main(args: Array<String>): Unit = runBlocking {
 
     var repositoryImpl = CustomerRepositoryImpl()
     launch {
-        repositoryImpl.save(user1)
-        repositoryImpl.delete(repositoryImpl.findByEmail("rocio@gmail.com")!!)
+        var res = repositoryImpl.save(user1)
+        res.name = "moha"
+        repositoryImpl.update(res)
     }
 
 }
