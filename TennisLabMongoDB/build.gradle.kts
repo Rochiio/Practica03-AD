@@ -29,6 +29,8 @@ dependencies {
 
     // Serializacion JSON
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation("junit:junit:4.13.1")
+    implementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
     //MOCKK
     testImplementation("io.mockk:mockk:${mockkVersion}")
@@ -37,6 +39,8 @@ dependencies {
     implementation("com.github.ajalt.mordant:mordant:2.0.0-beta8")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+
 }
 
 tasks.test {
