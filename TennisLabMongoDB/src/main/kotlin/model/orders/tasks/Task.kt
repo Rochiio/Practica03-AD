@@ -20,7 +20,6 @@ data class Task(
     var idCustomizer : Id<Customizer>?,
     //datos de la tarea embedidos
     var description : String,
-
     var taskType : TypeTask,
     var available : Boolean
 )
