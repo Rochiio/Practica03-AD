@@ -6,6 +6,7 @@ import kotlinx.coroutines.reactive.asFlow
 import model.users.Customer
 import mu.KotlinLogging
 import org.litote.kmongo.Id
+import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.eq
 import org.litote.kmongo.setTo
 
@@ -73,7 +74,7 @@ class CustomerRepositoryImpl : CustomerRepository {
     override suspend fun delete(item: Customer): Boolean {
         logger.debug { "Eliminando cliente: $item" }
         return dbMongo.getCollection<Customer>()
-            .updateOneById(item.id, Customer::available.setTo(false)).wasAcknowledged()
+            .updateOneById(item.id, "{${MongoOperator.set}:{'available' : false}}").wasAcknowledged()
     }
 
 
@@ -88,7 +89,6 @@ class CustomerRepositoryImpl : CustomerRepository {
 
 
     /**
-     * TODO este tampoco sé si va a fufar.
      * Eliminar todos los clientes.
      * @return si han sido eliminados con éxito.
      */

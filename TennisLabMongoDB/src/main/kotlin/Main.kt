@@ -1,7 +1,26 @@
-fun main(args: Array<String>) {
-    println("Hello World!")
+import db.MongoDbManager
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import model.users.Customer
+import org.bson.types.ObjectId
+import org.litote.kmongo.Id
+import repositories.users.CustomerRepositoryImpl
 
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
+fun main(args: Array<String>): Unit = runBlocking {
+    var user1 = Customer(
+        name = "rocio",
+        surname = "yo",
+        email = "rocio@gmail.com",
+        password = "1234",
+        available = true,
+        orderList = emptyList(),
+        tennisRacketsList = emptyList()
+    )
+
+    var repositoryImpl = CustomerRepositoryImpl()
+    launch {
+        repositoryImpl.save(user1)
+        repositoryImpl.delete(repositoryImpl.findByEmail("rocio@gmail.com")!!)
+    }
+
 }
