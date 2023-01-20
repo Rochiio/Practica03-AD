@@ -13,12 +13,12 @@ import java.time.LocalDate
 data class Stringer(
     @BsonId @Contextual
     var id: Id<Stringer> = newId<Stringer>(),
-    val brand: String,
-    val model: String,
+    var brand: String,
+    var model: String,
     @Serializable(with = LocalDateSerializer::class)
-    val acquisitionDate: LocalDate,
-    val available: Boolean,
-    val automatic: TypeMachine,
-    val maximumTension: Int,
-    val minimumTension: Int
+    var acquisitionDate: LocalDate,
+    var available: Boolean,
+    var automatic: TypeMachine,
+    var maximumTension: Int,
+    var minimumTension: Int
 )
