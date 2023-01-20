@@ -39,6 +39,7 @@ dependencies {
     implementation("com.github.ajalt.mordant:mordant:2.0.0-beta8")
 
     testImplementation(kotlin("test"))
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
