@@ -67,7 +67,6 @@ class EmployeeRepositoryImpl: EmployeeRepository {
 
 
     /**
-     * TODO no se si este va a funcionar
      * Eliminar a un empleado.
      * @param item empleado a eliminar.
      * @return si el empleado ha sido eliminado.
@@ -90,7 +89,6 @@ class EmployeeRepositoryImpl: EmployeeRepository {
 
 
     /**
-     * TODO este tampoco sé si va a fufar.
      * Eliminar todos los empleados.
      * @return si han sido eliminados con éxito.
      */
