@@ -13,13 +13,13 @@ data class Customizer(
     @BsonId @Contextual
     var id: Id<Customizer> = newId<Customizer>(),
     //var uuid : UUID?,
-    val brand: String,
-    val model: String,
+    var brand: String,
+    var model: String,
     @Serializable(with = LocalDateSerializer::class)
     val acquisitionDate: LocalDate,
-    val available: Boolean,
-    val maneuverability: Boolean,
-    val balance: Boolean,
-    val rigidity: Boolean
+    var available: Boolean,
+    var maneuverability: Boolean,
+    var balance: Boolean,
+    var rigidity: Boolean
 ) {
 }
