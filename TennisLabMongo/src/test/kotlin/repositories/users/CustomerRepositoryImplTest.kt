@@ -36,7 +36,8 @@ class CustomerRepositoryImplTest {
     }
 
     @After
-    fun tearDown() {
+    fun tearDown() = runTest{
+        repo.deleteAll()
         Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
         mainThreadSurrogate.close()
     }

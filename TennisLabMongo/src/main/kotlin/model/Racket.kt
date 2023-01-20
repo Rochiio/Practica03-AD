@@ -12,8 +12,8 @@ data class Racket(
     var id: Id<Racket> = newId<Racket>(),
     var brand: String,
     var model: String,
-    val maneuverability: Float,
-    val balance: Float,
-    val rigidity: Float
+    var maneuverability: Float,
+    var balance: Float,
+    var rigidity: Float
 ) {
 }
