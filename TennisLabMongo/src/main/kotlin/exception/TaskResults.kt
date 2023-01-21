@@ -8,4 +8,6 @@ abstract class TaskError<Nothing>(val code: Int, open val message: String?) : Ta
 class TaskErrorNotFound<Nothing>(message: String?) : TaskError<Nothing>(404, message)
 class TaskErrorBadRequest<Nothing>(message: String?) : TaskError<Nothing>(400, message)
 class TaskInternalException<Nothing>(message: String?) : TaskError<Nothing>(500, message)
+class TaskErrorExists<Nothing>(message: String?) : TaskError<Nothing>(403, message)
+
 

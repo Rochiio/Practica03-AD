@@ -11,4 +11,6 @@ abstract class StringerError<Nothing>(val code: Int, open val message: String?) 
 class StringerErrorNotFound<Nothing>(message: String?) : StringerError<Nothing>(404, message)
 class StringerErrorBadRequest<Nothing>(message: String?) : StringerError<Nothing>(400, message)
 class StringerInternalException<Nothing>(message: String?) : StringerError<Nothing>(500, message)
+class StringerErrorExists<Nothing>(message: String?) : StringerError<Nothing>(403, message)
+
 
