@@ -11,4 +11,5 @@ abstract class CustomerError<Nothing>(val code: Int, open val message: String?) 
 class CustomerErrorNotFound<Nothing>(message: String?) : CustomerError<Nothing>(404, message)
 class CustomerErrorBadRequest<Nothing>(message: String?) : CustomerError<Nothing>(400, message)
 class CustomerInternalException<Nothing>(message: String?) : CustomerError<Nothing>(500, message)
+class CustomerErrorExists<Nothing>(message: String?) : CustomerError<Nothing>(403, message)
 
