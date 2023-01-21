@@ -19,7 +19,7 @@ class EmployeeController(private var repository: EmployeeRepository) {
      * @param password a ver si es correcta
      * @return trabajador dependiendo de si existe
      */
-    suspend fun getTrabajadorByEmailAndPassword(email: String, password: String): EmployeeResult<Employee>{
+    suspend fun getEmployeeByEmailAndPassword(email: String, password: String): EmployeeResult<Employee>{
         val find = repository.findByEmail(email)
         find?.let {
             if (find.password != password){
@@ -47,13 +47,13 @@ class EmployeeController(private var repository: EmployeeRepository) {
     /**
      * Añadir un trabajador
      */
-    suspend fun addTrabajador(trabajador: Employee): EmployeeResult<Employee>{
-        val existe = repository.findByEmail(trabajador.email)
+    suspend fun addEmployee(employee: Employee): EmployeeResult<Employee>{
+        val existe = repository.findByEmail(employee.email)
         existe?.let {
             return EmployeeErrorExists("Ya existe un trabajador con este email")
         }?: run{
-            repository.save(trabajador)
-            return EmployeeSuccess(201, trabajador)
+            repository.save(employee)
+            return EmployeeSuccess(201, employee)
         }
     }
 
@@ -61,17 +61,17 @@ class EmployeeController(private var repository: EmployeeRepository) {
     /**
      * Conseguir todos los trabajadores que existen.
      */
-    suspend fun getAllTrabajadores():EmployeeResult<Flow<Employee>>{
+    suspend fun getAllEmployees():EmployeeResult<Flow<Employee>>{
         val flow = repository.findAll()
         return EmployeeSuccess(200, flow)
     }
 
 
     /**
-     * Actualizar un trabajador
+     * Actualizar un employee
      */
-    suspend fun updateTrabajador(trabajador:Employee):EmployeeResult<Employee>{
-        var update = repository.update(trabajador)
+    suspend fun updateEmployee(employee:Employee):EmployeeResult<Employee>{
+        var update = repository.update(employee)
         return EmployeeSuccess(200, update)
     }
 
@@ -79,8 +79,8 @@ class EmployeeController(private var repository: EmployeeRepository) {
     /**
      * Eliminar un trabajador
      */
-    suspend fun deleteTrabajador(trabajador:Employee):EmployeeResult<Boolean>{
-        var correcto =repository.delete(trabajador)
+    suspend fun deleteEmployee(employee:Employee):EmployeeResult<Boolean>{
+        var correcto =repository.delete(employee)
         return EmployeeSuccess(200, correcto)
     }
 

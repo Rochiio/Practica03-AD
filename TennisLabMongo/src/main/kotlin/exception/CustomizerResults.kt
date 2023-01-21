@@ -11,4 +11,5 @@ abstract class CustomizerError<Nothing>(val code: Int, open val message: String?
 class CustomizerErrorNotFound<Nothing>(message: String?) : CustomizerError<Nothing>(404, message)
 class CustomizerErrorBadRequest<Nothing>(message: String?) : CustomizerError<Nothing>(400, message)
 class CustomizerInternalException<Nothing>(message: String?) : CustomizerError<Nothing>(500, message)
+class CustomizerErrorExists<Nothing>(message: String?) : CustomizerError<Nothing>(403, message)
 
