@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="controllers.MachineControllerTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2023-01-22T18:05:04" hostname="RO-PC" time="1.477">
+  <properties/>
+  <testcase name="getStringerById()" classname="controllers.MachineControllerTest" time="0.715"/>
+  <testcase name="getAllStringers()" classname="controllers.MachineControllerTest" time="0.427"/>
+  <testcase name="updateStringer()" classname="controllers.MachineControllerTest" time="0.023"/>
+  <testcase name="getStringerByIdError()" classname="controllers.MachineControllerTest" time="0.015"/>
+  <testcase name="addCustomizer()" classname="controllers.MachineControllerTest" time="0.097"/>
+  <testcase name="getCustomizerById()" classname="controllers.MachineControllerTest" time="0.023"/>
+  <testcase name="deleteStringer()" classname="controllers.MachineControllerTest" time="0.021"/>
+  <testcase name="addCustomizerError()" classname="controllers.MachineControllerTest" time="0.014"/>
+  <testcase name="addStringer()" classname="controllers.MachineControllerTest" time="0.026"/>
+  <testcase name="addStringerError()" classname="controllers.MachineControllerTest" time="0.014"/>
+  <testcase name="deleteCustomizer()" classname="controllers.MachineControllerTest" time="0.012"/>
+  <testcase name="updateCustomizer()" classname="controllers.MachineControllerTest" time="0.02"/>
+  <testcase name="getAllCustomizers()" classname="controllers.MachineControllerTest" time="0.019"/>
+  <testcase name="getCustomizerByIdError()" classname="controllers.MachineControllerTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

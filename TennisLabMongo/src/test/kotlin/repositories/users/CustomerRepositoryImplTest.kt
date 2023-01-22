@@ -116,14 +116,14 @@ class CustomerRepositoryImplTest {
     @Test
     fun delete() = runTest{
         repo.save(customer)
-        var delete = repo.delete(customer)
+        val delete = repo.delete(customer)
         assertTrue(delete)
     }
 
     @Test
     fun findAll() = runTest{
         repo.save(customer)
-        var all = repo.findAll().toList()
+        val all = repo.findAll().toList()
 
         assertAll(
             { assertTrue(all.isNotEmpty()) },
