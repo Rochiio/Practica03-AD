@@ -19,7 +19,9 @@ interface ApiUsers {
     @POST("users")
     suspend fun create(@Body user: CustomerDTO): CustomerDTO
 
+
+//TODO(Excepcion illegal input) ?? no entiendo
     @PUT("users/{id}")
-    suspend fun update(@Path("id") id : Int, @Body customer : Customer) : Customer
+    suspend fun update(@Path("id") id : Int, @Body customer : CustomerDTO) : Customer
 
 }

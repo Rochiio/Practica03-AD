@@ -7,5 +7,5 @@ data class CustomerDTO(
     val id : Int,
     val name : String,
     val username : String,
-    val email : String
+    var email : String
 )
