@@ -4,6 +4,8 @@ val mockkVersion: String = "1.13.2"
 plugins {
     kotlin("jvm") version "1.7.21"
     kotlin("plugin.serialization") version "1.7.20"
+    id("com.google.devtools.ksp") version "1.7.21-1.0.8"
+
     application
 }
 
@@ -37,6 +39,18 @@ dependencies {
 
     //Terminal
     implementation("com.github.ajalt.mordant:mordant:2.0.0-beta8")
+
+    //ktorfit
+    // Ktorfit, es decir Ktor client modificado para parecerse a Retrofit
+    ksp("de.jensklingenberg.ktorfit:ktorfit-ksp:1.0.0-beta16")
+    implementation("de.jensklingenberg.ktorfit:ktorfit-lib:1.0.0-beta16")
+
+    // Para serializar en Json con Ktor
+    implementation("io.ktor:ktor-client-serialization:2.1.3")
+    implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
+
+
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
