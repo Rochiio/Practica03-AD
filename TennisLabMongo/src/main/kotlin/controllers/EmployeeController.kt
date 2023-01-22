@@ -23,10 +23,10 @@ class EmployeeController(private var repository: EmployeeRepository) {
         val find = repository.findByEmail(email)
         find?.let {
             if (find.password != password){
-                return EmployeeErrorNotFound("Usuario o contraseña incorrecta")
+                return EmployeeErrorNotFound("Usuario o contraseña incorrecto")
             }
         }?: run {
-                return EmployeeErrorNotFound("Usuario o contraseña incorrecta")
+                return EmployeeErrorNotFound("Usuario o contraseña incorrecto")
         }
         return EmployeeSuccess(200, find)
     }
