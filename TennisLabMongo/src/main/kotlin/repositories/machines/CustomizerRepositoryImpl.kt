@@ -71,6 +71,7 @@ class CustomizerRepositoryImpl: CustomizerRepository {
 
 
     /**
+     * TODO no se si va a funcionar
      * Eliminar todas las personalizadoras.
      * @return si han sido eliminadas con éxito.
      */
