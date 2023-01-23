@@ -15,8 +15,11 @@ data class Task(
     @BsonId @Contextual
     var id : Id<Task> = newId(),
     //trabajador y maquina referenciados
+    @Contextual
     var idTrabajador : Id<Employee>?,
+    @Contextual
     var idStringer : Id<Stringer>?,
+    @Contextual
     var idCustomizer : Id<Customizer>?,
     //datos de la tarea embedidos
     var description : String,

@@ -3,13 +3,13 @@ package repositories.users
 import dto.customers.CustomerDTO
 import model.users.Customer
 import mu.KotlinLogging
-import services.api.ApiUsersClient
+import services.api.ApiClient
 import util.mappers.fromDto
 
 
 class CustomerApiRepository {
-    private val client by lazy { ApiUsersClient.instance }
-    val logger = KotlinLogging.logger { }
+    private val client by lazy { ApiClient.usersInstance }
+    private val logger = KotlinLogging.logger { }
 
     /**
      * recupera todos los clientes desde la api
@@ -20,8 +20,8 @@ class CustomerApiRepository {
             logger.debug { "CustomerApiRepository - findAll - OK" }
             return call
         } catch (e: Exception) {
-
-            throw Exception("CustomerApiRepository - findAll - ERROR - ${e.message}")
+            logger.error { "Customer - findAll - ERROR - ${e.message}" }
+            return emptyList()
         }
     }
 
@@ -33,28 +33,27 @@ class CustomerApiRepository {
         logger.debug { "buscando cliente con id : $id" }
         val call = client.getById(id)
 
-        try {
+        return try {
             logger.debug { "CustomerApiRepository - findById - OK" }
-            return call
+            call
         } catch (e: Exception) {
             logger.error { "CustomerApiRepository - findById - ERROR - ${e.message}" }
-            return null
+            null
         }
     }
 
     /**
      * busca un cliente por email en la api
-      */
-    suspend fun findByEmail(email: String): CustomerDTO? {
+     */
+    suspend fun findByEmail(email: String): List<CustomerDTO>? {
         logger.debug { "buscando cliente con email : $email" }
         val call = client.findByEmail(email)
-
-        try {
+        return try {
             logger.debug { "CustomerApiRepository - findByEmail - OK " }
-            return call
+            call
         } catch (e: Exception) {
             logger.error { "CustomerApiRepository - findByEmail - ERROR - ${e.message}" }
-            return null
+            null
         }
     }
 
@@ -90,12 +89,12 @@ class CustomerApiRepository {
         }
     }
 
-    suspend fun delete(id : Int){
+    suspend fun delete(id: Int) {
         logger.debug { "eliminando cliente con id : $id" }
-        try{
+        try {
             logger.debug { "CustomerApiRepository - delete - OK" }
             client.delete(id)
-        }catch(e : Exception){
+        } catch (e: Exception) {
             logger.debug { "CustomerApiRepository - delete - ERROR - ${e.message}" }
         }
     }

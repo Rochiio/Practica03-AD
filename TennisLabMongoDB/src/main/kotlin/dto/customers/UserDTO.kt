@@ -1,5 +1,8 @@
 package dto.customers
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserDTO(
     val address: Address,
     val company: Company,

@@ -1,5 +1,8 @@
 package dto.customers
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Address(
     val city: String,
     val geo: Geo,
