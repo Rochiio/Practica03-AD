@@ -90,4 +90,14 @@ class CustomerApiRepository {
         }
     }
 
+    suspend fun delete(id : Int){
+        logger.debug { "eliminando cliente con id : $id" }
+        try{
+            logger.debug { "CustomerApiRepository - delete - OK" }
+            client.delete(id)
+        }catch(e : Exception){
+            logger.debug { "CustomerApiRepository - delete - ERROR - ${e.message}" }
+        }
+    }
+
 }
