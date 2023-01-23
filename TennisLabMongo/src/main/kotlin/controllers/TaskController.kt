@@ -17,7 +17,7 @@ class TaskController(private var repository: TaskRepository) {
      * Añade un pedido
      */
     suspend fun addTask(tarea: Task): TaskResult<Task> {
-        val find = repository.findById(tarea.id)
+        val find = repository.findById(tarea.uuid)
         find?.let {
             return TaskErrorExists("Ya existe una tarea con este id")
         }
@@ -52,7 +52,7 @@ class TaskController(private var repository: TaskRepository) {
     /**
      * Busca un pedido por su UUID
      */
-    suspend fun getTaskById(id: Id<Task>): TaskResult<Task>{
+    suspend fun getTaskById(id: UUID): TaskResult<Task>{
         val find = repository.findById(id)
         find?.let {
             return TaskSuccess(200, it)
@@ -65,7 +65,7 @@ class TaskController(private var repository: TaskRepository) {
      * Añadir una tarea que ha sido añadida a un pedido
      */
     suspend fun addTaskToOrder(tarea : Task) : TaskResult<Task>{
-        when(getTaskById(tarea.id)){
+        when(getTaskById(tarea.uuid)){
             is TaskError -> addTask(tarea)
             is TaskSuccess ->  updateTask(tarea)
         }
