@@ -1,6 +1,7 @@
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import model.users.Customer
+import org.litote.kmongo.newId
 import repositories.users.CustomerRepositoryImpl
 
 
