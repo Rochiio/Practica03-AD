@@ -8,9 +8,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import org.litote.kmongo.json
 
-object ApiUsersClient {
+object ApiClient {
     private val url = "https://jsonplaceholder.typicode.com/"
 
     private val ktorfit by lazy {
@@ -29,8 +28,13 @@ object ApiUsersClient {
             .build()
     }
 
-    // Creamos una instancia de Retrofit con las llamadas a la API
-    val instance by lazy {
+    // instancia para las llamadas de la api de usuarios
+    val usersInstance by lazy {
         ktorfit.create<ApiUsers>()
+    }
+
+    // instancia para las llamadas a la api de tareas
+    val tasksInstance by lazy{
+        ktorfit.create<ApiTasks>()
     }
 }
