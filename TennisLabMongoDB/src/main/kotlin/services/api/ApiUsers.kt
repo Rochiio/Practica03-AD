@@ -31,5 +31,8 @@ interface ApiUsers {
     @DELETE("users/{id}")
     suspend fun delete(@Path("id") id: Int)
 
+    @DELETE("users/{id}")
+    suspend fun delete(@Path("id") id : Int)
+
 }
 
