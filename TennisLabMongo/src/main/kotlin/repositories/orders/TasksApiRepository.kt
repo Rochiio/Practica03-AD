@@ -3,7 +3,7 @@ package repositories.orders
 import dto.TaskDTO
 import model.orders.tasks.Task
 import mu.KotlinLogging
-import services.api.ApiClient
+import service.api.ApiClient
 
 class TasksApiRepository {
     private val client by lazy { ApiClient.tasksInstance }

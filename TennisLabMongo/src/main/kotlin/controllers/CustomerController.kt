@@ -4,25 +4,48 @@ import exception.CustomerErrorExists
 import exception.CustomerErrorNotFound
 import exception.CustomerResult
 import exception.CustomerSuccess
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import model.users.Customer
+import mu.KotlinLogging
 import org.litote.kmongo.Id
 import repositories.users.CustomerRepository
 import service.PasswordParser
+import service.cache.UsersCache
+import java.util.*
 
 class CustomerController(private var repository: CustomerRepository) {
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Añadir un cliente
      */
     suspend fun addCustomer(cliente: Customer): CustomerResult<Customer> {
-        val existe = repository.findById(cliente.id)
-        existe?.let {
+        logger.debug { "Buscamos en la caché si existe el usuario" }
+        val existeInCache = UsersCache.cache.get(cliente.uuid)
+        existeInCache?.let {
             return  CustomerErrorExists("Ya existe un cliente con el id: ${it.id}")
         }?: run{
-            repository.save(cliente)
-            return CustomerSuccess<Customer>(201, cliente)
+            logger.debug { "Buscamos en el mongo si existe el usuario" }
+            val existe = repository.findById(cliente.id)
+            existe?.let {
+                return  CustomerErrorExists("Ya existe un cliente con el id: ${it.id}")
+            }?: run{
+                logger.debug { "El usuario no existe,creando y añadiendo a DB y Cache concurrentemente" }
+                withContext(Dispatchers.IO) {
+                    launch {
+                        repository.save(cliente)
+                    }
+                    launch {
+                        UsersCache.cache.put(cliente.uuid, cliente)
+                    }
+                }
+                return CustomerSuccess<Customer>(201, cliente)
+            }
         }
+
     }
 
 
@@ -51,6 +74,31 @@ class CustomerController(private var repository: CustomerRepository) {
            return CustomerSuccess(200, it)
         }
         return CustomerErrorNotFound("No existe cliente con el id: $id")
+    }
+
+
+    /**
+     * Buscar un usuario por su uuid
+     */
+    suspend fun getCustomerByUuid(uuid: UUID): CustomerResult<Customer>{
+        logger.debug { "Buscamos en la cache si existe el usuario por su uuid" }
+        val findCache = UsersCache.cache.get(uuid)
+        findCache?.let {
+            return CustomerSuccess(200, it)
+        }?: run{
+            logger.debug { "Buscamos en la base de datos si existe el usuario por su id" }
+            val findDb = repository.findByUuid(uuid)
+            findDb?.let {
+                withContext(Dispatchers.IO){
+                    launch {
+                        UsersCache.cache.put(it.uuid, it)
+                    }
+                }
+                return CustomerSuccess(200, it)
+            }?:run{
+                return CustomerErrorNotFound("No existe cliente con el uuid: $uuid")
+            }
+        }
     }
 
 

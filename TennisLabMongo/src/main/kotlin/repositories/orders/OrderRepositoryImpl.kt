@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import model.orders.Order
 import model.users.Customer
 import mu.KotlinLogging
+import org.litote.kmongo.Id
 import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.setTo
 import java.util.*
@@ -12,7 +13,7 @@ import java.util.*
 class OrderRepositoryImpl : OrderRepository {
     private var logger = KotlinLogging.logger{}
     private  var dbMongo = MongoDbManager.database
-    override suspend fun findById(id: UUID): Order? {
+    override suspend fun findById(id: Id<Order>): Order? {
         logger.debug { "Buscando tarea con id: $id" }
         return dbMongo.getCollection<Order>().findOneById(id)
     }

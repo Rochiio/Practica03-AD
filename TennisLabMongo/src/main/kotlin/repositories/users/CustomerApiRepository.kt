@@ -3,7 +3,7 @@ package repositories.users
 import dto.customers.CustomerDTO
 import model.users.Customer
 import mu.KotlinLogging
-import services.api.ApiClient
+import service.api.ApiClient
 import util.mappers.fromDto
 
 
