@@ -33,7 +33,6 @@ import java.time.LocalDate
 @ExperimentalCoroutinesApi
 @ExtendWith(MockKExtension::class)
 class MachineControllerTest {
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
 
     @MockK
     private lateinit var stringerRepo: StringerRepositoryImpl
@@ -46,16 +45,6 @@ class MachineControllerTest {
         maneuverability = true, balance = false, rigidity = true)
     private val stringer = Stringer(brand = "test", model = "test", acquisitionDate = LocalDate.now(), available = true,
         automatic = TypeMachine.MANUAL, maximumTension = 50, minimumTension = 10)
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
-    @After
-    fun tearDown() = runTest{
-        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
-    }
 
 
     @Test

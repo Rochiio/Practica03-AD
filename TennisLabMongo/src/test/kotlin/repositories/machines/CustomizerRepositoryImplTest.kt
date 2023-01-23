@@ -24,12 +24,6 @@ class CustomizerRepositoryImplTest {
     private val customizer = Customizer(brand = "test", model = "test", acquisitionDate = LocalDate.now(), available = true,
         maneuverability = true, balance = false, rigidity = true)
 
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
 
     @BeforeEach
     fun setUpEach() = runTest{
@@ -39,8 +33,6 @@ class CustomizerRepositoryImplTest {
     @After
     fun tearDown() = runTest{
         repo.deleteAll()
-        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
     }
 
 
