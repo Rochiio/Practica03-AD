@@ -15,18 +15,8 @@ fun main(args: Array<String>): Unit = runBlocking {
 
     val repo = CustomerApiRepository()
     //var customers = repo.findAll(1, 4)
-    var customer = repo.findById(1)
+    var customer = repo.delete(1)
    // println(customers)
-    println(customer)
-println("--------------------")
-    customer?.email = "yo@gmail.com"
-    val save = CustomerDTO(15, "moha", "asidah", "moha@gmail.com")
-    val res1 = repo.save(save)
-    println(res1)
-    println("--------------------")
-    val res2 = repo.update(customer!!)
-    println(res2)
-    println("--------------------")
 
 
 }

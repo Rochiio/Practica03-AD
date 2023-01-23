@@ -24,4 +24,7 @@ interface ApiUsers {
     @PUT("users/{id}")
     suspend fun update(@Path("id") id : Int, @Body customer : CustomerDTO) : Customer
 
+    @DELETE("users/{id}")
+    suspend fun delete(@Path("id") id : Int)
+
 }
