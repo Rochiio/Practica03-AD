@@ -24,13 +24,6 @@ class StringerRepositoryImplTest{
     private val stringer = Stringer(brand = "test", model = "test", acquisitionDate = LocalDate.now(), available = true,
         automatic = TypeMachine.MANUAL, maximumTension = 50, minimumTension = 10)
 
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
-
     @BeforeEach
     fun setUpEach() = runTest{
         repo.deleteAll()
@@ -39,8 +32,6 @@ class StringerRepositoryImplTest{
     @After
     fun tearDown() = runTest{
         repo.deleteAll()
-        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
     }
 
 

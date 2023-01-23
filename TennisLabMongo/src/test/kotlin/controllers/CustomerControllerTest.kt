@@ -28,7 +28,6 @@ import repositories.users.CustomerRepositoryImpl
 @ExperimentalCoroutinesApi
 @ExtendWith(MockKExtension::class)
 class CustomerControllerTest {
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
 
     @MockK
     private lateinit var repository: CustomerRepositoryImpl
@@ -37,16 +36,6 @@ class CustomerControllerTest {
 
     private var customer = Customer(name ="Cliente", surname="Test", email ="email", password ="123456", available = true,
         orderList = emptyList(), tennisRacketsList = emptyList())
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
-    @After
-    fun tearDown() = runTest{
-        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
-    }
 
 
     @Test

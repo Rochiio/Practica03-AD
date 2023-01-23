@@ -32,8 +32,6 @@ import java.time.LocalDateTime
 @ExperimentalCoroutinesApi
 @ExtendWith(MockKExtension::class)
 class EmployeeControllerTest {
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
-
     @MockK
     private lateinit var repository: EmployeeRepositoryImpl
     @InjectMockKs
@@ -41,16 +39,6 @@ class EmployeeControllerTest {
 
     private var employee = Employee(name="Empleado", surname = "Test", email = "test", password ="1234", available = true,
         isAdmin = true, entryTime = LocalDateTime.now(), departureTime = LocalDateTime.now(), orderList = emptyList())
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
-    @After
-    fun tearDown() = runTest{
-        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
-    }
 
 
     @Test

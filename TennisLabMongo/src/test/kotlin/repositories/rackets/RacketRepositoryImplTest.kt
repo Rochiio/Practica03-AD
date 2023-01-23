@@ -22,13 +22,6 @@ class RacketRepositoryImplTest {
     private val repo = RacketRepositoryImpl()
     private val racket = Racket(brand = "Test", model = "Test", maneuverability = 25.0f, balance =2.5f, rigidity = 1.8f)
 
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
-
     @BeforeEach
     fun setUpEach() = runTest{
         repo.deleteAll()
@@ -37,8 +30,6 @@ class RacketRepositoryImplTest {
     @After
     fun tearDown() = runTest{
         repo.deleteAll()
-        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
     }
 
     @Test

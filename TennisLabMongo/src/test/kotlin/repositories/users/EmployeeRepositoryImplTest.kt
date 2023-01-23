@@ -24,13 +24,6 @@ class EmployeeRepositoryImplTest {
     private var employee = Employee(name="Empleado", surname = "Test", email = "test", password ="1234", available = true,
         isAdmin = true, entryTime = LocalDateTime.now(), departureTime = LocalDateTime.now(), orderList = emptyList())
 
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
-
     @BeforeEach
     fun setUpEach() = runTest{
         repo.deleteAll()
@@ -39,8 +32,6 @@ class EmployeeRepositoryImplTest {
     @After
     fun tearDown() = runTest{
         repo.deleteAll()
-        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
     }
 
     @Test
