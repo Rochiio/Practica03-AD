@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import model.Product
 import org.litote.kmongo.Id
 import repositories.orders.ProductRepository
+import java.util.*
 
 /**
  * Controlador de productos
@@ -18,7 +19,7 @@ class ProductController(private var repository: ProductRepository) {
      * Añadir un producto
      */
     suspend fun addProduct(item: Product): ProductResult<Product> {
-        val find = repository.findById(item.id)
+        val find = repository.findById(item.uuid)
         find?.let {
             return ProductErrorExists("Ya existe un producto con este id")
         }
@@ -30,7 +31,7 @@ class ProductController(private var repository: ProductRepository) {
     /**
      * Buscar un producto por su uuid.
      */
-    suspend fun getProductById(id: Id<Product>): ProductResult<Product> {
+    suspend fun getProductById(id: UUID): ProductResult<Product> {
         val find = repository.findById(id)
         find?.let {
             return ProductSuccess(200, it)
