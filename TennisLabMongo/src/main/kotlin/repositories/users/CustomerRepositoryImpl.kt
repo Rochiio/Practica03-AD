@@ -66,6 +66,7 @@ class CustomerRepositoryImpl : CustomerRepository {
     }
 
     /**
+     * TODO no se si este va a funcionar
      * Eliminar a un cliente.
      * @param item cliente a eliminar.
      * @return si el cliente ha sido eliminado.
@@ -96,6 +97,8 @@ class CustomerRepositoryImpl : CustomerRepository {
         return dbMongo.getCollection<Customer>()
             .deleteMany("{}").wasAcknowledged()
     }
+
+
 
 
 }

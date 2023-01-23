@@ -76,6 +76,7 @@ class StringerRepositoryImpl : StringerRepository {
 
 
     /**
+     * TODO no se si va a funcionar
      * Eliminar todas las encordadoras.
      * @return si han sido eliminadas con éxito.
      */
