@@ -8,12 +8,17 @@ import model.users.Customer
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
 import util.serializer.LocalDateSerializer
+import util.serializer.UUIDSerializer
 import java.time.LocalDate
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Serializable
 data class Order(
     @BsonId @Contextual
     var id: Id<Order>,
+    @Serializable(with = UUIDSerializer::class)
+    var uuid: UUID = UUID.randomUUID(),
     var state: Status,
     @Serializable(with = LocalDateSerializer::class)
     val entryDate: LocalDate?,
