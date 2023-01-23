@@ -19,8 +19,11 @@ data class Task(
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     //trabajador y maquina referenciados
+    @Contextual
     var idTrabajador : Id<Employee>?,
+    @Contextual
     var idStringer : Id<Stringer>?,
+    @Contextual
     var idCustomizer : Id<Customizer>?,
     //datos de la tarea embedidos
     var description : String,

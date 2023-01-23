@@ -1,26 +1,38 @@
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import model.users.Customer
-import org.litote.kmongo.newId
-import repositories.users.CustomerRepositoryImpl
-
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import model.TypeTask
+import model.orders.tasks.Customization
+import model.orders.tasks.Task
+import util.mappers.toDto
 
 fun main(args: Array<String>): Unit = runBlocking {
-    var user1 = Customer(
-        name = "rocio",
-        surname = "yo",
-        email = "rocio@gmail.com",
-        password = "1234",
-        available = true,
-        orderList = emptyList(),
-        tennisRacketsList = emptyList()
-    )
 
-    var repositoryImpl = CustomerRepositoryImpl()
-    launch {
-        var res = repositoryImpl.save(user1)
-        res.name = "moha"
-        repositoryImpl.update(res)
-    }
+    /*val repo = CustomerApiRepository()
+    var customers = repo.findAll(1, 100)
+    println(customers)
+
+*/
+
+    val c = Customization(
+        weight = 1,
+        balance = 2f,
+        stiffness = 3,
+        price = 4L,
+        racket_id = "id"
+    )
+    val json = Json
+    val s = json.encodeToString(c)
+    val task = Task(
+        idTrabajador = null,
+        idStringer = null,
+        idCustomizer = null,
+        description = json.encodeToString(c),
+        taskType = TypeTask.PERSONALIZADO,
+        available = true
+    )
+    println(task)
+    println("--------------")
+    println(task.toDto())
 
 }

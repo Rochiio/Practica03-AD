@@ -17,9 +17,9 @@ data class Customer(
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var name: String,
-    var surname:String,
+    var username:String,
     var email:String,
-    var password:String,
+    var password:String = "",
     var available: Boolean,
     //Lista de pedidos del cliente
     var orderList: List<String>, //TODO cambiar a lista de pedidos (ObjectID)

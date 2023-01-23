@@ -1,6 +1,5 @@
 package model.orders.tasks
 
-import javafx.beans.binding.FloatExpression
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.bson.codecs.pojo.annotations.BsonId
@@ -10,7 +9,7 @@ import util.serializer.UUIDSerializer
 import java.util.*
 
 @Serializable
-data class Customization(
+ data class Customization(
     @BsonId @Contextual
     val id: Id<Customization> = newId(),
     @Serializable(with = UUIDSerializer::class)
