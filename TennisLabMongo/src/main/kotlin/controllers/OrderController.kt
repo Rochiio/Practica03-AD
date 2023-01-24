@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import model.orders.Order
 import org.litote.kmongo.Id
 import repositories.orders.OrderRepository
+import java.util.UUID
 
 
 class OrderController(private var repository: OrderRepository) {
@@ -17,7 +18,7 @@ class OrderController(private var repository: OrderRepository) {
      * Añade un pedido
      */
     suspend fun addOrder(order: Order): OrderResult<Order> {
-        val find = repository.findById(order.id)
+        val find = repository.findById(order.uuid)
         find?.let {
             return OrderErrorExists("Ya existe un pedido con el mismo id")
         } ?: run {
@@ -57,7 +58,7 @@ class OrderController(private var repository: OrderRepository) {
     /**
      * Busca un pedido por su id
      */
-    suspend fun getOrderById(id: Id<Order>): OrderResult<Order>{
+    suspend fun getOrderById(id: UUID): OrderResult<Order>{
         val find = repository.findById(id)
         find?.let {
             return OrderSuccess(200, it)

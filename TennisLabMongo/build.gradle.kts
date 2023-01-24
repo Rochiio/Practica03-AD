@@ -43,6 +43,9 @@ dependencies {
     //MOCKK
     testImplementation("io.mockk:mockk:${mockkVersion}")
 
+
+    //SHA-512
+    implementation("com.google.guava:guava:31.1-jre")
     //Terminal
     implementation("com.github.ajalt.mordant:mordant:2.0.0-beta8")
 
