@@ -1,4 +1,4 @@
-package services.api
+package service.api
 
 import de.jensklingenberg.ktorfit.http.*
 import dto.GetAllDto

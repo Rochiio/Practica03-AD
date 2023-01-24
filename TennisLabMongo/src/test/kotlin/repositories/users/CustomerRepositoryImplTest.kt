@@ -20,15 +20,8 @@ import org.junit.jupiter.api.BeforeEach
 @ExperimentalCoroutinesApi
 class CustomerRepositoryImplTest {
     private var repo = CustomerRepositoryImpl()
-    private var customer = Customer(name ="Cliente", surname="Test", email ="email", password ="123456", available = true,
+    private var customer = Customer(name ="Cliente", username ="Test", email ="email", password ="123456", available = true,
         orderList = emptyList(), tennisRacketsList = emptyList())
-
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
 
     @BeforeEach
     fun setUpEach() = runTest{
@@ -36,10 +29,8 @@ class CustomerRepositoryImplTest {
     }
 
     @After
-    fun tearDown() = runTest{
+    fun tearDown() = runTest {
         repo.deleteAll()
-        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
     }
 
 
@@ -52,7 +43,7 @@ class CustomerRepositoryImplTest {
             { assertNotNull(find) },
             { assertEquals(find?.id, customer.id) },
             { assertEquals(find?.name, customer.name) },
-            { assertEquals(find?.surname, customer.surname) },
+            { assertEquals(find?.username, customer.username) },
             { assertEquals(find?.email, customer.email) },
             { assertEquals(find?.password, customer.password) },
             { assertEquals(find?.available, customer.available) },
@@ -70,7 +61,7 @@ class CustomerRepositoryImplTest {
             { assertNotNull(find) },
             { assertEquals(find?.id, customer.id) },
             { assertEquals(find?.name, customer.name) },
-            { assertEquals(find?.surname, customer.surname) },
+            { assertEquals(find?.username, customer.username) },
             { assertEquals(find?.email, customer.email) },
             { assertEquals(find?.password, customer.password) },
             { assertEquals(find?.available, customer.available) },
@@ -86,7 +77,7 @@ class CustomerRepositoryImplTest {
         assertAll(
             { assertEquals(save.id, customer.id) },
             { assertEquals(save.name, customer.name) },
-            { assertEquals(save.surname, customer.surname) },
+            { assertEquals(save.username, customer.username) },
             { assertEquals(save.email, customer.email) },
             { assertEquals(save.password, customer.password) },
             { assertEquals(save.available, customer.available) },
@@ -104,7 +95,7 @@ class CustomerRepositoryImplTest {
         assertAll(
             { assertEquals(update.id, save.id) },
             { assertEquals(update.name, save.name) },
-            { assertEquals(update.surname, save.surname) },
+            { assertEquals(update.username, save.username) },
             { assertEquals(update.email, save.email) },
             { assertEquals(update.password, save.password) },
             { assertEquals(update.available, save.available) },
@@ -129,7 +120,7 @@ class CustomerRepositoryImplTest {
             { assertTrue(all.isNotEmpty()) },
             { assertEquals(all[0].id, customer.id) },
             { assertEquals(all[0].name, customer.name) },
-            { assertEquals(all[0].surname, customer.surname) },
+            { assertEquals(all[0].username, customer.username) },
             { assertEquals(all[0].email, customer.email) },
             { assertEquals(all[0].password, customer.password) },
             { assertEquals(all[0].available, customer.available) },

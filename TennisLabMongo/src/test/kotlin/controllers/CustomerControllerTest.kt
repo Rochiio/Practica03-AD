@@ -34,7 +34,7 @@ class CustomerControllerTest {
     @InjectMockKs
     private lateinit var controller: CustomerController
 
-    private var customer = Customer(name ="Cliente", surname="Test", email ="email", password ="123456", available = true,
+    private var customer = Customer(name ="Cliente", username="Test", email ="email", password ="123456", available = true,
         orderList = emptyList(), tennisRacketsList = emptyList())
 
 
@@ -50,7 +50,7 @@ class CustomerControllerTest {
             { assertTrue(resultSuccess.code==201) },
             { assertEquals(resultSuccess.data.id, customer.id) },
             { assertEquals(resultSuccess.data.name, customer.name) },
-            { assertEquals(resultSuccess.data.surname, customer.surname) },
+            { assertEquals(resultSuccess.data.username, customer.username) },
             { assertEquals(resultSuccess.data.email, customer.email) },
             { assertEquals(resultSuccess.data.password, customer.password) },
             { assertEquals(resultSuccess.data.available, customer.available) },
@@ -128,7 +128,7 @@ class CustomerControllerTest {
             { assertTrue(resultSuccess.code==200) },
             { assertEquals(resultSuccess.data.id, customer.id) },
             { assertEquals(resultSuccess.data.name, customer.name) },
-            { assertEquals(resultSuccess.data.surname, customer.surname) },
+            { assertEquals(resultSuccess.data.username, customer.username) },
             { assertEquals(resultSuccess.data.email, customer.email) },
             { assertEquals(resultSuccess.data.password, customer.password) },
             { assertEquals(resultSuccess.data.available, customer.available) },
@@ -166,7 +166,7 @@ class CustomerControllerTest {
             { assertTrue(flow.isNotEmpty()) },
             { assertEquals(flow[0].id, customer.id) },
             { assertEquals(flow[0].name, customer.name) },
-            { assertEquals(flow[0].surname, customer.surname) },
+            { assertEquals(flow[0].username, customer.username) },
             { assertEquals(flow[0].email, customer.email) },
             { assertEquals(flow[0].password, customer.password) },
             { assertEquals(flow[0].available, customer.available) },
@@ -187,7 +187,7 @@ class CustomerControllerTest {
             { assertTrue(resultSuccess.code==200) },
             { assertEquals(resultSuccess.data.id, customer.id) },
             { assertEquals(resultSuccess.data.name, customer.name) },
-            { assertEquals(resultSuccess.data.surname, customer.surname) },
+            { assertEquals(resultSuccess.data.username, customer.username) },
             { assertEquals(resultSuccess.data.email, customer.email) },
             { assertEquals(resultSuccess.data.password, customer.password) },
             { assertEquals(resultSuccess.data.available, customer.available) },

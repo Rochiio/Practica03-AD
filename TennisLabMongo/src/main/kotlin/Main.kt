@@ -1,17 +1,22 @@
+import controllers.CustomerController
+import exception.CustomerError
+import exception.CustomerSuccess
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import model.TypeTask
-import model.orders.tasks.Customization
-import model.orders.tasks.Task
-import repositories.users.CustomerApiRepository
-
+import model.users.Customer
+import repositories.users.CustomerRepositoryImpl
 
 fun main(args: Array<String>): Unit = runBlocking {
 
-    val repo = CustomerApiRepository()
-    var customers = repo.findAll(1, 100)
-    println(customers)
+    var controller = CustomerController(CustomerRepositoryImpl())
+    var user = Customer(name = "Prueba", username = "pruebis", email = "prueba@gmail.com", password = "1234",
+        available = true, orderList = emptyList(), tennisRacketsList = emptyList())
 
+    controller.addCustomer(user)
+
+    var find = controller.getCustomerByUuid(user.uuid)
+    when(find){
+        is CustomerError -> println(find.message)
+        is CustomerSuccess -> println(find.data)
+    }
 
 }

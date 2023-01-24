@@ -1,4 +1,4 @@
-package services.api
+package service.api
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.create

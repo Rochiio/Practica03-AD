@@ -9,6 +9,7 @@ import org.litote.kmongo.Id
 import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.eq
 import org.litote.kmongo.setTo
+import java.util.*
 
 /**
  * Implementación del repositorio de clientes.
@@ -27,6 +28,18 @@ class CustomerRepositoryImpl : CustomerRepository {
         logger.debug { "Buscando cliente con email: $email" }
         return dbMongo.getCollection<Customer>()
             .findOne(Customer::email eq email)
+    }
+
+
+    /**
+     * Buscar un cliente por su uuid.
+     * @param uuid uuid por el que buscar.
+     * @return el cliente si ha sido encontrado.
+     */
+    override suspend fun findByUuid(uuid: UUID): Customer? {
+        logger.debug { "Buscando cliente con uuid: $uuid" }
+        return dbMongo.getCollection<Customer>()
+            .findOne(Customer::uuid eq uuid)
     }
 
 

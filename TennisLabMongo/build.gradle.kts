@@ -34,6 +34,12 @@ dependencies {
     implementation("junit:junit:4.13.1")
     implementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
+    //SHA-512
+    implementation("com.google.guava:guava:31.1-jre")
+
+    //Cache
+    implementation("io.github.reactivecircus.cache4k:cache4k:0.9.0")
+
     //MOCKK
     testImplementation("io.mockk:mockk:${mockkVersion}")
 
@@ -57,7 +63,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 }
 
 tasks.test {
