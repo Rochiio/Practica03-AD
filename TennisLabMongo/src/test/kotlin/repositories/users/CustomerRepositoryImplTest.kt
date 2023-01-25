@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.setMain
 import model.users.Customer
 import org.junit.After
 import org.junit.Before
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -23,12 +24,12 @@ class CustomerRepositoryImplTest {
     private var customer = Customer(name ="Cliente", username ="Test", email ="email", password ="123456", available = true,
         orderList = emptyList(), tennisRacketsList = emptyList())
 
-    @BeforeEach
+    @Before
     fun setUpEach() = runTest{
         repo.deleteAll()
     }
 
-    @After
+    @AfterEach
     fun tearDown() = runTest {
         repo.deleteAll()
     }

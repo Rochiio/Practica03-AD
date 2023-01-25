@@ -9,6 +9,9 @@ import repositories.machines.CustomizerRepository
 import repositories.machines.StringerRepository
 import java.util.*
 
+/**
+ * Controlador de Maquinas
+ */
 class MachineController(
     private var stringerRepo: StringerRepository,
     private var customizerRepo: CustomizerRepository
@@ -16,7 +19,9 @@ class MachineController(
 
 
     /**
-     * Añadir una encordadora
+     * Añadir una encordadora.
+     * @param item encordadora a añadir.
+     * @return Result dependiendo de como se haya realizado la accion.
      */
     suspend fun addStringer(item: Stringer): StringerResult<Stringer>{
         val find = stringerRepo.findById(item.id)
@@ -29,9 +34,11 @@ class MachineController(
 
 
     /**
-     * Buscar una encordadora por su uuid.
+     * Buscar una encordadora por su id.
+     * @param id id de la encordadora a buscar.
+     * @return Result dependiendo del resultado de la accion.
      */
-    suspend fun getStringerById(id: Id<Stringer>): StringerResult<Stringer> {
+    suspend fun getStringerById(id: String): StringerResult<Stringer> {
         var existe = stringerRepo.findById(id)
         existe?.let {
             return StringerSuccess(200, it)
@@ -43,6 +50,8 @@ class MachineController(
 
     /**
      * Actualizar una encordadora
+     * @param item encordadora a actualizar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateStringer(item: Stringer):StringerResult<Stringer>{
         val update = stringerRepo.update(item)
@@ -52,6 +61,7 @@ class MachineController(
 
     /**
      * Conseguir todas las encordadoras.
+     * @return Flujo de encordadoras.
      */
     suspend fun getAllStringers(): StringerResult<Flow<Stringer>> {
         val flow = stringerRepo.findAll()
@@ -61,6 +71,8 @@ class MachineController(
 
     /**
      * Eliminar una encordadora.
+     * @param stringer encordadora a eliminar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteStringer(stringer: Stringer):StringerResult<Boolean> {
         val delete = stringerRepo.delete(stringer)
@@ -70,6 +82,8 @@ class MachineController(
 
     /**
      * Añadir una personalizadora
+     * @param item personalizadora a añadir.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun addCustomizer(item: Customizer):CustomizerResult<Customizer>{
         var existe = customizerRepo.findById(item.id)
@@ -83,9 +97,11 @@ class MachineController(
 
 
     /**
-     * Conseguir personalizadora por su uuid.
+     * Conseguir personalizadora por su id.
+     * @param id id de la personalizadora a buscar.
+     * @return Result dependiendo del resultado de la accion.
      */
-    suspend fun getCustomizerById(id: Id<Customizer>): CustomizerResult<Customizer> {
+    suspend fun getCustomizerById(id: String): CustomizerResult<Customizer> {
         val existe = customizerRepo.findById(id)
         existe?.let {
             return CustomizerSuccess(200, it)
@@ -96,7 +112,9 @@ class MachineController(
 
 
     /**
-     * Actualizar una personalizadora
+     * Actualizar una personalizadora.
+     * @param item personalizadora a actualizar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateCustomizer(item: Customizer):CustomizerResult<Customizer>{
         val update = customizerRepo.update(item)
@@ -106,6 +124,7 @@ class MachineController(
 
     /**
      * Conseguir todas las personalizadoras.
+     * @return Flujo de personalizadoras.
      */
     suspend fun getAllCustomizers(): CustomizerResult<Flow<Customizer>> {
         val flow = customizerRepo.findAll()
@@ -115,6 +134,8 @@ class MachineController(
 
     /**
      * Eliminar una personalizadora.
+     * @param customizer personalizadora a eliminar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteCustomizer(customizer: Customizer):CustomizerResult<Boolean> {
         val delete = customizerRepo.delete(customizer)

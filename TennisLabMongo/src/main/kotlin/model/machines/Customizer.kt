@@ -12,8 +12,8 @@ import java.util.*
 
 @Serializable
 data class Customizer(
-    @BsonId @Contextual
-    var id: Id<Customizer> = newId<Customizer>(),
+    @BsonId
+    var id: String = newId<Customizer>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var brand: String,

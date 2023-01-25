@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="controllers.CustomerControllerTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2023-01-25T16:07:18" hostname="RO-PC" time="2.007">
+  <properties/>
+  <testcase name="getCustomerById()" classname="controllers.CustomerControllerTest" time="0.959"/>
+  <testcase name="getCustomerByIdError()" classname="controllers.CustomerControllerTest" time="0.025"/>
+  <testcase name="deleteCustomer()" classname="controllers.CustomerControllerTest" time="0.026"/>
+  <testcase name="addCustomer()" classname="controllers.CustomerControllerTest" time="0.419"/>
+  <testcase name="getAllCustomers()" classname="controllers.CustomerControllerTest" time="0.494"/>
+  <testcase name="getCustomerByEmailAndPasswordError()" classname="controllers.CustomerControllerTest" time="0.016"/>
+  <testcase name="addCustomerErrorYaExiste()" classname="controllers.CustomerControllerTest" time="0.02"/>
+  <testcase name="updateCustomer()" classname="controllers.CustomerControllerTest" time="0.022"/>
+  <system-out><![CDATA[17:07:19.314 [Test worker @coroutine#14] DEBUG controllers.CustomerController - Buscamos en la caché si existe el usuario
+17:07:19.508 [Test worker @coroutine#14] DEBUG controllers.CustomerController - Buscamos en el mongo si existe el usuario
+17:07:19.512 [Test worker @coroutine#14] DEBUG controllers.CustomerController - El usuario no existe,creando y añadiendo a DB y Cache concurrentemente
+17:07:20.133 [Test worker @coroutine#36] DEBUG controllers.CustomerController - Buscamos en la caché si existe el usuario
+17:07:20.134 [Test worker @coroutine#36] DEBUG controllers.CustomerController - Buscamos en el mongo si existe el usuario
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

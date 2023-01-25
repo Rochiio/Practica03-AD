@@ -14,8 +14,8 @@ import java.util.*
 
 @Serializable
 data class Task(
-    @BsonId @Contextual
-    var id : Id<Task> = newId(),
+    @BsonId
+    var id : String = newId<Task>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     //trabajador y maquina referenciados

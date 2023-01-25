@@ -11,13 +11,18 @@ import repositories.orders.TaskRepository
 
 import java.util.*
 
+/**
+ * Controlador de tareas.
+ */
 class TaskController(private var repository: TaskRepository) {
 
     /**
-     * Añade un pedido
+     * Añade una tarea.
+     * @param tarea tarea a añadir.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun addTask(tarea: Task): TaskResult<Task> {
-        val find = repository.findById(tarea.uuid)
+        val find = repository.findById(tarea.id)
         find?.let {
             return TaskErrorExists("Ya existe una tarea con este id")
         }
@@ -26,7 +31,8 @@ class TaskController(private var repository: TaskRepository) {
     }
 
     /**
-     * Recupera todos los pedidos guardados. Una lista vacía si no hay pedidos
+     * Recupera todas las tareas.
+     * @return Flujo de tareas
      */
     suspend fun getAllTasks(): TaskResult<Flow<Task>>{
         val flow = repository.findAll()
@@ -34,7 +40,9 @@ class TaskController(private var repository: TaskRepository) {
     }
 
     /**
-     * Actualiza un pedido ya existente o lo guarda si no existe
+     * Actualiza una tarea.
+     * @param tarea tarea a actualizar
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateTask(tarea: Task): TaskResult<Task>{
         val update = repository.update(tarea)
@@ -42,7 +50,9 @@ class TaskController(private var repository: TaskRepository) {
     }
 
     /**
-     * Elimina un pedido
+     * Elimina un pedido.
+     * @param task pedido a eliminar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteTask(task: Task): TaskResult<Boolean> {
         val delete = repository.delete(task)
@@ -50,9 +60,11 @@ class TaskController(private var repository: TaskRepository) {
     }
 
     /**
-     * Busca un pedido por su UUID
+     * Busca un pedido por su id.
+     * @param id id de la tarea a buscar.
+     * @return Result dependiendo del resultado de la accion.
      */
-    suspend fun getTaskById(id: UUID): TaskResult<Task>{
+    suspend fun getTaskById(id: String): TaskResult<Task>{
         val find = repository.findById(id)
         find?.let {
             return TaskSuccess(200, it)
@@ -63,9 +75,11 @@ class TaskController(private var repository: TaskRepository) {
 
     /**
      * Añadir una tarea que ha sido añadida a un pedido
+     * @param tarea tarea que ha sido añadida a un pedido.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun addTaskToOrder(tarea : Task) : TaskResult<Task>{
-        when(getTaskById(tarea.uuid)){
+        when(getTaskById(tarea.id)){
             is TaskError -> addTask(tarea)
             is TaskSuccess ->  updateTask(tarea)
         }

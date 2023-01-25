@@ -19,7 +19,7 @@ class RacketRepositoryImpl: RacketRepository {
      * @param id id de la raqueta a buscar.
      * @return la raqueta si ha sido encontrada.
      */
-    override suspend fun findById(id: Id<Racket>): Racket? {
+    override suspend fun findById(id: String): Racket? {
         logger.debug { "Buscando raqueta con id: $id"}
         return dbMongo.getCollection<Racket>()
             .findOneById(id)

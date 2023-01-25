@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.setMain
 import model.machines.Customizer
 import org.junit.After
 import org.junit.Before
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -25,12 +26,12 @@ class CustomizerRepositoryImplTest {
         maneuverability = true, balance = false, rigidity = true)
 
 
-    @BeforeEach
+    @Before
     fun setUpEach() = runTest{
         repo.deleteAll()
     }
 
-    @After
+    @AfterEach
     fun tearDown() = runTest{
         repo.deleteAll()
     }

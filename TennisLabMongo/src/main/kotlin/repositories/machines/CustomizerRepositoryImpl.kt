@@ -17,7 +17,7 @@ class CustomizerRepositoryImpl: CustomizerRepository {
      * @param id id de la personalizadora a buscar.
      * @return personalizadora si ha sido encontrada.
      */
-    override suspend fun findById(id: Id<Customizer>): Customizer? {
+    override suspend fun findById(id: String): Customizer? {
         logger.debug { "Buscando personalizadora por id: $id" }
         return dbMongo.getCollection<Customizer>()
             .findOneById(id)

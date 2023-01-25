@@ -14,7 +14,7 @@ import java.util.*
 @Serializable
 data class Stringer(
     @BsonId @Contextual
-    var id: Id<Stringer> = newId<Stringer>(),
+    var id: String = newId<Stringer>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var brand: String,

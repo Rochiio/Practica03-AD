@@ -12,7 +12,7 @@ import java.util.*
 class ProductRepositoryImpl : ProductRepository {
     private var logger = KotlinLogging.logger {}
     private var dbMongo = MongoDbManager.database
-    override suspend fun findById(id: Id<Product>): Product? {
+    override suspend fun findById(id: String): Product? {
         logger.debug { "Buscando producto con id: $id" }
         return dbMongo.getCollection<Product>().findOneById(id)
     }

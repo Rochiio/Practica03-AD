@@ -9,7 +9,9 @@ import model.users.Employee
 import org.litote.kmongo.Id
 import repositories.users.EmployeeRepository
 
-
+/**
+ * Controlador de empleados.
+ */
 class EmployeeController(private var repository: EmployeeRepository) {
 
 
@@ -34,8 +36,10 @@ class EmployeeController(private var repository: EmployeeRepository) {
 
     /**
      * Buscar un empleado por el id.
+     * @param id id del empleado a buscar.
+     * @return Result dependiendo de si ha sido correcto el resultado.
      */
-    suspend fun getEmployeeById(id: Id<Employee>): EmployeeResult<Employee>{
+    suspend fun getEmployeeById(id: String): EmployeeResult<Employee>{
         val find = repository.findById(id)
         find?.let {
             return EmployeeSuccess(200, it)
@@ -45,7 +49,9 @@ class EmployeeController(private var repository: EmployeeRepository) {
 
 
     /**
-     * Añadir un trabajador
+     * Añadir un trabajador.
+     * @param employee trabajador a añadir.
+     * @return Result dependiendo de la accion.
      */
     suspend fun addEmployee(employee: Employee): EmployeeResult<Employee>{
         val existe = repository.findByEmail(employee.email)
@@ -60,6 +66,7 @@ class EmployeeController(private var repository: EmployeeRepository) {
 
     /**
      * Conseguir todos los trabajadores que existen.
+     * @return Flujo de empleados.
      */
     suspend fun getAllEmployees():EmployeeResult<Flow<Employee>>{
         val flow = repository.findAll()
@@ -69,6 +76,8 @@ class EmployeeController(private var repository: EmployeeRepository) {
 
     /**
      * Actualizar un employee
+     * @param employee empleado a actualizar.
+     * @return Result de la accion realizada.
      */
     suspend fun updateEmployee(employee:Employee):EmployeeResult<Employee>{
         var update = repository.update(employee)
@@ -77,7 +86,9 @@ class EmployeeController(private var repository: EmployeeRepository) {
 
 
     /**
-     * Eliminar un trabajador
+     * Eliminar un trabajador.
+     * @param employee empleado a eliminar.
+     * @return Result dependiendo de si se ha eliminado correctamente el empleado.
      */
     suspend fun deleteEmployee(employee:Employee):EmployeeResult<Boolean>{
         var correcto =repository.delete(employee)

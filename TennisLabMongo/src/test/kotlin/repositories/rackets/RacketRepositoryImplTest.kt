@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.setMain
 import model.Racket
 import org.junit.After
 import org.junit.Before
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -22,12 +23,12 @@ class RacketRepositoryImplTest {
     private val repo = RacketRepositoryImpl()
     private val racket = Racket(brand = "Test", model = "Test", maneuverability = 25.0f, balance =2.5f, rigidity = 1.8f)
 
-    @BeforeEach
+    @Before
     fun setUpEach() = runTest{
         repo.deleteAll()
     }
 
-    @After
+    @AfterEach
     fun tearDown() = runTest{
         repo.deleteAll()
     }

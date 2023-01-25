@@ -16,10 +16,12 @@ import java.util.*
 class ProductController(private var repository: ProductRepository) {
 
     /**
-     * Añadir un producto
+     * Añadir un producto.
+     * @param item producto a añadir.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun addProduct(item: Product): ProductResult<Product> {
-        val find = repository.findById(item.uuid)
+        val find = repository.findById(item.id)
         find?.let {
             return ProductErrorExists("Ya existe un producto con este id")
         }
@@ -29,9 +31,11 @@ class ProductController(private var repository: ProductRepository) {
 
 
     /**
-     * Buscar un producto por su uuid.
+     * Buscar un producto por su id.
+     * @param id del producto a buscar.
+     * @return Result dependiendo del resultado de la accion.
      */
-    suspend fun getProductById(id: UUID): ProductResult<Product> {
+    suspend fun getProductById(id: String): ProductResult<Product> {
         val find = repository.findById(id)
         find?.let {
             return ProductSuccess(200, it)
@@ -42,6 +46,8 @@ class ProductController(private var repository: ProductRepository) {
 
     /**
      * Actualizar un producto
+     * @param item producto a actualizar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateProduct(item: Product):  ProductResult<Product> {
         val update = repository.update(item)
@@ -51,6 +57,7 @@ class ProductController(private var repository: ProductRepository) {
 
     /**
      * Conseguir todos los productos.
+     * @return Flujo de productos
      */
     suspend fun getAllProducts():  ProductResult<Flow<Product>> {
         val flow = repository.findAll()
@@ -60,6 +67,8 @@ class ProductController(private var repository: ProductRepository) {
 
     /**
      * Eliminar un producto.
+     * @param item producto a eliminar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteProduct(item: Product): ProductResult<Boolean> {
         val delete = repository.delete(item)
