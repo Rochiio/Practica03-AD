@@ -10,12 +10,16 @@ import org.litote.kmongo.Id
 import repositories.orders.OrderRepository
 import java.util.UUID
 
-
+/**
+ * Controlador de pedidos.
+ */
 class OrderController(private var repository: OrderRepository) {
 
 
     /**
-     * Añade un pedido
+     * Añadir un pedido.
+     * @param order a añadir.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun addOrder(order: Order): OrderResult<Order> {
         val find = repository.findById(order.id)
@@ -29,7 +33,8 @@ class OrderController(private var repository: OrderRepository) {
 
 
     /**
-     * Recupera todos los pedidos guardados. Una lista vacía si no hay pedidos
+     * Recupera todos los pedidos guardados.
+     * @return Flujo de pedidos
      */
     suspend fun getOrders(): OrderResult<Flow<Order>>{
         val flow = repository.findAll()
@@ -38,7 +43,9 @@ class OrderController(private var repository: OrderRepository) {
 
 
     /**
-     * Actualiza un pedido ya existente o lo guarda si no existe
+     * Actualiza un pedido.
+     * @param pedido pedido a actualizar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateOrder(pedido: Order):OrderResult<Order>{
         val update = repository.update(pedido)
@@ -47,7 +54,9 @@ class OrderController(private var repository: OrderRepository) {
 
 
     /**
-     * Elimina un pedido
+     * Elimina un pedido.
+     * @param pedido pedido a eliminar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteOrder(pedido: Order): OrderResult<Boolean> {
         val delete = repository.delete(pedido)
@@ -57,6 +66,8 @@ class OrderController(private var repository: OrderRepository) {
 
     /**
      * Busca un pedido por su id
+     * @param id id del pedido a buscar.
+     * @return Result dependiendo del resultado de la accion.
      */
     suspend fun getOrderById(id: String): OrderResult<Order>{
         val find = repository.findById(id)

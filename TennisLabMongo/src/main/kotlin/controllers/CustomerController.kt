@@ -6,19 +6,17 @@ import exception.CustomerResult
 import exception.CustomerSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import model.users.Customer
 import mu.KotlinLogging
-import org.litote.kmongo.Id
 import repositories.users.CustomerCacheRepository
 import repositories.users.CustomerRepository
 import service.PasswordParser
-import service.cache.UsersCache
-import java.util.*
 
+/**
+ * Controlador de los Clientes.
+ */
 class CustomerController(
     private var repository: CustomerRepository,
     private var cache: CustomerCacheRepository
@@ -124,6 +122,7 @@ class CustomerController(
 
     /**
      * Conseguir todos los clientes que existen.
+     * @return Result de flujo con los clientes.
      */
     suspend fun getAllCustomers():CustomerResult<Flow<Customer>>{
         val flow = repository.findAll()
@@ -150,6 +149,8 @@ class CustomerController(
 
     /**
      * Eliminar un cliente
+     * @param cliente cliente a eliminar.
+     * @return Result dependiendo de si ha sido realizado correctamente la accion.
      */
     suspend fun deleteCustomer(cliente: Customer): CustomerResult<Boolean> {
         withContext(Dispatchers.IO) {
