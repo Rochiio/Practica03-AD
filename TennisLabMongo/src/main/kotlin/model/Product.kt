@@ -10,8 +10,8 @@ import java.util.*
 
 @Serializable
 data class Product(
-    @BsonId @Contextual
-    var id : Id<Product> = newId(),
+    @BsonId
+    var id : String = newId<Product>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     val type : TypeProduct,

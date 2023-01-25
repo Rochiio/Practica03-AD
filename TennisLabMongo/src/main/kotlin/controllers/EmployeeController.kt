@@ -35,7 +35,7 @@ class EmployeeController(private var repository: EmployeeRepository) {
     /**
      * Buscar un empleado por el id.
      */
-    suspend fun getEmployeeById(id: Id<Employee>): EmployeeResult<Employee>{
+    suspend fun getEmployeeById(id: String): EmployeeResult<Employee>{
         val find = repository.findById(id)
         find?.let {
             return EmployeeSuccess(200, it)

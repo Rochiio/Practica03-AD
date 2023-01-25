@@ -18,7 +18,7 @@ class OrderController(private var repository: OrderRepository) {
      * Añade un pedido
      */
     suspend fun addOrder(order: Order): OrderResult<Order> {
-        val find = repository.findById(order.uuid)
+        val find = repository.findById(order.id)
         find?.let {
             return OrderErrorExists("Ya existe un pedido con el mismo id")
         } ?: run {
@@ -58,7 +58,7 @@ class OrderController(private var repository: OrderRepository) {
     /**
      * Busca un pedido por su id
      */
-    suspend fun getOrderById(id: UUID): OrderResult<Order>{
+    suspend fun getOrderById(id: String): OrderResult<Order>{
         val find = repository.findById(id)
         find?.let {
             return OrderSuccess(200, it)

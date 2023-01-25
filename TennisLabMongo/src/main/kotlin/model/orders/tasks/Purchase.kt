@@ -11,8 +11,8 @@ import java.util.*
 
 @Serializable
 data class Purchase(
-    @BsonId @Contextual
-    val id: Id<Purchase> = newId(),
+    @BsonId
+    val id: String = newId<Purchase>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var price : Float,

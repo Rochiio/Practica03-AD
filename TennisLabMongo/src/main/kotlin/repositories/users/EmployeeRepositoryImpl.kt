@@ -35,7 +35,7 @@ class EmployeeRepositoryImpl: EmployeeRepository {
      * @param id id del empleado a buscar.
      * @return el empleado si ha sido encontrado.
      */
-    override suspend fun findById(id: Id<Employee>): Employee? {
+    override suspend fun findById(id: String): Employee? {
         logger.debug { "Buscando empleado por id: $id" }
         return dbMongo.getCollection<Employee>()
             .findOneById(id)

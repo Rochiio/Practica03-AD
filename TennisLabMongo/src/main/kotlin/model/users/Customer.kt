@@ -13,7 +13,7 @@ import java.util.*
 @Serializable
 data class Customer(
     @BsonId @Contextual
-    var id: Id<Customer> = newId<Customer>(),
+    var id: String = newId<Customer>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var name: String,

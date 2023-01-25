@@ -22,7 +22,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @param id id de la encordadora a buscar.
      * @return encordadora si ha sido encontrada.
      */
-    override suspend fun findById(id: Id<Stringer>): Stringer? {
+    override suspend fun findById(id: String): Stringer? {
         logger.debug { "Buscando encordadora por id: $id" }
         return dbMongo.getCollection<Stringer>()
             .findOneById(id)

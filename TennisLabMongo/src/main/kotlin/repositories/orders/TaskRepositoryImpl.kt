@@ -14,7 +14,7 @@ import java.util.*
 class TaskRepositoryImpl : TaskRepository {
     private var logger = KotlinLogging.logger{}
     private  var dbMongo = MongoDbManager.database
-    override suspend fun findById(id: Id<Task>): Task? {
+    override suspend fun findById(id: String): Task? {
         logger.debug { "Buscando tarea con id: $id" }
         return dbMongo.getCollection<Task>().findOneById(id)
     }

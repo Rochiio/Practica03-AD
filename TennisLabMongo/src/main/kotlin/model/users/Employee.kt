@@ -12,8 +12,8 @@ import java.util.*
 
 @Serializable
 data class Employee(
-    @BsonId @Contextual
-    var id: Id<Employee> = newId<Employee>(),
+    @BsonId
+    var id: String = newId<Employee>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var name: String,

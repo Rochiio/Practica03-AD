@@ -19,7 +19,7 @@ class ProductController(private var repository: ProductRepository) {
      * Añadir un producto
      */
     suspend fun addProduct(item: Product): ProductResult<Product> {
-        val find = repository.findById(item.uuid)
+        val find = repository.findById(item.id)
         find?.let {
             return ProductErrorExists("Ya existe un producto con este id")
         }
@@ -31,7 +31,7 @@ class ProductController(private var repository: ProductRepository) {
     /**
      * Buscar un producto por su uuid.
      */
-    suspend fun getProductById(id: UUID): ProductResult<Product> {
+    suspend fun getProductById(id: String): ProductResult<Product> {
         val find = repository.findById(id)
         find?.let {
             return ProductSuccess(200, it)

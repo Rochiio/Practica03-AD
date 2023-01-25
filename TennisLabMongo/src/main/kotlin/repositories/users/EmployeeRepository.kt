@@ -5,6 +5,6 @@ import org.litote.kmongo.Id
 import repositories.ICRUD
 
 
-interface EmployeeRepository: ICRUD<Employee, Id<Employee>> {
+interface EmployeeRepository: ICRUD<Employee, String> {
     suspend fun findByEmail(email: String): Employee?
 }

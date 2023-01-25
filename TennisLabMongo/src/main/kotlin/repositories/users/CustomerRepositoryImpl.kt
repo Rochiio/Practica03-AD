@@ -48,7 +48,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @param id id del cliente a buscar.
      * @return el cliente si ha sido encontrado.
      */
-    override suspend fun findById(id: Id<Customer>): Customer? {
+    override suspend fun findById(id: String): Customer? {
         logger.debug { "Buscando cliente con id: $id"}
         return dbMongo.getCollection<Customer>()
             .findOneById(id)

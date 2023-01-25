@@ -31,7 +31,7 @@ class MachineController(
     /**
      * Buscar una encordadora por su uuid.
      */
-    suspend fun getStringerById(id: Id<Stringer>): StringerResult<Stringer> {
+    suspend fun getStringerById(id: String): StringerResult<Stringer> {
         var existe = stringerRepo.findById(id)
         existe?.let {
             return StringerSuccess(200, it)
@@ -85,7 +85,7 @@ class MachineController(
     /**
      * Conseguir personalizadora por su uuid.
      */
-    suspend fun getCustomizerById(id: Id<Customizer>): CustomizerResult<Customizer> {
+    suspend fun getCustomizerById(id: String): CustomizerResult<Customizer> {
         val existe = customizerRepo.findById(id)
         existe?.let {
             return CustomizerSuccess(200, it)

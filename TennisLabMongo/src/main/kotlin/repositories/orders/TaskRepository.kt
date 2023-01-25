@@ -6,5 +6,5 @@ import org.litote.kmongo.Id
 import repositories.ICRUD
 import java.util.*
 
-interface TaskRepository : ICRUD<Task, Id<Task>>{
+interface TaskRepository : ICRUD<Task, String>{
 }

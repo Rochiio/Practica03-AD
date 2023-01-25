@@ -11,8 +11,8 @@ import java.util.*
 @Serializable
 //TODO cambiar no se como se mide los 3 ultimos xD
 data class Racket(
-    @BsonId @Contextual
-    var id: Id<Racket> = newId<Racket>(),
+    @BsonId
+    var id: String = newId<Racket>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var brand: String,

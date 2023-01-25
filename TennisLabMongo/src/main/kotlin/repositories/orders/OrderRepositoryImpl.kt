@@ -13,7 +13,7 @@ import java.util.*
 class OrderRepositoryImpl : OrderRepository {
     private var logger = KotlinLogging.logger{}
     private  var dbMongo = MongoDbManager.database
-    override suspend fun findById(id: Id<Order>): Order? {
+    override suspend fun findById(id: String): Order? {
         logger.debug { "Buscando tarea con id: $id" }
         return dbMongo.getCollection<Order>().findOneById(id)
     }

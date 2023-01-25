@@ -10,8 +10,8 @@ import java.util.*
 
 @Serializable
  data class Customization(
-    @BsonId @Contextual
-    val id: Id<Customization> = newId(),
+    @BsonId
+    val id: String = newId<Customization>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var weight : Int,

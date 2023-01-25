@@ -7,6 +7,7 @@ import model.orders.tasks.Task
 import model.users.Customer
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
+import org.litote.kmongo.newId
 import util.serializer.LocalDateSerializer
 import util.serializer.UUIDSerializer
 import java.time.LocalDate
@@ -15,8 +16,8 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class Order(
-    @BsonId @Contextual
-    var id: Id<Order>,
+    @BsonId
+    var id: String = newId<Order>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     var state: Status,

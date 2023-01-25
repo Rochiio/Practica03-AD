@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.setMain
 import model.users.Employee
 import org.junit.After
 import org.junit.Before
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -24,12 +25,12 @@ class EmployeeRepositoryImplTest {
     private var employee = Employee(name="Empleado", surname = "Test", email = "test", password ="1234", available = true,
         isAdmin = true, entryTime = LocalDateTime.now(), departureTime = LocalDateTime.now(), orderList = emptyList())
 
-    @BeforeEach
+    @Before
     fun setUpEach() = runTest{
         repo.deleteAll()
     }
 
-    @After
+    @AfterEach
     fun tearDown() = runTest{
         repo.deleteAll()
     }
