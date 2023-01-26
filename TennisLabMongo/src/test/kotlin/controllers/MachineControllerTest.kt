@@ -1,26 +1,21 @@
 package controllers
 
 import exception.*
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import model.TypeMachine
 import model.machines.Customizer
 import model.machines.Stringer
-import org.junit.After
-import org.junit.Before
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -45,6 +40,11 @@ class MachineControllerTest {
         maneuverability = true, balance = false, rigidity = true)
     private val stringer = Stringer(brand = "test", model = "test", acquisitionDate = LocalDate.now(), available = true,
         automatic = TypeMachine.MANUAL, maximumTension = 50, minimumTension = 10)
+
+
+    init {
+        MockKAnnotations.init(this)
+    }
 
 
     @Test

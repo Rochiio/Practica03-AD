@@ -1,12 +1,10 @@
 package model.orders
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import model.Status
 import model.orders.tasks.Task
 import model.users.Customer
 import org.bson.codecs.pojo.annotations.BsonId
-import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import util.serializer.LocalDateSerializer
 import util.serializer.UUIDSerializer

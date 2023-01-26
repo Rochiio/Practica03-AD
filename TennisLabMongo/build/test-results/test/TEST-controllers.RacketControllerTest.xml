@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="controllers.RacketControllerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2023-01-26T16:48:52" hostname="RO-PC" time="1.277">
+  <properties/>
+  <testcase name="saveRacketError()" classname="controllers.RacketControllerTest" time="0.673"/>
+  <testcase name="findByIdError()" classname="controllers.RacketControllerTest" time="0.024"/>
+  <testcase name="updateRacket()" classname="controllers.RacketControllerTest" time="0.034"/>
+  <testcase name="deleteRacket()" classname="controllers.RacketControllerTest" time="0.028"/>
+  <testcase name="findById()" classname="controllers.RacketControllerTest" time="0.031"/>
+  <testcase name="saveRacket()" classname="controllers.RacketControllerTest" time="0.033"/>
+  <testcase name="getAllRackets()" classname="controllers.RacketControllerTest" time="0.433"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
