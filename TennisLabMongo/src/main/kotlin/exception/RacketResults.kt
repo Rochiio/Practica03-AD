@@ -11,4 +11,6 @@ abstract class RacketError<Nothing>(val code: Int, open val message: String?) : 
 class RacketErrorNotFound<Nothing>(message: String?) : RacketError<Nothing>(404, message)
 class RacketErrorBadRequest<Nothing>(message: String?) : RacketError<Nothing>(400, message)
 class RacketInternalException<Nothing>(message: String?) : RacketError<Nothing>(500, message)
+class RacketErrorExists<Nothing>(message: String?) : RacketError<Nothing>(403, message)
+
 

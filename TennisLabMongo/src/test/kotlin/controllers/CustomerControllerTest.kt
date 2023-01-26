@@ -3,6 +3,7 @@ package controllers
 import exception.CustomerErrorExists
 import exception.CustomerErrorNotFound
 import exception.CustomerSuccess
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
@@ -12,12 +13,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import model.users.Customer
-import org.junit.After
-import org.junit.Before
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -36,6 +33,10 @@ class CustomerControllerTest {
 
     private var customer = Customer(name ="Cliente", username="Test", email ="email", password ="123456", available = true,
         orderList = emptyList(), tennisRacketsList = emptyList())
+
+    init {
+     MockKAnnotations.init(this)
+    }
 
 
     @Test
