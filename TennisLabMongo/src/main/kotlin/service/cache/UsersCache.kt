@@ -13,7 +13,7 @@ import kotlin.time.Duration.Companion.minutes
  * Cache de usuarios
  */
 private val logger = KotlinLogging.logger {  }
-private const val STOP = 6 * 10000L
+private const val STOP = 6 * 100L
 
 object UsersCache {
     val cache = Cache.Builder()
@@ -23,11 +23,15 @@ object UsersCache {
     suspend fun refresh(){
         withContext(Dispatchers.IO) {
             launch {
+var c = 4
                 do {
+                    println("ACTUALIZANDO CACHE")
                     logger.debug { "Limpiando caché 🗑" }
-                    UsersCache.cache.invalidateAll()
+                    cache.invalidateAll()
                     delay(STOP)
-                } while (true)
+                    c--
+                    println(c)
+                } while (c > 0)
             }
         }
     }

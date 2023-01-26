@@ -12,12 +12,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import model.users.Customer
-import org.junit.After
-import org.junit.Before
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*

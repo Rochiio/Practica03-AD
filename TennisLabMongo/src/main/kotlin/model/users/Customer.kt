@@ -16,6 +16,7 @@ data class Customer(
     var id: String = newId<Customer>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
+    var _id : Int = 0,
     var name: String,
     var username:String,
     var email:String,

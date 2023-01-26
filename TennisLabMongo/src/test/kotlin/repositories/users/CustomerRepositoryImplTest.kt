@@ -1,28 +1,22 @@
 package repositories.users
 
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import model.users.Customer
-import org.junit.After
 import org.junit.Before
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 
 @DelicateCoroutinesApi
 @ExperimentalCoroutinesApi
 class CustomerRepositoryImplTest {
     private var repo = CustomerRepositoryImpl()
     private var customer = Customer(name ="Cliente", username ="Test", email ="email", password ="123456", available = true,
-        orderList = emptyList(), tennisRacketsList = emptyList())
+        orderList = emptyList(), _id = 0, tennisRacketsList = emptyList())
 
     @Before
     fun setUpEach() = runTest{

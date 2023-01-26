@@ -30,7 +30,7 @@ object MongoDbManager {
     private const val OPTIONS = "?authSource=admin&retryWrites=true&w=majority"
 
     private const val MONGO_URI =
-        "$MONGO_TYPE$USERNAME:$PASSWORD@$HOST/$DATABASE"
+        "$MONGO_TYPE$USERNAME:$PASSWORD@$HOST/$DATABASE$OPTIONS"
 
     // Para local
     /*private const val MONGO_TYPE = "mongodb://" // "mongodb+srv://"

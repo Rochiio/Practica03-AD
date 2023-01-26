@@ -5,10 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import model.users.Customer
 import mu.KotlinLogging
-import org.litote.kmongo.Id
 import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.eq
-import org.litote.kmongo.setTo
 import java.util.*
 
 /**

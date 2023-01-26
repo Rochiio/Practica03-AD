@@ -16,6 +16,7 @@ import java.util.*
 data class Task(
     @BsonId
     var id : String = newId<Task>().toString(),
+    var _id : Int,
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
     //trabajador y maquina referenciados
