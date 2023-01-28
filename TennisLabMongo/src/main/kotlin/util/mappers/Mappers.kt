@@ -14,7 +14,7 @@ fun CustomerDTO.fromDto(): Customer {
         orderList = emptyList(),
         tennisRacketsList = emptyList(),
         available = true,
-        _id = id
+        nId = id
     )
 }
 

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Assertions.*
 class CustomerRepositoryImplTest {
     private var repo = CustomerRepositoryImpl()
     private var customer = Customer(name ="Cliente", username ="Test", email ="email", password ="123456", available = true,
-        orderList = emptyList(), _id = 0, tennisRacketsList = emptyList())
+        orderList = emptyList(), nId = 0, tennisRacketsList = emptyList())
 
     @Before
     fun setUpEach() = runTest{
