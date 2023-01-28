@@ -1,6 +1,7 @@
 package controllers
 
 import exception.*
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
@@ -39,6 +40,11 @@ class MachineControllerTest {
         maneuverability = true, balance = false, rigidity = true)
     private val stringer = Stringer(brand = "test", model = "test", acquisitionDate = LocalDate.now(), available = true,
         automatic = TypeMachine.MANUAL, maximumTension = 50, minimumTension = 10)
+
+
+    init {
+        MockKAnnotations.init(this)
+    }
 
 
     @Test

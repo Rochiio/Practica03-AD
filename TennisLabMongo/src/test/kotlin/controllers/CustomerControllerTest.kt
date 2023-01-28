@@ -3,6 +3,7 @@ package controllers
 import exception.CustomerErrorExists
 import exception.CustomerErrorNotFound
 import exception.CustomerSuccess
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
@@ -32,6 +33,10 @@ class CustomerControllerTest {
 
     private var customer = Customer(name ="Cliente", username="Test", email ="email", password ="123456", available = true,
         orderList = emptyList(), tennisRacketsList = emptyList())
+
+    init {
+     MockKAnnotations.init(this)
+    }
 
 
     @Test

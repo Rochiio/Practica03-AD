@@ -3,6 +3,7 @@ package controllers
 import exception.EmployeeErrorExists
 import exception.EmployeeErrorNotFound
 import exception.EmployeeSuccess
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
@@ -34,6 +35,9 @@ class EmployeeControllerTest {
     private var employee = Employee(name="Empleado", surname = "Test", email = "test", password ="1234", available = true,
         isAdmin = true, entryTime = LocalDateTime.now(), departureTime = LocalDateTime.now(), orderList = emptyList())
 
+    init {
+        MockKAnnotations.init(this)
+    }
 
     @Test
     fun getCustomerByEmailAndPasswordError() =runTest{
