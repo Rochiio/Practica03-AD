@@ -3,11 +3,7 @@ package model.orders.tasks
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import model.TypeTask
-import model.machines.Customizer
-import model.machines.Stringer
-import model.users.Employee
 import org.bson.codecs.pojo.annotations.BsonId
-import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import util.serializer.UUIDSerializer
 import java.util.*
@@ -20,13 +16,14 @@ data class Task(
     var uuid: UUID = UUID.randomUUID(),
     //trabajador y maquina referenciados
     @Contextual
-    var idTrabajador : Id<Employee>?,
+    var idEmployee : String?,
     @Contextual
-    var idStringer : Id<Stringer>?,
+    var idStringer : String?,
     @Contextual
-    var idCustomizer : Id<Customizer>?,
+    var idCustomizer : String?,
+    var price: Float,
     //datos de la tarea embedidos
     var description : String,
     var taskType : TypeTask,
-    var available : Boolean
+    var available : Boolean,
 )
