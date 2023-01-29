@@ -1,7 +1,6 @@
 package repositories.users
 
 import model.users.Customer
-import org.litote.kmongo.Id
 import repositories.ICRUD
 import java.util.UUID
 

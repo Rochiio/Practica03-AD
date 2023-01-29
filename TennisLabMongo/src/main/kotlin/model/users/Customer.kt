@@ -22,6 +22,6 @@ data class Customer(
     var password:String = "",
     var available: Boolean,
     //Lista de pedidos del cliente
-    var orderList: List<String>, //TODO cambiar a lista de pedidos (ObjectID)
-    var tennisRacketsList: List<String> //TODO cambiar a lista de raquetas (ObjectID)
+    var orderList: List<String>,
+    var tennisRacketsList: List<String>
 )

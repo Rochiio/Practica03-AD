@@ -98,7 +98,6 @@ class Vista(
 
     /**
      * Bucle de opciones del cliente loggeado
-     * TODO añadir opciones de raquetas
      */
     private suspend fun clienteBucle() {
         var opcion: Int
@@ -109,10 +108,14 @@ class Vista(
                     "1- Realizar pedido \n" +
                             "2- Comprobar pedidos \n" +
                             "3- Cancelar pedido \n" +
+                            "4- Añadir Raqueta \n" +
+                            "5- Actualizar Raqueta \n" +
+                            "6- Eliminar Raqueta \n" +
+                            "7- Mostrar Raquetas \n" +
                             "0- Salir"
                 )
                 opcion = readln().toIntOrNull() ?: -1
-            } while (opcion !in 0..3)
+            } while (opcion !in 0..7)
             opcionesClienteBucle(opcion)
         } while (opcion != 0)
 
@@ -134,6 +137,22 @@ class Vista(
                 cancelarPedidoBucle()
             }
 
+            4 ->{
+                addRaqueta()
+            }
+
+            5 ->{
+                actuRaqueta()
+            }
+
+            6 ->{
+                deleteRaqueta()
+            }
+
+            7 ->{
+                getRackets()
+            }
+
             0 -> {
                 terminal.println(blue.bg("Saliendo de la sesión"))
             }
@@ -141,10 +160,52 @@ class Vista(
     }
 
 
+
+    private suspend fun opcionesBucleTarea(opcion: Int) {
+        when (opcion) {
+            1 -> {
+                val tarea = creacionTareaEncordado()
+                taskController.addTask(tarea)
+                Data.tasksCreated.add(tarea)
+            }
+
+            2 -> {
+                val tarea = creacionTareaPersonalizado()
+                taskController.addTask(tarea)
+                Data.tasksCreated.add(tarea)
+            }
+
+            3 -> {
+                val tarea = createTareaAdquisicion()
+                taskController.addTask(tarea)
+                Data.tasksCreated.add(tarea)
+            }
+
+            4 -> {
+                val pedido = creacionPedido(Data.tasksCreated)
+                pedido?.let {
+                    Data.pendingOrders.add(pedido)
+                    orderController.addOrder(pedido)
+                    terminal.println("Pedido creado")
+                }
+
+                getPedidos(orderController.getPedidos())
+
+            }
+
+            0 -> {
+                terminal.println(blue.bg("Saliendo de la creacion de tareas"))
+            }
+        }
+    }
+
+
+    //------------------------------------------------ PEDIDOS -------------------------------------------------
+
     private suspend fun cancelarPedidoBucle() {
         terminal.println("Introduce el pedido que quieres eliminar (selecciona con el indice): ")
         var lista: List<Order> = listOf()
-            when(val result = orderController.getOrders()){
+        when(val result = orderController.getOrders()){
             is OrderError -> terminal.println(red("❌${result.code}: ${result.message}"))
             is OrderSuccess ->{
                 lista = result.data.toList().filter { it.client == loggedCustomer }
@@ -192,45 +253,6 @@ class Vista(
         } while (opcion != 0 && opcion != 4)
     }
 
-
-    private suspend fun opcionesBucleTarea(opcion: Int) {
-        when (opcion) {
-            1 -> {
-                val tarea = creacionTareaEncordado()
-                taskController.addTask(tarea)
-                Data.tasksCreated.add(tarea)
-            }
-
-            2 -> {
-                val tarea = creacionTareaPersonalizado()
-                taskController.addTask(tarea)
-                Data.tasksCreated.add(tarea)
-            }
-
-            3 -> {
-                val tarea = createTareaAdquisicion()
-                taskController.addTask(tarea)
-                Data.tasksCreated.add(tarea)
-            }
-
-            4 -> {
-                val pedido = creacionPedido(Data.tasksCreated)
-                pedido?.let {
-                    Data.pendingOrders.add(pedido)
-                    orderController.addOrder(pedido)
-                    terminal.println("Pedido creado")
-                }
-
-                getPedidos(orderController.getPedidos())
-
-            }
-
-            0 -> {
-                terminal.println(blue.bg("Saliendo de la creacion de tareas"))
-            }
-        }
-    }
-
     private fun creacionPedido(tareas: MutableList<Task>): Order? {
         var pedido: Order?
         var precio = 0F
@@ -250,6 +272,9 @@ class Vista(
 
         return pedido
     }
+
+
+    //----------------------------------------------- TAREAS ---------------------------------------------------------
 
 
     suspend fun creacionTareaEncordado(): Task {
@@ -1422,6 +1447,147 @@ class Vista(
 
 
         return Employee(name =nombre, surname=apellido, email = email, password = PasswordParser.encriptar(password), available = true, isAdmin =admin)
+    }
+
+
+//------------------------------------------ RAQUETAS ------------------------------------------
+
+    /**
+     * Actualizar raqueta
+     */
+    private suspend fun actuRaqueta(){
+        print("Dime el ID de la raqueta a actualizar: ")
+        val id = readln()
+
+        when(val result = racketController.findById(id)){
+            is RacketError -> terminal.println(red("❌${result.code}: ${result.message}"))
+            is RacketSuccess -> {
+                val raqueta = creacionRaquetas()
+                raqueta.id = result.data.id
+                raqueta.uuid = result.data.uuid
+                racketController.updateRacket(raqueta)
+            }
+        }
+    }
+
+
+    /**
+     * Eliminar raqueta
+     */
+    private suspend fun deleteRaqueta(){
+        print("Dime el ID de la raqueta a eliminar: ")
+        val id = readln()
+        when (val result = racketController.findById(id)){
+            is RacketError -> terminal.println(red("❌${result.code}: ${result.message}"))
+            is RacketSuccess -> {
+                racketController.deleteRacket(result.data)
+            }
+        }
+    }
+
+
+    /**
+     * Creamos y añadimos la raqueta al repo de raquetas y actualizamos a el cliente.
+     */
+    private suspend fun addRaqueta(){
+        val raqueta = creacionRaquetas()
+        when (val result = racketController.saveRacket(raqueta)) {
+            is RacketError -> terminal.println(red("❌${result.code}: ${result.message}"))
+            is RacketSuccess -> {
+                terminal.println("✅${result.code}: ${result.data}")
+                var list =loggedCustomer?.tennisRacketsList?.toMutableList()
+                list?.add(result.data.id)
+                loggedCustomer?.tennisRacketsList = list!!
+                customerController.updateCustomer(loggedCustomer!!)
+            }
+        }
+    }
+
+
+    /**
+     * Crear raquetas.
+     * @return raqueta creada
+     */
+    private fun creacionRaquetas(): Racket {
+        var marca: String
+        do {
+            print("Marca raqueta: ")
+            marca = readln()
+        } while (marca.isEmpty())
+
+        var modelo: String
+        do {
+            print("Modelo raqueta: ")
+            modelo = readln()
+        } while (modelo.isEmpty())
+
+        var maniobrabilidad: Float
+        do {
+            print("Maniobrabilidad raqueta: ")
+            maniobrabilidad = readln().toFloatOrNull() ?: -1.0f
+        } while (maniobrabilidad <= 0.0f)
+
+        var balance: Float
+        do {
+            print("Balance raqueta: ")
+            balance = readln().toFloatOrNull() ?: -1.0f
+        } while (balance <= 0.0f)
+
+        var rigidez: Float
+        do {
+            print("Rigidez raqueta: ")
+            rigidez = readln().toFloatOrNull() ?: -1.0f
+        } while (rigidez <= 0.0f)
+
+        return Racket(brand = marca, model = modelo, maneuverability = maniobrabilidad, balance = balance, rigidity = rigidez)
+    }
+
+
+    /**
+     * Encontrar las raquetas del cliente.
+     */
+    private suspend fun getRackets(){
+        var list = mutableListOf<Racket>()
+        val listRacketsCustomer = loggedCustomer?.tennisRacketsList
+        when(val result = racketController.getAllRackets()){
+            is RacketError -> terminal.println(red("❌${result.code}: ${result.message}"))
+            is RacketSuccess -> {
+                listRacketsCustomer?.forEach {
+                    when(val find = racketController.findById(it) ){
+                        is RacketError -> TODO()
+                        is RacketSuccess -> list.add(find.data)
+                    }
+                }
+            }
+        }
+
+        printRackets(list)
+    }
+
+
+    /**
+     * Imprimir las raquetas
+     */
+    private fun printRackets(list: MutableList<Racket>) {
+        if (list.isEmpty()) {
+            println("Lista vacía")
+        } else {
+            terminal.println(table {
+                align = TextAlign.CENTER
+                header {
+                    style(blue, bold = true)
+                    row("ID", "MARCA", "MODELO", "MANIOBRABILIDAD", "BALANCE", "RIGIDEZ")
+                }
+                for (racket in list) {
+                    body {
+                        rowStyles(cyan, brightCyan)
+                        row(
+                            racket.id, racket.brand, racket.model, racket.maneuverability, racket.balance, racket.rigidity
+                        )
+                    }
+                }
+            })
+        }
     }
 
 
