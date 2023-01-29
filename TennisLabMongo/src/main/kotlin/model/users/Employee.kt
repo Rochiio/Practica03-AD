@@ -23,9 +23,9 @@ data class Employee(
     var available: Boolean,
     var isAdmin: Boolean,
     @Serializable(with = LocalDateTimeSerializer::class)
-    var entryTime: LocalDateTime,
+    var entryTime: LocalDateTime? = null,
     @Serializable(with = LocalDateTimeSerializer::class)
-    var departureTime: LocalDateTime,
+    var departureTime: LocalDateTime? = null,
     //Lista de pedidos máximo 2
-    var orderList: List<String> //TODO cambiar a lista de pedidos (ObjectID)
+    var orderList: List<String>? = null
 )
