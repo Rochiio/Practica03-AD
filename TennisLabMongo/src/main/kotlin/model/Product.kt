@@ -14,11 +14,11 @@ data class Product(
     var id : String = newId<Product>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
-    var type : TypeProduct,
-    val brand : String,
-    val model : String,
-    var price : Float,
-    var stock : Int
+    var type: TypeProduct,
+    var brand: String,
+    var model: String,
+    var price: Float,
+    var stock: Int
 )
 
 

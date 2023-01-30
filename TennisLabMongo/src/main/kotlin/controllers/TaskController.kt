@@ -3,18 +3,15 @@ package controller
 
 import exception.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import model.orders.tasks.Task
-import org.litote.kmongo.Id
 import repositories.orders.TaskRepository
-
-
-
-import java.util.*
+import repositories.orders.TasksApiRepository
 
 /**
  * Controlador de tareas.
  */
-class TaskController(private var repository: TaskRepository) {
+class TaskController(private var repository: TaskRepository, private var api: TasksApiRepository) {
 
     /**
      * Añade una tarea.
@@ -34,7 +31,7 @@ class TaskController(private var repository: TaskRepository) {
      * Recupera todas las tareas.
      * @return Flujo de tareas
      */
-    suspend fun getAllTasks(): TaskResult<Flow<Task>>{
+    suspend fun getAllTasks(): TaskResult<Flow<Task>> {
         val flow = repository.findAll()
         return TaskSuccess(200, flow)
     }
@@ -44,7 +41,7 @@ class TaskController(private var repository: TaskRepository) {
      * @param tarea tarea a actualizar
      * @return Result dependiendo del resultado de la accion.
      */
-    suspend fun updateTask(tarea: Task): TaskResult<Task>{
+    suspend fun updateTask(tarea: Task): TaskResult<Task> {
         val update = repository.update(tarea)
         return TaskSuccess(200, update)
     }
@@ -64,7 +61,7 @@ class TaskController(private var repository: TaskRepository) {
      * @param id id de la tarea a buscar.
      * @return Result dependiendo del resultado de la accion.
      */
-    suspend fun getTaskById(id: String): TaskResult<Task>{
+    suspend fun getTaskById(id: String): TaskResult<Task> {
         val find = repository.findById(id)
         find?.let {
             return TaskSuccess(200, it)
@@ -78,11 +75,25 @@ class TaskController(private var repository: TaskRepository) {
      * @param tarea tarea que ha sido añadida a un pedido.
      * @return Result dependiendo del resultado de la accion.
      */
-    suspend fun addTaskToOrder(tarea : Task) : TaskResult<Task>{
-        when(getTaskById(tarea.id)){
+    suspend fun addTaskToOrder(tarea: Task): TaskResult<Task> {
+        when (getTaskById(tarea.id)) {
             is TaskError -> addTask(tarea)
-            is TaskSuccess ->  updateTask(tarea)
+            is TaskSuccess -> updateTask(tarea)
         }
         return TaskSuccess(204, tarea)
+    }
+
+    /**
+     * Añade una tarea a la api remota
+     * @param tarea tara que se va a guardar en la api remota
+     * @return Result dependiendo del resultado de la acción
+     */
+    suspend fun saveTaskToRemote(task: Task): TaskResult<Task> {
+        return try {
+            api.save(task)
+            TaskSuccess(200, task)
+        } catch (e: Exception) {
+            TaskErrorExists("Ya existe una tarea con este id")
+        }
     }
 }

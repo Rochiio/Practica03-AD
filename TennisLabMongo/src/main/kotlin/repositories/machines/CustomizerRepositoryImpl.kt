@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import model.machines.Customizer
 import mu.KotlinLogging
-import org.litote.kmongo.Id
 
 class CustomizerRepositoryImpl: CustomizerRepository {
     private var logger = KotlinLogging.logger {}

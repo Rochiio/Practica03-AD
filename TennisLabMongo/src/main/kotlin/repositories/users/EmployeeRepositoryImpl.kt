@@ -3,10 +3,8 @@ package repositories.users
 import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
-import model.users.Customer
 import mu.KotlinLogging
 import model.users.Employee
-import org.litote.kmongo.Id
 import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.eq
 

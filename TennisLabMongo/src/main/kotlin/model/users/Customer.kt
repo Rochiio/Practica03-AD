@@ -3,11 +3,8 @@ package model.users
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.bson.codecs.pojo.annotations.BsonId
-import org.litote.kmongo.Id
 import org.litote.kmongo.newId
-import util.serializer.LocalDateTimeSerializer
 import util.serializer.UUIDSerializer
-import java.time.LocalDateTime
 import java.util.*
 
 @Serializable
@@ -16,6 +13,7 @@ data class Customer(
     var id: String = newId<Customer>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
+    var nId : Int = 0,
     var name: String,
     var username:String,
     var email:String,

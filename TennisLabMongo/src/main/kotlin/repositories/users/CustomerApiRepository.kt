@@ -12,7 +12,9 @@ class CustomerApiRepository {
     private val logger = KotlinLogging.logger { }
 
     /**
-     * recupera todos los clientes desde la api
+     * Recupera los usuarios de la api
+     * @param page pagina de tareas
+     * @param per_page cuantas tareas queremos por página
      */
     suspend fun findAll(page: Int, per_page: Int): List<CustomerDTO> {
         val call = client.getAll(page, per_page)
@@ -26,7 +28,9 @@ class CustomerApiRepository {
     }
 
     /**
-     * busca un cliente por id en la api
+     * Busca una usuario por su id
+     * @param id id de la usuario
+     * @return usuario con el id buscado o null si no existe
      */
     suspend fun findById(id: Int): CustomerDTO? {
 
@@ -43,7 +47,9 @@ class CustomerApiRepository {
     }
 
     /**
-     * busca un cliente por email en la api
+     * Busca un usuario por su email en la api
+     * @param email el email del usuario
+     * @return una lista con los usuario que comparten el email
      */
     suspend fun findByEmail(email: String): List<CustomerDTO>? {
         logger.debug { "buscando cliente con email : $email" }
@@ -58,7 +64,9 @@ class CustomerApiRepository {
     }
 
     /**
-     * guarda un elemento completo en la api
+     * Guarda una usuario en la api
+     * @param usuario a guardar
+     * @return la usuario guardada
      */
     suspend fun save(customer: CustomerDTO): Customer {
         logger.debug { "guardando cliente : $customer" }
@@ -73,7 +81,9 @@ class CustomerApiRepository {
     }
 
     /**
-     * actualiza los campos de un cliente en la api
+     * Actualiza una usuario en la api
+     * @param usuario que hay que actualizar
+     * @return la usuario actualizada
      */
     suspend fun update(customer: CustomerDTO): Customer {
         logger.debug { "actualizando cliente : $customer" }
@@ -89,6 +99,10 @@ class CustomerApiRepository {
         }
     }
 
+    /**
+     * elimina un usuario de la api
+     * @param id id del usuario que vamos a eliminar
+     */
     suspend fun delete(id: Int) {
         logger.debug { "eliminando cliente con id : $id" }
         try {

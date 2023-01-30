@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.7.21"
     kotlin("plugin.serialization") version "1.7.20"
     id("com.google.devtools.ksp") version "1.7.21-1.0.8"
+
     application
 }
 
@@ -16,6 +17,7 @@ repositories {
 }
 
 dependencies {
+
     // Mongo Kotlin Asincrono
     implementation("org.litote.kmongo:kmongo-async:4.7.2")
     // Corrutinas Mongo

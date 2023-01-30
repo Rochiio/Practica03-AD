@@ -7,7 +7,7 @@ import model.users.Customer
 import repositories.users.CustomerCacheRepositoryImpl
 import repositories.users.CustomerRepositoryImpl
 import service.cache.UsersCache
-import kotlin.system.exitProcess
+
 //TODO Revisar no para si no pones exitProcess
 fun main(args: Array<String>): Unit = runBlocking {
     var controller = CustomerController(CustomerRepositoryImpl(), CustomerCacheRepositoryImpl())
@@ -18,7 +18,7 @@ fun main(args: Array<String>): Unit = runBlocking {
 
 
     var user = Customer(name = "Prueba", username = "pruebis", email = "prueba@gmail.com", password = "1234",
-        available = true, orderList = emptyList(), tennisRacketsList = emptyList())
+        available = true, orderList = emptyList(), nId = 0, tennisRacketsList = emptyList())
 
     controller.addCustomer(user)
 
@@ -28,7 +28,5 @@ fun main(args: Array<String>): Unit = runBlocking {
         is CustomerSuccess -> println(find.data)
     }
 
-
     refresh.cancel()
-    exitProcess(0)
 }
