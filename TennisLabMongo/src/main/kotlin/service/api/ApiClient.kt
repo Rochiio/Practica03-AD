@@ -8,6 +8,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import org.koin.core.annotation.Single
+
 
 object ApiClient {
     private val url = "https://jsonplaceholder.typicode.com/"

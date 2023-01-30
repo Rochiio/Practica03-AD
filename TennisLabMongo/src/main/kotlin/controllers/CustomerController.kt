@@ -11,6 +11,8 @@ import kotlinx.coroutines.withContext
 import model.Racket
 import model.users.Customer
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import repositories.users.CustomerCacheRepository
 import repositories.users.CustomerRepository
 import service.PasswordParser
@@ -18,8 +20,12 @@ import service.PasswordParser
 /**
  * Controlador de los Clientes.
  */
+@Single
+@Named("CustomerController")
 class CustomerController(
+    @Named("CustomerRepository")
     private var repository: CustomerRepository,
+    @Named("CustomerCacheRepository")
     private var cache: CustomerCacheRepository
 ) {
     private val logger = KotlinLogging.logger { }

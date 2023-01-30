@@ -6,12 +6,18 @@ import exception.EmployeeResult
 import exception.EmployeeSuccess
 import kotlinx.coroutines.flow.Flow
 import model.users.Employee
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import repositories.users.EmployeeRepository
 
 /**
  * Controlador de empleados.
  */
-class EmployeeController(private var repository: EmployeeRepository) {
+@Single
+@Named("EmployeeController")
+class EmployeeController(
+    @Named("EmployeeRepository")
+    private var repository: EmployeeRepository) {
 
 
     /**

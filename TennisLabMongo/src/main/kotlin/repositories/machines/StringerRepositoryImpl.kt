@@ -5,16 +5,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import model.machines.Stringer
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
 
 /**
  * Implementación repositorio de maquinas de encordar.
  */
+private var logger = KotlinLogging.logger {}
 
+@Single
+@Named("StringerRepository")
 class StringerRepositoryImpl : StringerRepository {
-    private var logger = KotlinLogging.logger {}
-    private var dbMongo = MongoDbManager.database
 
+    val dbMongo =MongoDbManager.database
 
     /**
      * Buscar una encordadora por el id.
@@ -34,7 +38,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @return la encordadora salvada.
      */
     override suspend fun save(item: Stringer): Stringer {
-        logger.debug{"Salvando encordadora: $item"}
+        logger.debug { "Salvando encordadora: $item" }
         return dbMongo.getCollection<Stringer>()
             .save(item).let { item }
     }
@@ -58,7 +62,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @return si ha sido eliminada correctamente.
      */
     override suspend fun delete(item: Stringer): Boolean {
-        logger.debug { "Eliminando encordadora: $item"}
+        logger.debug { "Eliminando encordadora: $item" }
         return dbMongo.getCollection<Stringer>()
             .deleteOneById(item.id).wasAcknowledged()
     }

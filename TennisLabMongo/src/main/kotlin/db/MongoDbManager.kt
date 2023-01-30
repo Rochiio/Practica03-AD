@@ -1,6 +1,8 @@
 package db
 
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
@@ -12,7 +14,6 @@ private val logger = KotlinLogging.logger {}
 
 // Si trabajas con corrutinas mira esto para optimizar los tipos a usar
 // https://litote.org/kmongo/dokka/kmongo/org.litote.kmongo.coroutine/index.html
-
 object MongoDbManager {
     private lateinit var mongoClient: CoroutineClient // Vamos ausar un wrapper  de //MongoClient
     lateinit var database: CoroutineDatabase// MongoDatabase

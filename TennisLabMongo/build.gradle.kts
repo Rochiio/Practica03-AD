@@ -1,11 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val mockkVersion: String = "1.13.2"
-
+// Koin
+val koin_ktor_version: String by project
+val ksp_version: String by project
+val koin_ksp_version: String by project
+val koin_version: String by project
 plugins {
     kotlin("jvm") version "1.7.21"
     kotlin("plugin.serialization") version "1.7.20"
     id("com.google.devtools.ksp") version "1.7.21-1.0.8"
-
     application
 }
 
@@ -15,9 +18,15 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
 }
-
+// Use KSP Generated sources
+sourceSets.main {
+    java.srcDirs("build/generated/ksp/main/kotlin")
+}
 dependencies {
-
+    //KOIN
+    implementation("io.insert-koin:koin-core:$koin_version")
+    implementation("io.insert-koin:koin-annotations:$koin_ksp_version")
+    ksp ("io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
     // Mongo Kotlin Asincrono
     implementation("org.litote.kmongo:kmongo-async:4.7.2")
     // Corrutinas Mongo
@@ -63,6 +72,8 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    testImplementation ("io.insert-koin:koin-test:$koin_version")
+
 }
 
 tasks.test {

@@ -6,10 +6,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import model.machines.Customizer
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
-class CustomizerRepositoryImpl: CustomizerRepository {
-    private var logger = KotlinLogging.logger {}
-    private var dbMongo = MongoDbManager.database
+private var logger = KotlinLogging.logger {}
+
+@Single
+@Named("CustomizerRepository")
+class CustomizerRepositoryImpl : CustomizerRepository {
+    private val dbMongo = MongoDbManager.database
 
     /**
      * Buscar una personalizadora por el id.
@@ -29,7 +34,7 @@ class CustomizerRepositoryImpl: CustomizerRepository {
      * @return la personalizadora salvada.
      */
     override suspend fun save(item: Customizer): Customizer {
-        logger.debug{"Salvando personalizadora: $item"}
+        logger.debug { "Salvando personalizadora: $item" }
         return dbMongo.getCollection<Customizer>()
             .save(item).let { item }
     }
@@ -53,7 +58,7 @@ class CustomizerRepositoryImpl: CustomizerRepository {
      * @return si ha sido eliminada correctamente.
      */
     override suspend fun delete(item: Customizer): Boolean {
-        logger.debug { "Eliminando personalizadora: $item"}
+        logger.debug { "Eliminando personalizadora: $item" }
         return dbMongo.getCollection<Customizer>()
             .deleteOneById(item.id).wasAcknowledged()
     }

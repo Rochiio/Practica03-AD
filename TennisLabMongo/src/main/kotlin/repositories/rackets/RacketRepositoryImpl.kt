@@ -5,10 +5,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import model.Racket
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
 /**
  * Implementación repositorio raquetas.
  */
+@Single
+@Named("RacketRepository")
 class RacketRepositoryImpl: RacketRepository {
     private var logger = KotlinLogging.logger {}
     private var dbMongo = MongoDbManager.database
