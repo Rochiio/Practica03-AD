@@ -2,6 +2,8 @@ package model.orders.tasks
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import model.Product
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
@@ -15,6 +17,6 @@ data class Purchase(
     val id: String = newId<Purchase>().toString(),
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
-    var price : Float,
-    var product : Product
+    var price: Float,
+    var product: List<Product>
 )
