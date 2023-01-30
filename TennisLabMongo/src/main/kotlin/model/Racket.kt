@@ -1,9 +1,7 @@
 package model
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.bson.codecs.pojo.annotations.BsonId
-import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import util.serializer.UUIDSerializer
 import java.util.*
