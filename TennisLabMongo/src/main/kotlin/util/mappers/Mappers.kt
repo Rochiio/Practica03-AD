@@ -1,4 +1,3 @@
-
 package util.mappers
 
 import dto.TaskDTO
@@ -18,8 +17,8 @@ fun CustomerDTO.fromDto(): Customer {
     )
 }
 
-fun Task.toDto() : TaskDTO = TaskDTO(
-    id = this._id,
+fun Task.toDto(): TaskDTO = TaskDTO(
+    id = this.nId,
     title = this.description,
     userId = 0,
     completed = available

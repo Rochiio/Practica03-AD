@@ -10,7 +10,6 @@ import util.serializer.LocalDateSerializer
 import util.serializer.UUIDSerializer
 import java.time.LocalDate
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Serializable
 data class Order(
@@ -29,6 +28,6 @@ data class Order(
     val maxDate: LocalDate?,
     var totalPrice: Float,
     val client: Customer,
-    var tasks: ArrayList<Task>
+    var tasks: List<Task>
 )
 

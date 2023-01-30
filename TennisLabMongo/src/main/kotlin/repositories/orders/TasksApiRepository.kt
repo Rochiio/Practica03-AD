@@ -1,8 +1,6 @@
 package repositories.orders
 
 import dto.TaskDTO
-import exception.TaskResult
-import exception.TaskSuccess
 import model.orders.tasks.Task
 import mu.KotlinLogging
 import service.api.ApiClient
@@ -90,7 +88,7 @@ class TasksApiRepository {
         logger.debug { "actualizando tarea : $task" }
         try {
 
-            val res = client.update(task._id, task.toDto())
+            val res = client.update(task.nId, task.toDto())
             logger.debug { "CustomerApiRepository - update - OK" }
             return task
 
