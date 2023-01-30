@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
+import repositories.users.CustomerCacheRepositoryImpl
 import repositories.users.CustomerRepositoryImpl
 
 @DelicateCoroutinesApi
@@ -28,6 +29,8 @@ class CustomerControllerTest : {
 
     @MockK
     private lateinit var repository: CustomerRepositoryImpl
+    @MockK
+    private lateinit var cache: CustomerCacheRepositoryImpl
     @InjectMockKs
     private lateinit var controller: CustomerController
 
@@ -42,6 +45,8 @@ class CustomerControllerTest : {
     @Test
     fun addCustomer() = runTest{
         coEvery { repository.findById(customer.id) } returns null
+        coEvery { cache.findById(customer.id) } returns null
+        coEvery { cache.addCache(customer)} returns customer
         coEvery { repository.save(customer) } returns customer
 
         val add = controller.addCustomer(customer)
@@ -61,11 +66,14 @@ class CustomerControllerTest : {
 
         coVerify(exactly=1){repository.save(customer)}
         coVerify(exactly=1){repository.findById(customer.id)}
+        coVerify(exactly=1){cache.findById(customer.id)}
+        coVerify(exactly=1){cache.addCache(customer)}
     }
 
 
     @Test
     fun addCustomerErrorYaExiste() = runTest{
+        coEvery { cache.findById(customer.id) } returns null
         coEvery { repository.findById(customer.id) } returns customer
 
         val add = controller.addCustomer(customer)
@@ -77,6 +85,7 @@ class CustomerControllerTest : {
         )
 
         coVerify(exactly=1){repository.findById(customer.id)}
+        coVerify(exactly=1){cache.findById(customer.id)}
     }
 
 //    TODO no lo realiza correctamente porq no puede similar el password parser (creo)
@@ -121,7 +130,10 @@ class CustomerControllerTest : {
 
     @Test
     fun getCustomerById() =runTest{
+        coEvery { cache.findById(customer.id) } returns null
         coEvery { repository.findById(customer.id) } returns customer
+        coEvery { cache.addCache(customer)} returns customer
+
         val get = controller.getCustomerById(customer.id)
         val resultSuccess = get as CustomerSuccess<Customer>
 
@@ -138,11 +150,14 @@ class CustomerControllerTest : {
         )
 
         coVerify(exactly=1){repository.findById(customer.id)}
+        coVerify(exactly=1){cache.findById(customer.id)}
+        coVerify(exactly=1){cache.addCache(customer)}
     }
 
 
     @Test
     fun getCustomerByIdError() =runTest{
+        coEvery { cache.findById(customer.id) } returns null
         coEvery { repository.findById(customer.id) } returns null
         val get = controller.getCustomerById(customer.id)
         val resultError = get as CustomerErrorNotFound
@@ -153,6 +168,7 @@ class CustomerControllerTest : {
         )
 
         coVerify(exactly=1){repository.findById(customer.id)}
+        coVerify(exactly=1){cache.findById(customer.id)}
     }
 
     @Test
@@ -180,7 +196,9 @@ class CustomerControllerTest : {
 
     @Test
     fun updateCustomer() = runTest{
+        coEvery { cache.update(customer) } returns customer
         coEvery { repository.update(customer) } returns customer
+
         val get = controller.updateCustomer(customer)
         val resultSuccess = get as CustomerSuccess<Customer>
 
@@ -197,11 +215,14 @@ class CustomerControllerTest : {
         )
 
         coVerify(exactly = 1){repository.update(customer)}
+        coVerify(exactly = 1){cache.update(customer)}
     }
 
     @Test
     fun deleteCustomer() = runTest{
         coEvery { repository.delete(customer) } returns true
+        coEvery{ cache.delete(customer)} returns true
+
         val get = controller.deleteCustomer(customer)
         val resultSuccess = get as CustomerSuccess<Boolean>
 
@@ -209,5 +230,8 @@ class CustomerControllerTest : {
             { assertTrue(resultSuccess.code == 200) },
             { assertTrue(resultSuccess.data) }
         )
+
+        coVerify(exactly = 1){repository.delete(customer)}
+        coVerify(exactly = 1){cache.delete(customer)}
     }
 }
