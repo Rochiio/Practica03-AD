@@ -38,7 +38,7 @@ class ProductController(private var repository: ProductRepository) {
         find?.let {
             return ProductSuccess(200, it)
         }
-        return ProductErrorNotFound("No existe un producto con el id: $id")
+        return ProductErrorNotFound("No existe un producto con este id")
     }
 
 
