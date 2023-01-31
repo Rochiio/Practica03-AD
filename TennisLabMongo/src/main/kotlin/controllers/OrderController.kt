@@ -6,11 +6,14 @@ import exception.OrderResult
 import exception.OrderSuccess
 import kotlinx.coroutines.flow.Flow
 import model.orders.Order
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import repositories.orders.OrderRepository
 
 /**
  * Controlador de pedidos.
  */
+@Single
 class OrderController(private var repository: OrderRepository) {
 
 

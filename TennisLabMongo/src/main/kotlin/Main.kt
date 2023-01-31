@@ -4,12 +4,17 @@ import exception.CustomerSuccess
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import model.users.Customer
+import org.koin.core.context.startKoin
+import org.koin.ksp.generated.defaultModule
 import repositories.users.CustomerCacheRepositoryImpl
 import repositories.users.CustomerRepositoryImpl
 import service.cache.UsersCache
 
 //TODO Revisar no para si no pones exitProcess
 fun main(args: Array<String>): Unit = runBlocking {
+    startKoin{
+        defaultModule
+    }
     var controller = CustomerController(CustomerRepositoryImpl(), CustomerCacheRepositoryImpl())
 
     var refresh = launch {

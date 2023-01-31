@@ -5,12 +5,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import mu.KotlinLogging
 import model.users.Employee
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.eq
 
 /**
  * Implementación del repositorio de trabajadores.
  */
+@Single
+@Named("EmployeeRepository")
 class EmployeeRepositoryImpl: EmployeeRepository {
     private var logger = KotlinLogging.logger {}
     private var dbMongo = MongoDbManager.database

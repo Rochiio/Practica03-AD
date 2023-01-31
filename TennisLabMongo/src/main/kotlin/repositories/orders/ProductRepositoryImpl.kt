@@ -4,10 +4,14 @@ import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow
 import model.Product
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.MongoOperator
+private var logger = KotlinLogging.logger {}
 
+@Single
+@Named("ProductRepository")
 class ProductRepositoryImpl : ProductRepository {
-    private var logger = KotlinLogging.logger {}
     private var dbMongo = MongoDbManager.database
     override suspend fun findById(id: String): Product? {
         logger.debug { "Buscando producto con id: $id" }

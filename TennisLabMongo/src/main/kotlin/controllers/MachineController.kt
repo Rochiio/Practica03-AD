@@ -4,12 +4,16 @@ import exception.*
 import kotlinx.coroutines.flow.Flow
 import model.machines.Customizer
 import model.machines.Stringer
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import repositories.machines.CustomizerRepository
 import repositories.machines.StringerRepository
 
 /**
  * Controlador de Maquinas
  */
+@Single
+@Named("MachineController")
 class MachineController(
     private var stringerRepo: StringerRepository,
     private var customizerRepo: CustomizerRepository

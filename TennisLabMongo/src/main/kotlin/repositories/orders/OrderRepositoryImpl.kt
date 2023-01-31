@@ -4,11 +4,16 @@ import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow
 import model.orders.Order
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.MongoOperator
 
+private var logger = KotlinLogging.logger {}
+
+@Single
+@Named("OrderRepository")
 class OrderRepositoryImpl : OrderRepository {
-    private var logger = KotlinLogging.logger{}
-    private  var dbMongo = MongoDbManager.database
+    val dbMongo = MongoDbManager.database
     override suspend fun findById(id: String): Order? {
         logger.debug { "Buscando tarea con id: $id" }
         return dbMongo.getCollection<Order>().findOneById(id)
@@ -22,7 +27,7 @@ class OrderRepositoryImpl : OrderRepository {
 
     override suspend fun update(item: Order): Order {
         logger.debug { "Actualizando tarea: $item" }
-        return  dbMongo.getCollection<Order>()
+        return dbMongo.getCollection<Order>()
             .updateOneById(item.id, item)
             .wasAcknowledged().let { item }
     }
@@ -34,7 +39,7 @@ class OrderRepositoryImpl : OrderRepository {
     }
 
     override suspend fun findAll(): Flow<Order> {
-        logger.debug { "Recuperando todas las tareas "}
+        logger.debug { "Recuperando todas las tareas " }
         return dbMongo.getCollection<Order>().find().toFlow()
     }
 

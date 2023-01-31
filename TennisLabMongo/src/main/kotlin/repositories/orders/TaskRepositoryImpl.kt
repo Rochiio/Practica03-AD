@@ -4,12 +4,17 @@ import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow
 import model.orders.tasks.Task
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.MongoOperator
 import java.util.UUID
 
+private var logger = KotlinLogging.logger {}
+
+@Single
+@Named("TaskRepository")
 class TaskRepositoryImpl : TaskRepository {
-    private var logger = KotlinLogging.logger{}
-    private  var dbMongo = MongoDbManager.database
+    private val dbMongo = MongoDbManager.database
     override suspend fun findById(id: String): Task? {
         logger.debug { "Buscando tarea con id: $id" }
         return dbMongo.getCollection<Task>().findOneById(id)
@@ -23,7 +28,7 @@ class TaskRepositoryImpl : TaskRepository {
 
     override suspend fun update(item: Task): Task {
         logger.debug { "Actualizando tarea: $item" }
-        return  dbMongo.getCollection<Task>()
+        return dbMongo.getCollection<Task>()
             .updateOneById(item.id, item)
             .wasAcknowledged().let { item }
     }
@@ -35,7 +40,7 @@ class TaskRepositoryImpl : TaskRepository {
     }
 
     override suspend fun findAll(): Flow<Task> {
-        logger.debug { "Recuperando todas las tareas "}
+        logger.debug { "Recuperando todas las tareas " }
         return dbMongo.getCollection<Task>().find().toFlow()
     }
 

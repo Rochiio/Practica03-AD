@@ -9,11 +9,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import model.users.Customer
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import service.cache.UsersCache
 
 /**
  * Implementación del repositorio de caché de clientes.
  */
+@Single
+@Named("CustomerCacheRepository")
 class CustomerCacheRepositoryImpl:  CustomerCacheRepository{
     private val logger = KotlinLogging.logger { }
 

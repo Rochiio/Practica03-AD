@@ -5,12 +5,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import model.users.Customer
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.*
 import java.util.*
 
 /**
  * Implementación del repositorio de clientes.
  */
+@Single
+@Named("CustomerRepository")
 class CustomerRepositoryImpl : CustomerRepository {
     private var logger = KotlinLogging.logger {}
     private var dbMongo = MongoDbManager.database
