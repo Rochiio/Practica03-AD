@@ -54,14 +54,15 @@ class Vista(
     private var terminal = Terminal(width = 150)
     private var loggedEmployee: Employee? = null
     private var loggedCustomer: Customer? = null
-    private var apiUsers =CustomerApiRepository()
+    private var apiUsers = CustomerApiRepository()
     //private var apiTasks = TasksApiRepository()
 
-    suspend fun runVista(){
+    suspend fun runVista() {
         initUsers()
         var opt = principal()
         opcionesPrincipal(opt)
     }
+
     suspend fun initUsers() {
         val admin = Employee(
             name = "admin",
@@ -72,7 +73,7 @@ class Vista(
             isAdmin = true,
             entryTime = null,
             departureTime = null,
-            orderList = emptyList()
+            orderList = mutableListOf()
         )
 
         employeeController.addEmployee(admin)
@@ -85,7 +86,7 @@ class Vista(
      * Funcion principal para el inicio
      */
     suspend fun principal(): Int {
-        val init = withContext(Dispatchers.IO){
+        val init = withContext(Dispatchers.IO) {
             initUsers()
         }
 
@@ -258,7 +259,7 @@ class Vista(
      * Completar un pedido del trabajador.
      */
     private suspend fun completarPedidoTrabajador() {
-        val lista = mutableListOf<Order>()
+        var lista = mutableListOf<Order>()
         loggedEmployee?.orderList?.forEach {
             when (val result = orderController.getOrderById(it)) {
                 is OrderError -> TODO()
@@ -266,20 +267,25 @@ class Vista(
             }
         }
 
-        lista.filter { it.state == Status.EN_PROCESO }
+        lista = lista.filter { it.state == Status.EN_PROCESO }.toMutableList()
         getPedidos(lista)
+        if (lista.isNotEmpty()) {
+            print("Elija el pedido a completar por índice:")
+            val indice = readln().toIntOrNull() ?: -1
 
-        print("Elija el pedido a completar por índice:")
-        val indice = readln().toIntOrNull() ?: -1
-
-        if (indice < 0 || lista.size < indice) {
-            terminal.println(red("❌Indice de pedido incorrecto"))
-        } else {
-            val pedido = lista[indice]
-            pedido.state = Status.TERMINADO
-            pedido.exitDate = LocalDate.now()
-            orderController.updateOrder(pedido)
-            Data.completeOrders.add(pedido)
+            if (indice < 0 || lista.size < indice) {
+                terminal.println(red("❌Indice de pedido incorrecto"))
+            } else {
+                val pedido = lista[indice]
+                loggedEmployee?.orderList?.remove(pedido.id)
+                pedido.state = Status.TERMINADO
+                pedido.finalDate = LocalDate.now()
+                orderController.updateOrder(pedido)
+                Data.completeOrders.add(pedido)
+                withContext(Dispatchers.IO) {
+                    launch { employeeController.updateEmployee(loggedEmployee!!) }
+                }
+            }
         }
     }
 
@@ -297,7 +303,7 @@ class Vista(
                     getPedidos(lista)
                     print("Elija el pedido a realizar por índice:")
                     val indice = readln().toIntOrNull() ?: -1
-                    if (indice < 0 || lista.size < indice) {
+                    if (indice < 0 || indice >= lista.size) {
                         terminal.println(red("❌Indice de pedido incorrecto"))
                     } else {
                         val pedido = lista[indice]
@@ -306,6 +312,7 @@ class Vista(
                         withContext(Dispatchers.IO) {
                             launch {
                                 pedido.state = Status.EN_PROCESO
+                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id}
                                 orderController.updateOrder(pedido)
                             }
                             launch {
@@ -419,7 +426,7 @@ class Vista(
         var products: List<Product> = mutableListOf()
         when (result) {
             is ProductError -> terminal.println(red("❌${result.code}: ${result.message}"))
-            is ProductSuccess ->products =  products + result.data.toList().filter { it.type == TypeProduct.CORDAJE }
+            is ProductSuccess -> products = products + result.data.toList().filter { it.type == TypeProduct.CORDAJE }
 
         }
         do {
@@ -575,7 +582,8 @@ class Vista(
                         "FECHA FINAL",
                         "PRECIO",
                         "TOPE ENTREGA",
-                        "CLIENTE"
+                        "ESTADO"
+
                     )
                 }
                 for (pedido in lista) {
@@ -589,7 +597,7 @@ class Vista(
                             pedido.finalDate,
                             pedido.totalPrice,
                             pedido.maxDate,
-                            pedido.client.uuid
+                            pedido.state
                         )
                     }
                     indice++
