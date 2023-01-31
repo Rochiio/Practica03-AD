@@ -7,10 +7,14 @@ import com.github.ajalt.mordant.terminal.Terminal
 import controller.*
 import controllers.*
 import exception.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import model.*
+import model.lists.StringerAssignments
 import model.machines.Customizer
 import model.machines.Stringer
 import model.orders.Order
@@ -23,7 +27,6 @@ import model.users.Employee
 import util.Data
 import service.PasswordParser
 import java.time.LocalDate
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -126,37 +129,14 @@ class Vista(
 
     private suspend fun opcionesClienteBucle(opcion: Int) {
         when (opcion) {
-            1 -> {
-                realizarPedidoBucle()
-            }
-
-            2 -> {
-                comprobarPedidosBucle()
-            }
-
-            3 -> {
-                cancelarPedidoBucle()
-            }
-
-            4 -> {
-                addRaqueta()
-            }
-
-            5 -> {
-                actuRaqueta()
-            }
-
-            6 -> {
-                deleteRaqueta()
-            }
-
-            7 -> {
-                getRackets()
-            }
-
-            0 -> {
-                terminal.println(blue.bg("Saliendo de la sesión"))
-            }
+            1 -> realizarPedidoBucle()
+            2 -> comprobarPedidosBucle()
+            3 -> cancelarPedidoBucle()
+            4 -> addRaqueta()
+            5 -> actuRaqueta()
+            6 -> deleteRaqueta()
+            7 -> getRackets()
+            0 -> terminal.println(blue.bg("Saliendo de la sesión"))
         }
     }
 
@@ -193,18 +173,121 @@ class Vista(
                     is OrderError -> terminal.println(red("❌${result.code}: ${result.message}"))
 
                 }
-
-
             }
 
-            0 -> {
-                terminal.println(blue.bg("Saliendo de la creacion de tareas"))
-            }
+            0 -> terminal.println(blue.bg("Saliendo de la creacion de tareas"))
         }
     }
 
 
     //------------------------------------------------ PEDIDOS -------------------------------------------------
+
+    /**
+     * Bucle de pedidos para los trabajadores
+     */
+    private suspend fun administradorBuclePedidos() {
+        var opcion: Int
+        do {
+            terminal.println(brightBlue("------ Pedidos ------"))
+            do {
+                terminal.println(
+                    "1- Asignar Pedido \n" +
+                            "2- Completar Pedido \n" +
+                            "0- Salir"
+                )
+                opcion = readln().toIntOrNull() ?: -1
+            } while (opcion < 0 || opcion > 4)
+            opcionesBucleAdminPedidos(opcion)
+        } while (opcion != 0)
+    }
+
+
+    /**
+     * Opciones del bucle de pedidos de los administradores y trabajadores
+     */
+    private suspend fun opcionesBucleAdminPedidos(opcion: Int) {
+        when(opcion){
+            1 -> asignarPedidoTrabajador()
+            2 -> completarPedidoTrabajador()
+            0 -> terminal.println(brightBlue.bg("Saliendo de pedidos🛒🛒"))
+        }
+    }
+
+
+    /**
+     * Completar un pedido del trabajador.
+     */
+    private suspend fun completarPedidoTrabajador() {
+        val lista = mutableListOf<Order>()
+        loggedEmployee?.orderList?.forEach {
+            when(val result = orderController.getOrderById(it)){
+                is OrderError -> TODO()
+                is OrderSuccess -> lista.add(result.data)
+            }
+        }
+
+        lista.filter{it.state == Status.EN_PROCESO}
+        getPedidos(lista)
+
+        print("Elija el pedido a completar por índice:")
+        val indice = readln().toIntOrNull() ?: -1
+
+        if (indice < 0 || lista.size < indice) {
+            terminal.println(red("❌Indice de pedido incorrecto"))
+        } else {
+            val pedido = lista[indice]
+            pedido.state= Status.TERMINADO
+            pedido.exitDate = LocalDate.now()
+            orderController.updateOrder(pedido)
+            Data.completeOrders.add(pedido)
+        }
+    }
+
+
+    /**
+     * Asignarle al trabajador un pedido.
+     * Dependiendo de si ha llegado a su tope en el turno y si elige correctamente el pedido.
+     */
+    private suspend fun asignarPedidoTrabajador() {
+        if(loggedEmployee?.orderList?.size!! < 2) {
+            when (val result = orderController.getOrders()) {
+                is OrderError -> terminal.println(red("❌${result.code}: ${result.message}"))
+                is OrderSuccess -> {
+                    val lista = result.data.toList().filter { it.state == Status.RECIBIDO }
+                    getPedidos(lista)
+                    print("Elija el pedido a realizar por índice:")
+                    val indice = readln().toIntOrNull() ?: -1
+                    if (indice < 0 || lista.size < indice) {
+                        terminal.println(red("❌Indice de pedido incorrecto"))
+                    } else {
+                        val pedido = lista[indice]
+                        Data.pendingOrders.remove(pedido)
+
+                        withContext(Dispatchers.IO) {
+                            launch {
+                                pedido.state= Status.EN_PROCESO
+                                orderController.updateOrder(pedido)
+                            }
+                            launch {
+                                val list = loggedEmployee?.orderList?.toMutableList()
+                                list?.add(pedido.id)
+                                loggedEmployee?.orderList = list
+                                employeeController.updateEmployee(loggedEmployee!!)
+                            }
+
+                            launch {
+                                val assignament = StringerAssignments(pedido.id, loggedEmployee!!)
+                                Data.assignments.add(assignament)
+                            }
+                        }
+                    }
+                }
+            }
+        }else{
+            terminal.println(red("❌Trabajador ${loggedEmployee?.name} ha llegado a el tope de pedidos en un turno"))
+        }
+    }
+
 
     private suspend fun cancelarPedidoBucle() {
         terminal.println("Introduce el pedido que quieres eliminar (selecciona con el indice): ")
@@ -217,7 +300,7 @@ class Vista(
         }
 
         getPedidos(lista)
-        var indice = readln().toIntOrNull() ?: -1
+        val indice = readln().toIntOrNull() ?: -1
         if (indice < 0 || indice > lista.size) {
             terminal.println(red("INDICE DE PEDIDO INCORRECTO"))
         } else {
@@ -238,7 +321,7 @@ class Vista(
 
     private suspend fun realizarPedidoBucle() {
         var opcion: Int
-        var pedido: Order? = null
+        //var pedido: Order? = null
         terminal.println(brightBlue("------ Realización de pedido ------"))
 
         do {
@@ -258,7 +341,7 @@ class Vista(
     }
 
     private fun creacionPedido(tareas: MutableList<Task>): Order? {
-        var pedido: Order?
+        val pedido: Order?
         var precio = 0F
         tareas.forEach { precio += it.price }
         println(precio)
@@ -282,7 +365,7 @@ class Vista(
 
 
     suspend fun creacionTareaEncordado(): Task {
-        var tarea: Task? = null
+        val tarea: Task?
 
         terminal.println("Indica la tensión vertical: ")
         val tV = readln().toIntOrNull() ?: -1
@@ -305,7 +388,7 @@ class Vista(
             terminal.println("ID: ")
             id = readln().toIntOrNull() ?: 0
         } while (id !in (0 until products.size))
-        var cV = products[id]
+        val cV = products[id]
 
         do {
             terminal.println("Indica el cordaje horizontal (escribe el indice): ")
@@ -348,7 +431,7 @@ class Vista(
     }
 
     suspend fun creacionTareaPersonalizado(): Task {
-        var tarea: Task?
+        val tarea: Task?
 
         terminal.println("Indica el nuevo peso de la raqueta: ")
         val peso = readln().toIntOrNull() ?: -1
@@ -357,7 +440,7 @@ class Vista(
         val balance = readln().toFloatOrNull() ?: -1F
 
         terminal.println("Indica la nueva rigidez de la raqueta: ")
-        var rigidez = readln().toIntOrNull() ?: -1
+        val rigidez = readln().toIntOrNull() ?: -1
 
         terminal.println("Selecciona una raqueta: ")
         getRackets()
@@ -389,7 +472,7 @@ class Vista(
 
 
     private suspend fun createTareaAdquisicion(): Task {
-        var tarea: Task?
+        val tarea: Task?
         val productos = mutableListOf<Product>()
         var repeat: Boolean
         do {
@@ -412,7 +495,7 @@ class Vista(
                 }
             }
             terminal.println("¿Quieres añadir otro producto? (S/N)")
-            var opt = readln()
+            val opt = readln()
             if (opt.equals("s", ignoreCase = true))
                 repeat = true
         } while (repeat)
@@ -482,7 +565,7 @@ class Vista(
     private suspend fun loginBucle() {
         var email: String
 
-        terminal.println(brightBlue("------ Log In Usuario ------"))
+        terminal.println(brightBlue("------ Log In Trabajador ------"))
         do {
             terminal.print("Correo: ")
             email = readln()
@@ -491,9 +574,8 @@ class Vista(
         terminal.print("Contraseña: ")
         val password: String = readln()
 
-        when (val result =
-            employeeController.getEmployeeByEmailAndPassword(email, PasswordParser.encriptar(password))) {
-            is EmployeeError -> TODO()
+        when (val result = employeeController.getEmployeeByEmailAndPassword(email, PasswordParser.encriptar(password))) {
+            is EmployeeError -> terminal.println(red("❌${result.code}: ${result.message}"))
             is EmployeeSuccess -> {
                 val correcto = result.data
                 loggedEmployee = correcto
@@ -510,8 +592,8 @@ class Vista(
     /**
      * Bucle vista si el usuario es un encordador.
      */
-    private fun encordadorBucle() {
-
+    private suspend fun encordadorBucle() {
+        administradorBuclePedidos()
     }
 
     /**
@@ -543,26 +625,12 @@ class Vista(
      */
     private suspend fun opcionesBucleAdmin(opcion: Int) {
         when (opcion) {
-            1 -> {
-                administradorBucleUsuarios()
-            }
-
-            2 -> {
-                administradorBucleClientes()
-            }
-
-            3 -> {
-                administradorBucleMaquinas()
-            }
-
-            4 -> {}
-            5 -> {
-                administradorBucleProductos()
-            }
-
-            0 -> {
-                terminal.println(blue.bg("Saliendo de la sesión"))
-            }
+            1 -> administradorBucleUsuarios()
+            2 -> administradorBucleClientes()
+            3 -> administradorBucleMaquinas()
+            4 ->  administradorBuclePedidos()
+            5 ->  administradorBucleProductos()
+            0 -> terminal.println(blue.bg("Saliendo de la sesión"))
         }
     }
 
@@ -589,30 +657,17 @@ class Vista(
         } while (opcion != 0)
     }
 
+
     /**
      * Opciones del bucle del administrador con los productos.
      */
     private suspend fun opcionesBucleAdminProductos(opcion: Int) {
         when (opcion) {
-            1 -> {
-                addProducto()
-            }
-
-            2 -> {
-                actuProducto()
-            }
-
-            3 -> {
-                getProductos()
-            }
-
-            4 -> {
-                eliminarProducto()
-            }
-
-            0 -> {
-                terminal.println(brightBlue.bg("Saliendo de la configuración de productos🛒🛒"))
-            }
+            1 -> addProducto()
+            2 -> actuProducto()
+            3 -> getProductos()
+            4 -> eliminarProducto()
+            0 ->terminal.println(brightBlue.bg("Saliendo de la configuración de productos🛒🛒"))
         }
     }
 
@@ -672,6 +727,7 @@ class Vista(
             }
         }
     }
+
 
     private fun mostrarTablaProductos(lista: List<Product>) {
         var index = 0
@@ -776,25 +832,12 @@ class Vista(
      */
     private suspend fun opcionesBucleAdminClientes(opcion: Int) {
         when (opcion) {
-            1 -> {
-                addCliente()
-            }
+            1 -> addCliente()
+            2 -> actuCliente()
+            3 -> getClientes()
+            4 -> eliminarCliente()
+            0 -> terminal.println(blue.bg("Saliendo de la configuración de clientes👩🏻👨🏻"))
 
-            2 -> {
-                actuCliente()
-            }
-
-            3 -> {
-                getClientes()
-            }
-
-            4 -> {
-                eliminarCliente()
-            }
-
-            0 -> {
-                terminal.println(blue.bg("Saliendo de la configuración de clientes👩🏻👨🏻"))
-            }
         }
     }
 
@@ -976,25 +1019,11 @@ class Vista(
 
     private suspend fun opcionesBucleAdminPersonalizadoras(opcion: Int) {
         when (opcion) {
-            1 -> {
-                addPersonalizadora()
-            }
-
-            2 -> {
-                actuPersonalizadora()
-            }
-
-            3 -> {
-                getPersonalizadoras()
-            }
-
-            4 -> {
-                eliminarPersonalizadora()
-            }
-
-            0 -> {
-                terminal.println(blue.bg("Saliendo de la configuración de personalizadoras🎾🎾"))
-            }
+            1 -> addPersonalizadora()
+            2 -> actuPersonalizadora()
+            3 -> getPersonalizadoras()
+            4 -> eliminarPersonalizadora()
+            0 -> terminal.println(blue.bg("Saliendo de la configuración de personalizadoras🎾🎾"))
         }
     }
 
@@ -1156,25 +1185,11 @@ class Vista(
 
     private suspend fun opcionesBucleAdminEncordadoras(opcion: Int) {
         when (opcion) {
-            1 -> {
-                addEncordadora()
-            }
-
-            2 -> {
-                actuEncordadora()
-            }
-
-            3 -> {
-                getEncordadoras()
-            }
-
-            4 -> {
-                eliminarEncordadora()
-            }
-
-            0 -> {
-                terminal.println(blue.bg("Saliendo de la configuración de encordadoras🎾🎾"))
-            }
+            1 -> addEncordadora()
+            2 -> actuEncordadora()
+            3 -> getEncordadoras()
+            4 -> eliminarEncordadora()
+            0 -> terminal.println(blue.bg("Saliendo de la configuración de encordadoras🎾🎾"))
         }
     }
 
@@ -1259,6 +1274,7 @@ class Vista(
         }
 
     }
+
 
     /**
      * Añadir una encordadora.
@@ -1351,25 +1367,11 @@ class Vista(
      */
     private suspend fun opcionesBucleAdminUsuarios(opcion: Int) {
         when (opcion) {
-            1 -> {
-                addTrabajador()
-            }
-
-            2 -> {
-                actuTrabajador()
-            }
-
-            3 -> {
-                getTrabajadores()
-            }
-
-            4 -> {
-                eliminarTrabajador()
-            }
-
-            0 -> {
-                terminal.println(blue.bg("Saliendo de la configuración de trabajadores👩🏻👨🏻"))
-            }
+            1 -> addTrabajador()
+            2 -> actuTrabajador()
+            3 -> getTrabajadores()
+            4 -> eliminarTrabajador()
+            0 -> terminal.println(blue.bg("Saliendo de la configuración de trabajadores👩🏻👨🏻"))
         }
     }
 
@@ -1548,7 +1550,7 @@ class Vista(
             is RacketError -> terminal.println(red("❌${result.code}: ${result.message}"))
             is RacketSuccess -> {
                 terminal.println("✅${result.code}: ${result.data}")
-                var list = loggedCustomer?.tennisRacketsList?.toMutableList()
+                val list = loggedCustomer?.tennisRacketsList?.toMutableList()
                 list?.add(result.data.id)
                 loggedCustomer?.tennisRacketsList = list!!
                 customerController.updateCustomer(loggedCustomer!!)
@@ -1606,7 +1608,7 @@ class Vista(
      * Encontrar las raquetas del cliente.
      */
     private suspend fun getRackets() {
-        var list = mutableListOf<Racket>()
+        val list = mutableListOf<Racket>()
         val listRacketsCustomer = loggedCustomer?.tennisRacketsList
         when (val result = racketController.getAllRackets()) {
             is RacketError -> terminal.println(red("❌${result.code}: ${result.message}"))
@@ -1655,23 +1657,7 @@ class Vista(
     }
 
 
-//---------------------------------PEDIDOS------------------------------------------------------
-
-    private suspend fun administradorBuclePedidos() {
-        var opcion: Int
-        do {
-            terminal.println(brightBlue("------ Pedidos Admin ------"))
-            do {
-                terminal.println(
-                    "1- Añadir Pedido \n" +
-                            "2- Actualizar Pedido \n" +
-                            "3- Listar Cliente \n" +
-                            "4- Eliminar Cliente \n" +
-                            "0- Salir"
-                )
-                opcion = readln().toIntOrNull() ?: -1
-            } while (opcion < 0 || opcion > 4)
-            opcionesBucleAdminClientes(opcion)
-        } while (opcion != 0)
-    }
 }
+
+
+
