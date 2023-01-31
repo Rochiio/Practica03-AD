@@ -13,7 +13,6 @@ import repositories.machines.StringerRepository
  * Controlador de Maquinas
  */
 @Single
-@Named("MachineController")
 class MachineController(
     private var stringerRepo: StringerRepository,
     private var customizerRepo: CustomizerRepository

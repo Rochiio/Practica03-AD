@@ -14,9 +14,7 @@ import repositories.users.EmployeeRepository
  * Controlador de empleados.
  */
 @Single
-@Named("EmployeeController")
 class EmployeeController(
-    @Named("EmployeeRepository")
     private var repository: EmployeeRepository) {
 
 

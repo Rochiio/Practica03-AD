@@ -21,11 +21,8 @@ import service.PasswordParser
  * Controlador de los Clientes.
  */
 @Single
-@Named("CustomerController")
 class CustomerController(
-    @Named("CustomerRepository")
     private var repository: CustomerRepository,
-    @Named("CustomerCacheRepository")
     private var cache: CustomerCacheRepository
 ) {
     private val logger = KotlinLogging.logger { }

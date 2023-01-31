@@ -6,11 +6,14 @@ import exception.ProductResult
 import exception.ProductSuccess
 import kotlinx.coroutines.flow.Flow
 import model.Product
+import org.koin.core.annotation.Single
 import repositories.orders.ProductRepository
 
 /**
  * Controlador de productos
  */
+@Single
+
 class ProductController(private var repository: ProductRepository) {
 
     /**
@@ -38,7 +41,7 @@ class ProductController(private var repository: ProductRepository) {
         find?.let {
             return ProductSuccess(200, it)
         }
-        return ProductErrorNotFound("No existe un producto con el id: $id")
+        return ProductErrorNotFound("No existe un producto con este id")
     }
 
 
