@@ -14,7 +14,6 @@ import org.litote.kmongo.eq
  * Implementación del repositorio de trabajadores.
  */
 @Single
-@Named("EmployeeRepository")
 class EmployeeRepositoryImpl: EmployeeRepository {
     private var logger = KotlinLogging.logger {}
     private var dbMongo = MongoDbManager.database

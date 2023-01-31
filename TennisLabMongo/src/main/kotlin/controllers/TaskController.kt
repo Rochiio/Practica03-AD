@@ -5,12 +5,14 @@ import exception.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import model.orders.tasks.Task
+import org.koin.core.annotation.Single
 import repositories.orders.TaskRepository
 import repositories.orders.TasksApiRepository
 
 /**
  * Controlador de tareas.
  */
+@Single
 class TaskController(private var repository: TaskRepository, private var api: TasksApiRepository) {
 
     /**

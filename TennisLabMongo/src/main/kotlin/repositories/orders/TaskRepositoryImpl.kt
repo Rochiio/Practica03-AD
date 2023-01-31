@@ -12,7 +12,6 @@ import java.util.UUID
 private var logger = KotlinLogging.logger {}
 
 @Single
-@Named("TaskRepository")
 class TaskRepositoryImpl : TaskRepository {
     private val dbMongo = MongoDbManager.database
     override suspend fun findById(id: String): Task? {

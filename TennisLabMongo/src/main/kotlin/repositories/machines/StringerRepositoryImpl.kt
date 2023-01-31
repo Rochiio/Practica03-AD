@@ -15,7 +15,6 @@ import org.koin.core.annotation.Single
 private var logger = KotlinLogging.logger {}
 
 @Single
-@Named("StringerRepository")
 class StringerRepositoryImpl : StringerRepository {
 
     val dbMongo =MongoDbManager.database

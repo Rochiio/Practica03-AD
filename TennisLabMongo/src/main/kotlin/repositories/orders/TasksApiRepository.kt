@@ -7,10 +7,10 @@ import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import service.api.ApiClient
 import util.mappers.toDto
+
 private val logger = KotlinLogging.logger { }
 
 @Single
-@Named("TaskApiRepository")
 class TasksApiRepository {
     private val client by lazy { ApiClient.tasksInstance }
 

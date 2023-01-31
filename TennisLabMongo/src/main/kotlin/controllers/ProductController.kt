@@ -6,11 +6,14 @@ import exception.ProductResult
 import exception.ProductSuccess
 import kotlinx.coroutines.flow.Flow
 import model.Product
+import org.koin.core.annotation.Single
 import repositories.orders.ProductRepository
 
 /**
  * Controlador de productos
  */
+@Single
+
 class ProductController(private var repository: ProductRepository) {
 
     /**

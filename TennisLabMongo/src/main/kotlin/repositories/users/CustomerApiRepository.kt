@@ -9,7 +9,6 @@ import service.api.ApiClient
 import util.mappers.fromDto
 
 @Single
-@Named("CustomerApiRepository")
 class CustomerApiRepository {
     private val client by lazy { ApiClient.usersInstance }
     private val logger = KotlinLogging.logger { }

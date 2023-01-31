@@ -17,7 +17,6 @@ import service.cache.UsersCache
  * Implementación del repositorio de caché de clientes.
  */
 @Single
-@Named("CustomerCacheRepository")
 class CustomerCacheRepositoryImpl:  CustomerCacheRepository{
     private val logger = KotlinLogging.logger { }
 

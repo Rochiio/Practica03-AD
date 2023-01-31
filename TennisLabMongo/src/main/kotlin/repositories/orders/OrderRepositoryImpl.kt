@@ -11,7 +11,6 @@ import org.litote.kmongo.MongoOperator
 private var logger = KotlinLogging.logger {}
 
 @Single
-@Named("OrderRepository")
 class OrderRepositoryImpl : OrderRepository {
     val dbMongo = MongoDbManager.database
     override suspend fun findById(id: String): Order? {
