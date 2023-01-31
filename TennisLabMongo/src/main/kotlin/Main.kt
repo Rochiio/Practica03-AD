@@ -1,5 +1,6 @@
 import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.terminal.Terminal
+import controllers.EmployeeController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -8,10 +9,13 @@ import model.lists.CompleteOrdersList
 import model.lists.ListProductsServices
 import model.lists.PendingOrdersList
 import model.lists.StringerAssignmentsList
+import model.users.Employee
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.ksp.generated.defaultModule
+import repositories.users.CustomerApiRepository
+import service.PasswordParser
 import service.files.*
 import util.Data
 import view.Vista
@@ -21,20 +25,17 @@ import kotlin.system.exitProcess
 
 val t = Terminal()
 fun main(args: Array<String>): Unit = runBlocking {
+
     startKoin {
         defaultModule()
     }
     KoinApp().run()
 }
-
 class KoinApp : KoinComponent {
     private val vista: Vista by inject()
 
     suspend fun run() {
-        do {
-            val num = vista.principal()
-            vista.opcionesPrincipal(num)
-        } while (num != 0)
+        vista.runVista()
 
         //makeJsonListas()
         exitProcess(0)
