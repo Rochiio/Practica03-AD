@@ -24,6 +24,8 @@ import model.orders.tasks.Stringing
 import model.orders.tasks.Task
 import model.users.Customer
 import model.users.Employee
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import util.Data
 import service.PasswordParser
 import java.time.LocalDate
@@ -32,6 +34,7 @@ import kotlin.collections.ArrayList
 /**
  * Vista del usuario.
  */
+@Single
 class Vista(
     private var employeeController: EmployeeController,
     private var machineController: MachineController,

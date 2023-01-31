@@ -6,11 +6,13 @@ import exception.RacketResult
 import exception.RacketSuccess
 import kotlinx.coroutines.flow.Flow
 import model.Racket
+import org.koin.core.annotation.Single
 import repositories.rackets.RacketRepository
 
 /**
  * Controlador de raquetas.
  */
+@Single
 class RacketController(
     private var repository: RacketRepository
 ) {

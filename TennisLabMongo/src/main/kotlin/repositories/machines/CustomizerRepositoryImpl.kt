@@ -12,7 +12,6 @@ import org.koin.core.annotation.Single
 private var logger = KotlinLogging.logger {}
 
 @Single
-@Named("CustomizerRepository")
 class CustomizerRepositoryImpl : CustomizerRepository {
     private val dbMongo = MongoDbManager.database
 

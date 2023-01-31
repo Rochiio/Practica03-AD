@@ -14,7 +14,6 @@ import java.util.*
  * Implementación del repositorio de clientes.
  */
 @Single
-@Named("CustomerRepository")
 class CustomerRepositoryImpl : CustomerRepository {
     private var logger = KotlinLogging.logger {}
     private var dbMongo = MongoDbManager.database

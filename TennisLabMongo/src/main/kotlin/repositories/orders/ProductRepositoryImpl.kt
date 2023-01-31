@@ -10,7 +10,6 @@ import org.litote.kmongo.MongoOperator
 private var logger = KotlinLogging.logger {}
 
 @Single
-@Named("ProductRepository")
 class ProductRepositoryImpl : ProductRepository {
     private var dbMongo = MongoDbManager.database
     override suspend fun findById(id: String): Product? {

@@ -12,7 +12,6 @@ import org.koin.core.annotation.Single
  * Implementación repositorio raquetas.
  */
 @Single
-@Named("RacketRepository")
 class RacketRepositoryImpl: RacketRepository {
     private var logger = KotlinLogging.logger {}
     private var dbMongo = MongoDbManager.database
