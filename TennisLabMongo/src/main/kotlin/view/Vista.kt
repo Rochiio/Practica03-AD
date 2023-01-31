@@ -86,9 +86,6 @@ class Vista(
      * Funcion principal para el inicio
      */
     suspend fun principal(): Int {
-        val init = withContext(Dispatchers.IO) {
-            initUsers()
-        }
 
 
         var opcion: Int
