@@ -25,7 +25,7 @@ import repositories.users.CustomerRepositoryImpl
 @DelicateCoroutinesApi
 @ExperimentalCoroutinesApi
 @ExtendWith(MockKExtension::class)
-class CustomerControllerTest : {
+class CustomerControllerTest  {
 
     @MockK
     private lateinit var repository: CustomerRepositoryImpl

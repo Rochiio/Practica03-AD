@@ -78,7 +78,7 @@ class TasksApiRepository {
             task
         } catch (e: Exception) {
             logger.error { "TasksApiRepository - findByUserId - ERROR - ${e.message}" }
-            throw Exception(e.message)
+            throw Exception("ERROR AL CREAR UNA TAREA")
 
         }
     }
