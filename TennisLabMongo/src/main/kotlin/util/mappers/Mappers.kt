@@ -19,9 +19,14 @@ fun CustomerDTO.fromDto(): Customer {
     )
 }
 
-fun Task.toDto(): TaskDTO = TaskDTO(
-    id = this.nId,
-    title = this.description,
-    userId = 0,
-    completed = available
-)
+fun Task.toDto(): TaskDTO {
+
+    val res = TaskDTO(
+        id = this.nId,
+        title = this.id,
+        userId = 0,
+        completed = available
+    )
+    println(res)
+    return res
+}

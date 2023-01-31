@@ -74,7 +74,9 @@ class TasksApiRepository {
      */
     suspend fun save(task: Task): Task {
         return try {
-            val call = client.create(task.toDto())
+            val a = task.toDto()
+            println(a)
+            val call = client.create(a)
             task
         } catch (e: Exception) {
             logger.error { "TasksApiRepository - findByUserId - ERROR - ${e.message}" }

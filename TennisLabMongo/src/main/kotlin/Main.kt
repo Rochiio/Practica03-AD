@@ -1,14 +1,14 @@
 import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.terminal.Terminal
 import controllers.EmployeeController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import db.MongoDbManager
+import javafx.application.Application.launch
+import kotlinx.coroutines.*
 import model.lists.CompleteOrdersList
 import model.lists.ListProductsServices
 import model.lists.PendingOrdersList
 import model.lists.StringerAssignmentsList
+import model.users.Customer
 import model.users.Employee
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -16,33 +16,75 @@ import org.koin.core.context.startKoin
 import org.koin.ksp.generated.defaultModule
 import repositories.users.CustomerApiRepository
 import service.PasswordParser
+import service.cache.UsersCache
 import service.files.*
 import util.Data
 import view.Vista
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Properties
 import kotlin.system.exitProcess
 
 val t = Terminal()
+val properties = Properties()
 fun main(args: Array<String>): Unit = runBlocking {
 
+    properties.load(javaClass.classLoader.getResourceAsStream("application.properties"))
+    clearData()
+    sampleData()
     startKoin {
         defaultModule()
     }
+
     KoinApp().run()
 }
+
 class KoinApp : KoinComponent {
     private val vista: Vista by inject()
 
-    suspend fun run() {
-        vista.runVista()
-
+    @OptIn(DelicateCoroutinesApi::class)
+    suspend fun run(): Unit = runBlocking {
+        var salir = false
+        withContext(Dispatchers.IO) {
+            var cache = launch {
+                do {
+                    UsersCache.refresh()
+                } while ((!salir))
+            }
+            launch {
+                vista.runVista()
+                salir = true
+                cache.cancel()
+            }
+        }
         //makeJsonListas()
         exitProcess(0)
     }
 }
 
+suspend fun clearData() {
+    var clear = properties.getProperty("database.clear").toBoolean()
+    if (clear) {
+        t.println(TextColors.green("🤖🧹 LIMPIANDO DATOS DEL PROGRAMA"))
 
+        MongoDbManager.database.dropCollection("customer")
+        MongoDbManager.database.dropCollection("customizer")
+        MongoDbManager.database.dropCollection("employee")
+        MongoDbManager.database.dropCollection("order")
+        MongoDbManager.database.dropCollection("product")
+        MongoDbManager.database.dropCollection("racket")
+        MongoDbManager.database.dropCollection("stringer")
+        MongoDbManager.database.dropCollection("task")
+    }
+}
+
+suspend fun sampleData(){
+    var sample = properties.getProperty("database.sample").toBoolean()
+    if (sample){
+        t.println(TextColors.green("🤖🔋 CARGANDO DATOS DE PRUEBA"))
+        //TODO("SAmple data")
+    }
+}
 /**
  * Hacer los ficheros con json
  */
@@ -67,7 +109,7 @@ suspend fun makeJsonListas() = withContext(Dispatchers.IO) {
         makeListadoPedidosCompletados()
     }
 
-    val pedido = async{
+    val pedido = async {
         makePedido()
     }
 
