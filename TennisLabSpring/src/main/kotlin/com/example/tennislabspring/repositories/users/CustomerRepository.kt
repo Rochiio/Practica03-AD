@@ -7,6 +7,6 @@ import java.util.*
 
 @Repository
 interface CustomerRepository: CoroutineCrudRepository<Customer, String> {
-    fun findByEmail(email: String): Customer?
-    fun findByUuid(uuid: UUID): Customer?
+    suspend fun findCustomerByEmail(email: String): Customer?
+    suspend fun findCustomerByUuid(uuid: UUID): Customer?
 }

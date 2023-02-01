@@ -20,16 +20,16 @@ class TennisLabSpringApplication
 
 	override fun run(vararg args: String?) = runBlocking{
 
-		var r = Racket(brand = "prueba", model = "model", maneuverability = 2.5f, rigidity = 3.5f, balance = 3.6f)
-		var c = Customer(name="Prueba", username = "username",email = "email",password ="1234", available = true, orderList = emptyList(),
-			tennisRacketsList = listOf(r)
-		)
+//		var r = Racket(brand = "prueba", model = "model", maneuverability = 2.5f, rigidity = 3.5f, balance = 3.6f)
+//		var c = Customer(name="Prueba", username = "username",email = "email",password ="1234", available = true, orderList = emptyList(),
+//			tennisRacketsList = listOf(r)
+//		)
+//
+//
+//		repo.save(c)
 
-
-		repo.save(c)
-
-		println(c)
-		println(r)
+		var find = repo.findCustomerByEmail("email")
+		println(find)
 
 		exitProcess(0)
 	}
