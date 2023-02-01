@@ -81,7 +81,9 @@ class Vista(
     /**
      * Funcion principal para el inicio
      */
+
      fun principal(): Int {
+
 
 
         var opcion: Int
@@ -305,7 +307,9 @@ class Vista(
                         withContext(Dispatchers.IO) {
                             launch {
                                 pedido.state = Status.EN_PROCESO
-                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id }
+
+                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id}
+
                                 orderController.updateOrder(pedido)
                             }
                             launch {

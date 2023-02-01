@@ -27,4 +27,5 @@ data class Employee(
     //Lista de pedidos máximo 2
     var orderList: MutableList<String>? = null,
     var machine : String? = null
+
 )
