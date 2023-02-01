@@ -26,9 +26,15 @@ import model.users.Customer
 import model.users.Employee
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
+import repositories.orders.TasksApiRepository
+import repositories.users.CustomerApiRepository
 import util.Data
 import service.PasswordParser
+import service.api.ApiClient
+import service.api.ApiUsers
+import util.mappers.fromDto
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.collections.ArrayList
 
 /**
@@ -42,17 +48,46 @@ class Vista(
     private var orderController: OrderController,
     private var taskController: TaskController,
     private var productController: ProductController,
-    private var racketController: RacketController
-) {
+    private var racketController: RacketController,
+
+    ) {
     private var terminal = Terminal(width = 150)
     private var loggedEmployee: Employee? = null
     private var loggedCustomer: Customer? = null
+    private var apiUsers = CustomerApiRepository()
+    //private var apiTasks = TasksApiRepository()
 
+    suspend fun runVista() {
+        initUsers()
+        var opt = principal()
+        opcionesPrincipal(opt)
+    }
+
+    suspend fun initUsers() {
+        val admin = Employee(
+            name = "admin",
+            surname = "admin",
+            email = "admin@admin.com",
+            password = PasswordParser.encriptar("1234"),
+            available = true,
+            isAdmin = true,
+            entryTime = null,
+            departureTime = null,
+            orderList = mutableListOf()
+        )
+
+        employeeController.addEmployee(admin)
+        val users = apiUsers.findAll(0, 100)
+        users.forEach { customerController.addCustomer(it.fromDto()) }
+
+    }
 
     /**
      * Funcion principal para el inicio
      */
-    fun principal(): Int {
+    suspend fun principal(): Int {
+
+
         var opcion: Int
         do {
             terminal.println(brightBlue("------ Bienvenido a tennislab🎾🎾 ------ \nelija una opción."))
@@ -209,7 +244,7 @@ class Vista(
      * Opciones del bucle de pedidos de los administradores y trabajadores
      */
     private suspend fun opcionesBucleAdminPedidos(opcion: Int) {
-        when(opcion){
+        when (opcion) {
             1 -> asignarPedidoTrabajador()
             2 -> completarPedidoTrabajador()
             0 -> terminal.println(brightBlue.bg("Saliendo de pedidos🛒🛒"))
@@ -221,28 +256,33 @@ class Vista(
      * Completar un pedido del trabajador.
      */
     private suspend fun completarPedidoTrabajador() {
-        val lista = mutableListOf<Order>()
+        var lista = mutableListOf<Order>()
         loggedEmployee?.orderList?.forEach {
-            when(val result = orderController.getOrderById(it)){
+            when (val result = orderController.getOrderById(it)) {
                 is OrderError -> TODO()
                 is OrderSuccess -> lista.add(result.data)
             }
         }
 
-        lista.filter{it.state == Status.EN_PROCESO}
+        lista = lista.filter { it.state == Status.EN_PROCESO }.toMutableList()
         getPedidos(lista)
+        if (lista.isNotEmpty()) {
+            print("Elija el pedido a completar por índice:")
+            val indice = readln().toIntOrNull() ?: -1
 
-        print("Elija el pedido a completar por índice:")
-        val indice = readln().toIntOrNull() ?: -1
-
-        if (indice < 0 || lista.size < indice) {
-            terminal.println(red("❌Indice de pedido incorrecto"))
-        } else {
-            val pedido = lista[indice]
-            pedido.state= Status.TERMINADO
-            pedido.exitDate = LocalDate.now()
-            orderController.updateOrder(pedido)
-            Data.completeOrders.add(pedido)
+            if (indice < 0 || lista.size < indice) {
+                terminal.println(red("❌Indice de pedido incorrecto"))
+            } else {
+                val pedido = lista[indice]
+                loggedEmployee?.orderList?.remove(pedido.id)
+                pedido.state = Status.TERMINADO
+                pedido.finalDate = LocalDate.now()
+                orderController.updateOrder(pedido)
+                Data.completeOrders.add(pedido)
+                withContext(Dispatchers.IO) {
+                    launch { employeeController.updateEmployee(loggedEmployee!!) }
+                }
+            }
         }
     }
 
@@ -252,7 +292,7 @@ class Vista(
      * Dependiendo de si ha llegado a su tope en el turno y si elige correctamente el pedido.
      */
     private suspend fun asignarPedidoTrabajador() {
-        if(loggedEmployee?.orderList?.size!! < 2) {
+        if (loggedEmployee?.orderList?.size!! < 2) {
             when (val result = orderController.getOrders()) {
                 is OrderError -> terminal.println(red("❌${result.code}: ${result.message}"))
                 is OrderSuccess -> {
@@ -260,7 +300,7 @@ class Vista(
                     getPedidos(lista)
                     print("Elija el pedido a realizar por índice:")
                     val indice = readln().toIntOrNull() ?: -1
-                    if (indice < 0 || lista.size < indice) {
+                    if (indice < 0 || indice >= lista.size) {
                         terminal.println(red("❌Indice de pedido incorrecto"))
                     } else {
                         val pedido = lista[indice]
@@ -268,7 +308,8 @@ class Vista(
 
                         withContext(Dispatchers.IO) {
                             launch {
-                                pedido.state= Status.EN_PROCESO
+                                pedido.state = Status.EN_PROCESO
+                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id}
                                 orderController.updateOrder(pedido)
                             }
                             launch {
@@ -286,7 +327,7 @@ class Vista(
                     }
                 }
             }
-        }else{
+        } else {
             terminal.println(red("❌Trabajador ${loggedEmployee?.name} ha llegado a el tope de pedidos en un turno"))
         }
     }
@@ -379,10 +420,10 @@ class Vista(
 
         var id = -1
         val result = productController.getAllProducts()
-        val products: List<Product> = mutableListOf()
+        var products: List<Product> = mutableListOf()
         when (result) {
             is ProductError -> terminal.println(red("❌${result.code}: ${result.message}"))
-            is ProductSuccess -> products + result.data.toList()
+            is ProductSuccess -> products = products + result.data.toList().filter { it.type == TypeProduct.CORDAJE }
 
         }
         do {
@@ -390,7 +431,7 @@ class Vista(
             getCordajes()
             terminal.println("ID: ")
             id = readln().toIntOrNull() ?: 0
-        } while (id !in (0 until products.size))
+        } while (id !in (products.indices))
         val cV = products[id]
 
         do {
@@ -398,7 +439,7 @@ class Vista(
             getCordajes()
             terminal.println("ID: ")
             id = readln().toIntOrNull() ?: 0
-        } while (id !in (0 until products.size))
+        } while (id !in (products.indices))
         val cH = products[id]
 
         terminal.println("Numero de nudos que quieres (2 o 4): ")
@@ -538,7 +579,8 @@ class Vista(
                         "FECHA FINAL",
                         "PRECIO",
                         "TOPE ENTREGA",
-                        "CLIENTE"
+                        "ESTADO"
+
                     )
                 }
                 for (pedido in lista) {
@@ -552,7 +594,7 @@ class Vista(
                             pedido.finalDate,
                             pedido.totalPrice,
                             pedido.maxDate,
-                            pedido.client.uuid
+                            pedido.state
                         )
                     }
                     indice++
@@ -577,7 +619,8 @@ class Vista(
         terminal.print("Contraseña: ")
         val password: String = readln()
 
-        when (val result = employeeController.getEmployeeByEmailAndPassword(email, PasswordParser.encriptar(password))) {
+        when (val result =
+            employeeController.getEmployeeByEmailAndPassword(email, PasswordParser.encriptar(password))) {
             is EmployeeError -> terminal.println(red("❌${result.code}: ${result.message}"))
             is EmployeeSuccess -> {
                 val correcto = result.data
@@ -589,6 +632,7 @@ class Vista(
                 }
             }
         }
+
     }
 
 
@@ -596,7 +640,10 @@ class Vista(
      * Bucle vista si el usuario es un encordador.
      */
     private suspend fun encordadorBucle() {
+        loggedEmployee?.entryTime = LocalDateTime.now()
         administradorBuclePedidos()
+        loggedEmployee?.departureTime = LocalDateTime.now()
+
     }
 
     /**
@@ -631,8 +678,8 @@ class Vista(
             1 -> administradorBucleUsuarios()
             2 -> administradorBucleClientes()
             3 -> administradorBucleMaquinas()
-            4 ->  administradorBuclePedidos()
-            5 ->  administradorBucleProductos()
+            4 -> administradorBuclePedidos()
+            5 -> administradorBucleProductos()
             0 -> terminal.println(blue.bg("Saliendo de la sesión"))
         }
     }
@@ -670,7 +717,7 @@ class Vista(
             2 -> actuProducto()
             3 -> getProductos()
             4 -> eliminarProducto()
-            0 ->terminal.println(brightBlue.bg("Saliendo de la configuración de productos🛒🛒"))
+            0 -> terminal.println(brightBlue.bg("Saliendo de la configuración de productos🛒🛒"))
         }
     }
 

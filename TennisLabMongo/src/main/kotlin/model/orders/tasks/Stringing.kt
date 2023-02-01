@@ -6,7 +6,7 @@ import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.newId
 import util.serializer.UUIDSerializer
 import java.util.*
-
+@Serializable
 data class Stringing(
     @BsonId
     val id: String = newId<Stringing>().toString(),

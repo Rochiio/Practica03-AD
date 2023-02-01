@@ -8,6 +8,7 @@ import model.orders.tasks.Task
 import org.koin.core.annotation.Single
 import repositories.orders.TaskRepository
 import repositories.orders.TasksApiRepository
+import service.api.ApiClient
 
 /**
  * Controlador de tareas.
@@ -26,6 +27,7 @@ class TaskController(private var repository: TaskRepository, private var api: Ta
             return TaskErrorExists("Ya existe una tarea con este id")
         }
         repository.save(tarea)
+        api.save(tarea)
         return TaskSuccess(201, tarea)
     }
 
@@ -45,6 +47,7 @@ class TaskController(private var repository: TaskRepository, private var api: Ta
      */
     suspend fun updateTask(tarea: Task): TaskResult<Task> {
         val update = repository.update(tarea)
+        api.update(tarea)
         return TaskSuccess(200, update)
     }
 
