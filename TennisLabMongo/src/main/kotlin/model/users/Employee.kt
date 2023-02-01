@@ -1,9 +1,7 @@
 package model.users
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.bson.codecs.pojo.annotations.BsonId
-import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import util.serializer.LocalDateTimeSerializer
 import util.serializer.UUIDSerializer
@@ -27,5 +25,7 @@ data class Employee(
     @Serializable(with = LocalDateTimeSerializer::class)
     var departureTime: LocalDateTime? = null,
     //Lista de pedidos máximo 2
-    var orderList: MutableList<String>? = null
+    var orderList: MutableList<String>? = null,
+    var machine : String? = null
+
 )
