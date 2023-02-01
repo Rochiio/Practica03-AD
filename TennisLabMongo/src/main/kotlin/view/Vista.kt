@@ -24,14 +24,10 @@ import model.orders.tasks.Stringing
 import model.orders.tasks.Task
 import model.users.Customer
 import model.users.Employee
-import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
-import repositories.orders.TasksApiRepository
 import repositories.users.CustomerApiRepository
 import util.Data
 import service.PasswordParser
-import service.api.ApiClient
-import service.api.ApiUsers
 import util.mappers.fromDto
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -59,7 +55,7 @@ class Vista(
 
     suspend fun runVista() {
         initUsers()
-        var opt = principal()
+        val opt = principal()
         opcionesPrincipal(opt)
     }
 
@@ -85,7 +81,7 @@ class Vista(
     /**
      * Funcion principal para el inicio
      */
-    suspend fun principal(): Int {
+     fun principal(): Int {
 
 
         var opcion: Int
@@ -201,7 +197,7 @@ class Vista(
 
             4 -> {
                 val pedido = creacionPedido(Data.tasksCreated)
-                pedido?.let {
+                pedido.let {
                     Data.pendingOrders.add(pedido)
                     orderController.addOrder(pedido)
                     terminal.println("Pedido creado")
@@ -309,7 +305,7 @@ class Vista(
                         withContext(Dispatchers.IO) {
                             launch {
                                 pedido.state = Status.EN_PROCESO
-                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id}
+                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id }
                                 orderController.updateOrder(pedido)
                             }
                             launch {
@@ -384,7 +380,7 @@ class Vista(
         } while (opcion != 0 && opcion != 4)
     }
 
-    private fun creacionPedido(tareas: MutableList<Task>): Order? {
+    private fun creacionPedido(tareas: MutableList<Task>): Order {
         val pedido: Order?
         var precio = 0F
         tareas.forEach { precio += it.price }
@@ -418,7 +414,7 @@ class Vista(
         val tH = readln().toIntOrNull() ?: -1
 
 
-        var id = -1
+        var id : Int
         val result = productController.getAllProducts()
         var products: List<Product> = mutableListOf()
         when (result) {
@@ -463,7 +459,7 @@ class Vista(
 
         tarea = Task(
             idEmployee = null, idStringer = null, idCustomizer = null,
-            price = precio.toFloat(),
+            price = precio,
             description = descripcion,
             taskType = TypeTask.ENCORDADO,
             available = true
@@ -1059,10 +1055,11 @@ class Vista(
                             "2- Actualizar Personalizadora \n" +
                             "3- Listar Personalizadoras \n" +
                             "4- Eliminar Personalizadora \n" +
+                            "5 - Asignar personalizadora \n" +
                             "0- Salir"
                 )
                 opcion = readln().toIntOrNull() ?: -1
-            } while (opcion < 0 || opcion > 4)
+            } while (opcion < 0 || opcion > 5)
             opcionesBucleAdminPersonalizadoras(opcion)
         } while (opcion != 0)
     }
@@ -1073,7 +1070,29 @@ class Vista(
             2 -> actuPersonalizadora()
             3 -> getPersonalizadoras()
             4 -> eliminarPersonalizadora()
+            5 -> asignarPersonalizadora()
             0 -> terminal.println(blue.bg("Saliendo de la configuración de personalizadoras🎾🎾"))
+        }
+    }
+
+    private suspend fun asignarPersonalizadora() {
+        val result = machineController.getAllCustomizers()
+        when (result) {
+            is CustomizerError -> terminal.println(red("❌${result.code}: ${result.message}"))
+            is CustomizerSuccess -> {
+                if (loggedEmployee?.machine == null) {
+                    terminal.println("Selecciona una personalizadora para utilizar")
+                    var opt : Int
+                    do {
+                        getPersonalizadoras()
+                        opt = readln().toIntOrNull() ?: 0
+                    } while (opt < 0 || opt >= result.data.toList().size)
+
+                    loggedEmployee?.machine = result.data.toList()[opt].id
+                    terminal.println("Maquina asignada")
+                    terminal.println(blue(loggedEmployee?.name!!) + "->" + green(loggedEmployee?.machine!!))
+                }
+            }
         }
     }
 
@@ -1107,12 +1126,24 @@ class Vista(
                         align = TextAlign.CENTER
                         header {
                             style(blue, bold = true)
-                            row("ID", "MODELO", "MARCA", "FECHA ADQUISICION", "MANIOBRABILIDAD", "BALANCE", "RIGIDEZ")
+                            row(
+                                "INDICE",
+                                "ID",
+                                "MODELO",
+                                "MARCA",
+                                "FECHA ADQUISICION",
+                                "MANIOBRABILIDAD",
+                                "BALANCE",
+                                "RIGIDEZ"
+                            )
                         }
+                        var indice = 0
                         for (pers in lista) {
+
                             body {
                                 rowStyles(cyan, brightCyan)
                                 row(
+                                    indice,
                                     pers.id,
                                     pers.model,
                                     pers.brand,
@@ -1122,6 +1153,7 @@ class Vista(
                                     pers.rigidity
                                 )
                             }
+                            indice++
                         }
                     })
                 }
@@ -1225,10 +1257,11 @@ class Vista(
                             "2- Actualizar Encordadora \n" +
                             "3- Listar Encordadoras \n" +
                             "4- Eliminar Encordadora \n" +
+                            "5 - Asignar encordadora \n" +
                             "0- Salir"
                 )
                 opcion = readln().toIntOrNull() ?: -1
-            } while (opcion < 0 || opcion > 4)
+            } while (opcion < 0 || opcion > 5)
             opcionesBucleAdminEncordadoras(opcion)
         } while (opcion != 0)
     }
@@ -1239,10 +1272,33 @@ class Vista(
             2 -> actuEncordadora()
             3 -> getEncordadoras()
             4 -> eliminarEncordadora()
+            5 -> asignarEncordadora()
             0 -> terminal.println(blue.bg("Saliendo de la configuración de encordadoras🎾🎾"))
         }
     }
 
+    private suspend fun asignarEncordadora() {
+        val result = machineController.getAllStringers()
+        when (result) {
+            is StringerError -> terminal.println(red("❌${result.code}: ${result.message}"))
+            is StringerSuccess -> {
+                if (loggedEmployee?.machine == null) {
+                    terminal.println("Selecciona una encordadora para utilizar")
+                    var opt : Int
+                    do {
+                        getEncordadoras()
+                        opt = readln().toIntOrNull() ?: 0
+                    } while (opt < 0 || opt >= result.data.toList().size)
+
+                    loggedEmployee?.machine = result.data.toList()[opt].id
+                    terminal.println("Maquina asignada")
+                    terminal.println(blue(loggedEmployee?.name!!) + "->" + green(loggedEmployee?.machine!!))
+                } else {
+                    terminal.println(red("Ya tienes una maquian asignada"))
+                }
+            }
+        }
+    }
 
     /**
      * Eliminar una encordadora
@@ -1275,6 +1331,7 @@ class Vista(
                         header {
                             style(blue, bold = true)
                             row(
+                                "INDICE",
                                 "ID",
                                 "MODELO",
                                 "MARCA",
@@ -1284,11 +1341,13 @@ class Vista(
                                 "TENSION MINIMA"
                             )
                         }
+                        var indice = 0
                         for (trab in lista) {
                             body {
                                 rowStyles(cyan, brightCyan)
 
                                 row(
+                                    indice,
                                     trab.id,
                                     trab.model,
                                     trab.brand,
@@ -1298,6 +1357,8 @@ class Vista(
                                     trab.minimumTension,
                                 )
                             }
+
+                            indice++
                         }
                     })
                 }
