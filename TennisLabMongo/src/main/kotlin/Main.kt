@@ -53,7 +53,11 @@ class KoinApp : KoinComponent {
                     val local = properties.getProperty("mongo.local").toBoolean()
                     if (!local) {
                         watchers.watchOrder()
+<<<<<<< HEAD
+                            .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value}") }
+=======
                             .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+>>>>>>> f9b51149b3066014dfbb31c3dae7e420d094fb8c
                     }
                 }
             }

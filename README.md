@@ -2,6 +2,7 @@
 <h2 align="center">Práctica Accesso a Datos 03</h2>
 
 ----
+[![Kotlin](https://img.shields.io/badge/Code-Kotlin-blueviolet)](https://kotlinlang.org/)
 
 <p  align="center" ><img src="./img/AD03.png" width="900px"></p>
 
@@ -24,7 +25,7 @@ Realizado con BDD noSQL MongoDB(KMongo) y Spring.
 <br>
 
 #### Documentación del proyecto:
-[Documentacion]()
+[Documentacion](https://github.com/loopedmoha/Practica03-AD/blob/main/documentación/TennisLab%202.pdf)
 
 <br>
 
