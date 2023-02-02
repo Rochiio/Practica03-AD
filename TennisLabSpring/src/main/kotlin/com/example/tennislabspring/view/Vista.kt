@@ -1775,6 +1775,19 @@ class Vista{
     }
 
 
+    /**
+     * Borrar todos los datos de las colecciones.
+     */
+    suspend fun deleteData(){
+        customerController.deleteAll()
+        employeeController.deleteAll()
+        machineController.deleteAll()
+        orderController.deleteAll()
+        productController.deleteAll()
+        racketController.deleteAll()
+        taskController.deleteAll()
+    }
+
 }
 
 

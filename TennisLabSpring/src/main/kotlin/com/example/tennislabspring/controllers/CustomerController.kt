@@ -164,5 +164,8 @@ class CustomerController
         return CustomerSuccess<Boolean>(200, true)
     }
 
+    suspend fun deleteAll(){
+        repository.deleteAll()
+    }
 
 }

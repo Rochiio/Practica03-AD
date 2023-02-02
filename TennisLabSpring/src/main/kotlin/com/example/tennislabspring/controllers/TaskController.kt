@@ -99,4 +99,8 @@ class TaskController(private var repository: TaskRepository, private var api: Ta
             TaskErrorExists("Ya existe una tarea con este id")
         }
     }
+
+    suspend fun deleteAll(){
+        repository.deleteAll()
+    }
 }

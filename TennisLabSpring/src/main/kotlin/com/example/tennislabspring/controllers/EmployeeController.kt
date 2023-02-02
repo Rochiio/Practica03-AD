@@ -97,6 +97,8 @@ class EmployeeController
         return EmployeeSuccess(200, true)
     }
 
-
+    suspend fun deleteAll(){
+        repository.deleteAll()
+    }
 
 }
