@@ -83,12 +83,6 @@ class Vista(
      */
 
     suspend fun principal(): Int {
-        //ESTO ES PARA PROBAR EL TIEMPO REAL
-/*withContext(Dispatchers.Unconfined) {
-    launch {
-    customerController.watchCustomers()
-        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }}
-}*/
 
         var opcion: Int
         do {

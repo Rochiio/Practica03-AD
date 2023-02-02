@@ -80,7 +80,4 @@ class RacketController(
         return RacketSuccess(200, delete)
     }
 
-    fun watchRackets() : ChangeStreamPublisher<Racket>{
-        return watchers.watchRacket()
-    }
 }

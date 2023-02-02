@@ -23,9 +23,8 @@ data class Customer(
     var password:String,
     var available: Boolean,
     //Lista de pedidos del cliente
-    //TODO Revisar
     @DocumentReference
-    var orderList: List<String>,
+    var orderList: List<String>?,
     @DocumentReference
-    var tennisRacketsList: List<Racket>
+    var tennisRacketsList: List<Racket>?
 )

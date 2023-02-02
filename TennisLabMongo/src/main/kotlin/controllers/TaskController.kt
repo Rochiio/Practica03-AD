@@ -104,7 +104,4 @@ class TaskController(private var repository: TaskRepository, private var api: Ta
         }
     }
 
-    fun watchTasks() : ChangeStreamPublisher<Task>{
-        return watchers.watchTask()
-    }
 }

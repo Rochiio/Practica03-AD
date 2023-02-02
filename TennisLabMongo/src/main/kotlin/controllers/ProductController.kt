@@ -79,7 +79,4 @@ class ProductController(private var repository: ProductRepository, private var w
         return ProductSuccess(200, delete)
     }
 
-    fun watchProduct() : ChangeStreamPublisher<Product> {
-        return watchers.watchProduct()
-    }
 }
