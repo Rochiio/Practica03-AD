@@ -27,7 +27,7 @@ fun main(args: Array<String>): Unit = runBlocking {
 
     properties.load(javaClass.classLoader.getResourceAsStream("application.properties"))
     clearData()
-    sampleData()
+    //sampleData()
     startKoin {
         defaultModule()
     }
@@ -47,12 +47,17 @@ class KoinApp : KoinComponent {
                     UsersCache.refresh()
                 } while ((!salir))
             }
+
             val w = launch {
                 launch {
-                    watchers.watchOrder()
-                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                    val local = properties.getProperty("mongo.local").toBoolean()
+                    if (!local) {
+                        watchers.watchOrder()
+                            .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                    }
                 }
             }
+
 
 
             launch {
@@ -84,13 +89,6 @@ suspend fun clearData() {
     }
 }
 
-suspend fun sampleData() {
-    var sample = properties.getProperty("database.sample").toBoolean()
-    if (sample) {
-        t.println(TextColors.green("🤖🔋 CARGANDO DATOS DE PRUEBA"))
-        //TODO("SAmple data")
-    }
-}
 
 /**
  * Hacer los ficheros con json

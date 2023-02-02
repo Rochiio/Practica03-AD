@@ -1,15 +1,16 @@
 package view
 
 import com.github.ajalt.mordant.rendering.TextAlign
+import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextColors.*
 import com.github.ajalt.mordant.table.table
 import com.github.ajalt.mordant.terminal.Terminal
 import controller.*
 import controllers.*
+import db.SampleData
 import exception.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import model.*
@@ -30,6 +31,7 @@ import service.PasswordParser
 import util.mappers.fromDto
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.Properties
 import kotlin.collections.ArrayList
 
 /**
@@ -54,25 +56,26 @@ class Vista(
 
     suspend fun runVista() {
         initUsers()
-
+        sampleData()
         val opt = principal()
         opcionesPrincipal(opt)
     }
 
-    suspend fun initUsers() {
-        val admin = Employee(
-            name = "admin",
-            surname = "admin",
-            email = "admin@admin.com",
-            password = PasswordParser.encriptar("1234"),
-            available = true,
-            isAdmin = true,
-            entryTime = null,
-            departureTime = null,
-            orderList = mutableListOf()
-        )
+    suspend fun sampleData() {
+        var properties = Properties()
+        properties.load(javaClass.classLoader.getResourceAsStream("application.properties"))
+        var sample = properties.getProperty("database.sample").toBoolean()
+        if (sample) {
+            terminal.println(TextColors.green("🤖🔋 CARGANDO DATOS DE PRUEBA"))
+            SampleData.sampleEmployees().forEach { e -> employeeController.addEmployee(e) }
+            SampleData.sampleProducts().forEach{ p -> productController.addProduct(p) }
+            SampleData.sampleCustomizer().forEach{customizer -> machineController.addCustomizer(customizer) }
+            SampleData.sampleStringers().forEach{stringer -> machineController.addStringer(stringer)}
+        }
+    }
 
-        employeeController.addEmployee(admin)
+    suspend fun initUsers() {
+        //employeeController.addEmployee(admin)
         val users = apiUsers.findAll(0, 100)
         users.forEach { customerController.addCustomer(it.fromDto()) }
 
