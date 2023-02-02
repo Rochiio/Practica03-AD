@@ -144,6 +144,9 @@ class MachineController
         return CustomizerSuccess(200, true)
     }
 
-
+    suspend fun deleteAll(){
+        stringerRepo.deleteAll()
+        customizerRepo.deleteAll()
+    }
 
 }

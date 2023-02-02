@@ -75,4 +75,8 @@ class ProductController
         repository.delete(item)
         return ProductSuccess(200, true)
     }
+
+    suspend fun deleteAll(){
+        repository.deleteAll()
+    }
 }

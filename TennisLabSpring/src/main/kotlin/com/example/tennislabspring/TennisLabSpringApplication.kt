@@ -24,13 +24,14 @@ val properties = Properties()
 @SpringBootApplication
 class TennisLabSpringApplication
 @Autowired constructor(
-	private val watchers: Watchers,
 	private val vista: Vista,
+	private val watchers: Watchers,
 ):CommandLineRunner {
+
 
 	override fun run(vararg args: String?) = runBlocking{
 			properties.load(javaClass.classLoader.getResourceAsStream("database.properties"))
-			clearData()
+			clearData(vista)
 			sampleData()
 
 			var salir = false
@@ -62,12 +63,11 @@ class TennisLabSpringApplication
 
 	}
 
-	suspend fun clearData() {
+	suspend fun clearData(vista: Vista) {
 		var clear = properties.getProperty("database.clear").toBoolean()
 		if (clear) {
 			t.println(TextColors.green("🤖🧹 LIMPIANDO DATOS DEL PROGRAMA"))
-//TODO("SAmple data")
-
+			vista.deleteData()
 		}
 	}
 

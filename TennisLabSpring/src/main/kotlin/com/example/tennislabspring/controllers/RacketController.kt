@@ -76,4 +76,8 @@ class RacketController
         repository.delete(item)
         return RacketSuccess(200, true)
     }
+
+    suspend fun deleteAll(){
+        repository.deleteAll()
+    }
 }

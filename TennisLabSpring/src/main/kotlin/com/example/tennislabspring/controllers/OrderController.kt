@@ -78,5 +78,8 @@ class OrderController
         return OrderErrorNotFound("No existe el pedido con este id")
     }
 
+    suspend fun deleteAll(){
+        repository.deleteAll()
+    }
 
 }
