@@ -2,6 +2,7 @@ import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.terminal.Terminal
 import db.MongoDbManager
 import kotlinx.coroutines.*
+import kotlinx.coroutines.reactive.collect
 import model.lists.CompleteOrdersList
 import model.lists.ListProductsServices
 import model.lists.PendingOrdersList
@@ -12,6 +13,7 @@ import org.koin.core.context.startKoin
 import org.koin.ksp.generated.defaultModule
 import service.cache.UsersCache
 import service.files.*
+import service.reactive.Watchers
 import util.Data
 import view.Vista
 import java.nio.file.Files
@@ -35,6 +37,7 @@ fun main(args: Array<String>): Unit = runBlocking {
 
 class KoinApp : KoinComponent {
     private val vista: Vista by inject()
+    val watchers = Watchers()
 
     @OptIn(DelicateCoroutinesApi::class)
     suspend fun run(): Unit = runBlocking {
@@ -44,6 +47,9 @@ class KoinApp : KoinComponent {
                 do {
                     UsersCache.refresh()
                 } while ((!salir))
+            }
+            launch {
+                watchers.watchCustomers().collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
             }
             launch {
                 vista.runVista()
