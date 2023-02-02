@@ -1,0 +1,64 @@
+{
+    "list": [
+    ]
+}{
+    "list": [
+        {
+            "idOrder": "63dc01a71421810aaba65467",
+            "stringer": {
+                "id": "63dc01026aab2757dfc817c3",
+                "uuid": "d7336fe5-0efd-4f37-93cf-2e6888f5e55d",
+                "name": "rocio",
+                "surname": "palao",
+                "email": "rocio@mail.com",
+                "password": "0fd0dd091bd165d29de6ebc97988ef6582575faafc84f7ebe7672379fd1211e3a3fcce723b27500fb147d4963e58e1c30373d7727bd14f5129c616eb972ec023",
+                "available": true,
+                "isAdmin": false,
+                "entryTime": "2023-02-02T19:34:23.854194100",
+                "departureTime": "2023-02-02T19:35:38.134924800",
+                "orderList": [
+                    "63dc01c91421810aaba65471"
+                ]
+            }
+        },
+        {
+            "idOrder": "63dc01bb1421810aaba6546b",
+            "stringer": {
+                "id": "63dc01026aab2757dfc817c3",
+                "uuid": "d7336fe5-0efd-4f37-93cf-2e6888f5e55d",
+                "name": "rocio",
+                "surname": "palao",
+                "email": "rocio@mail.com",
+                "password": "0fd0dd091bd165d29de6ebc97988ef6582575faafc84f7ebe7672379fd1211e3a3fcce723b27500fb147d4963e58e1c30373d7727bd14f5129c616eb972ec023",
+                "available": true,
+                "isAdmin": false,
+                "entryTime": "2023-02-02T19:34:23.854194100",
+                "departureTime": "2023-02-02T19:35:38.134924800",
+                "orderList": [
+                    "63dc01c91421810aaba65471"
+                ]
+            }
+        },
+        {
+            "idOrder": "63dc01c91421810aaba65471",
+            "stringer": {
+                "id": "63dc01026aab2757dfc817c3",
+                "uuid": "d7336fe5-0efd-4f37-93cf-2e6888f5e55d",
+                "name": "rocio",
+                "surname": "palao",
+                "email": "rocio@mail.com",
+                "password": "0fd0dd091bd165d29de6ebc97988ef6582575faafc84f7ebe7672379fd1211e3a3fcce723b27500fb147d4963e58e1c30373d7727bd14f5129c616eb972ec023",
+                "available": true,
+                "isAdmin": false,
+                "entryTime": "2023-02-02T19:34:23.854194100",
+                "departureTime": "2023-02-02T19:35:38.134924800",
+                "orderList": [
+                    "63dc01c91421810aaba65471"
+                ]
+            }
+        }
+    ]
+}{
+    "list": [
+    ]
+}

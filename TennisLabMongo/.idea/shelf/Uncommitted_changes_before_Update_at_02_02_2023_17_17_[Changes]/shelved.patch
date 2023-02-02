@@ -1,0 +1,16 @@
+Index: src/main/kotlin/db/Data.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/db/Data.kt b/src/main/kotlin/db/Data.kt
+new file mode 100644
+--- /dev/null	(date 1675354632434)
++++ b/src/main/kotlin/db/Data.kt	(date 1675354632434)
+@@ -0,0 +1,5 @@
++package db
++
++class Data {
++    fun init
++}
+\ No newline at end of file
