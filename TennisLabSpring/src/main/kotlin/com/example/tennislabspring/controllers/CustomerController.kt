@@ -9,10 +9,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import org.springframework.stereotype.Controller
+import com.example.tennislabspring.repositories.users.CustomerCacheRepository
+import org.springframework.beans.factory.annotation.Autowired
+
 /**
  * Controlador de los Clientes.
  */
-class CustomerController(
+@Controller
+class CustomerController
+    @Autowired constructor(
     private var repository: CustomerRepository,
     private var cache: CustomerCacheRepository
 ) {
@@ -137,7 +143,7 @@ class CustomerController(
             }
         }
 
-        val update = repository.update(cliente)
+        val update = repository.save(cliente)
         return CustomerSuccess<Customer>(200, update)
     }
 

@@ -39,11 +39,10 @@ class KoinApp : KoinComponent {
     private val vista: Vista by inject()
     val watchers = Watchers()
 
-    @OptIn(DelicateCoroutinesApi::class)
     suspend fun run(): Unit = runBlocking {
         var salir = false
         withContext(Dispatchers.IO) {
-            var cache = launch {
+            val cache = launch {
                 do {
                     UsersCache.refresh()
                 } while ((!salir))

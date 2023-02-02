@@ -1,20 +1,20 @@
-package controllers
+package com.example.tennislabspring.controllers
 
-import exception.OrderErrorExists
-import exception.OrderErrorNotFound
-import exception.OrderResult
-import exception.OrderSuccess
+
+import com.example.tennislabspring.exception.*
+import com.example.tennislabspring.model.orders.Order
+import com.example.tennislabspring.repositories.orders.OrderRepository
 import kotlinx.coroutines.flow.Flow
-import model.orders.Order
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Single
-import repositories.orders.OrderRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Controller
 
 /**
  * Controlador de pedidos.
  */
-@Single
-class OrderController(private var repository: OrderRepository) {
+@Controller
+class OrderController
+    @Autowired constructor(
+        private var repository: OrderRepository) {
 
 
     /**
@@ -49,7 +49,7 @@ class OrderController(private var repository: OrderRepository) {
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateOrder(pedido: Order):OrderResult<Order>{
-        val update = repository.update(pedido)
+        val update = repository.save(pedido)
         return OrderSuccess(200, update)
     }
 
@@ -60,8 +60,8 @@ class OrderController(private var repository: OrderRepository) {
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteOrder(pedido: Order): OrderResult<Boolean> {
-        val delete = repository.delete(pedido)
-        return OrderSuccess(200, delete)
+        repository.delete(pedido)
+        return OrderSuccess(200, true)
     }
 
 
