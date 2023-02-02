@@ -17,9 +17,11 @@ import com.example.tennislabspring.service.PasswordParser
 import com.example.tennislabspring.util.Data
 import com.example.tennislabspring.util.mappers.fromDto
 import com.github.ajalt.mordant.rendering.TextAlign
+import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextColors.*
 import com.github.ajalt.mordant.table.table
 import com.github.ajalt.mordant.terminal.Terminal
+import db.SampleData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
 import kotlinx.serialization.encodeToString
@@ -28,25 +30,32 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.collections.ArrayList
 
 /**
  * Vista del usuario.
  */
 @Component
-class Vista{
+class Vista {
     @Autowired
     private lateinit var employeeController: EmployeeController
+
     @Autowired
     private lateinit var machineController: MachineController
+
     @Autowired
     private lateinit var customerController: CustomerController
+
     @Autowired
     private lateinit var orderController: OrderController
+
     @Autowired
     private lateinit var taskController: TaskController
+
     @Autowired
     private lateinit var productController: ProductController
+
     @Autowired
     private lateinit var racketController: RacketController
 
@@ -58,28 +67,28 @@ class Vista{
 
     suspend fun runVista() {
         initUsers()
-
+        sampleData()
         val opt = principal()
         opcionesPrincipal(opt)
     }
 
     suspend fun initUsers() {
-        val admin = Employee(
-            name = "admin",
-            surname = "admin",
-            email = "admin@admin.com",
-            password = PasswordParser.encriptar("1234"),
-            available = true,
-            isAdmin = true,
-            entryTime = null,
-            departureTime = null,
-            orderList = mutableListOf()
-        )
-
-        employeeController.addEmployee(admin)
         val users = apiUsers.findAll(0, 100)
         users.forEach { customerController.addCustomer(it.fromDto()) }
 
+    }
+
+    suspend fun sampleData() {
+        var properties = Properties()
+        properties.load(javaClass.classLoader.getResourceAsStream("database.properties"))
+        var sample = properties.getProperty("database.sample").toBoolean()
+        if (sample) {
+            terminal.println(TextColors.green("🤖🔋 CARGANDO DATOS DE PRUEBA"))
+            SampleData.sampleEmployees().forEach { e -> employeeController.addEmployee(e) }
+            SampleData.sampleProducts().forEach { p -> productController.addProduct(p) }
+            SampleData.sampleCustomizer().forEach { customizer -> machineController.addCustomizer(customizer) }
+            SampleData.sampleStringers().forEach { stringer -> machineController.addStringer(stringer) }
+        }
     }
 
     /**
@@ -1778,7 +1787,7 @@ class Vista{
     /**
      * Borrar todos los datos de las colecciones.
      */
-    suspend fun deleteData(){
+    suspend fun deleteData() {
         customerController.deleteAll()
         employeeController.deleteAll()
         machineController.deleteAll()
