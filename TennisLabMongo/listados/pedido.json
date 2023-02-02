@@ -1,0 +1,27 @@
+{
+    "id": "63dc01a71421810aaba65467",
+    "uuid": "8130366f-f31a-474f-bd2d-a6e0fb052bcf",
+    "state": "TERMINADO",
+    "entryDate": "2023-02-02",
+    "exitDate": "2023-12-31",
+    "finalDate": "2023-02-02",
+    "maxDate": "2023-02-17",
+    "totalPrice": 34.98,
+    "client": {
+        "id": "63dc01026aab2757dfc817bf",
+        "uuid": "38476b1b-7761-4a74-b383-4b8f704847f2",
+        "nId": 8,
+        "name": "Nicholas Runolfsdottir V",
+        "username": "Nicholas Runolfsdottir V",
+        "email": "Sherwood@rosamond.me",
+        "password": "d404559f602eab6fd602ac7680dacbfaadd13630335e951f097af3900e9de176b6db28512f2e000b9d04fba5133e8b1c6e8df59db3a8ab9d60be4b97cc9e81db",
+        "available": true,
+        "orderList": [
+        ],
+        "tennisRacketsList": [
+            "63dc018a1421810aaba65461"
+        ]
+    },
+    "tasks": [
+    ]
+}
