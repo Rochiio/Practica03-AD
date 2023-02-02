@@ -2,7 +2,6 @@
 <h2 align="center">Práctica Accesso a Datos 03</h2>
 
 ----
-![GitHub](https://img.shields.io/github/last-commit)
 [![Kotlin](https://img.shields.io/badge/Code-Kotlin-blueviolet)](https://kotlinlang.org/)
 
 <p  align="center" ><img src="./img/AD03.png" width="900px"></p>
