@@ -32,5 +32,5 @@ data class Order(
     var totalPrice: Float,
     val client: Customer,
     @DocumentReference
-    var tasks: List<Task>
+    var tasks: List<Task>?
 )

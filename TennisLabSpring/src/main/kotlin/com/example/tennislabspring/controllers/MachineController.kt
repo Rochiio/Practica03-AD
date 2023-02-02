@@ -1,19 +1,20 @@
-package controllers
+package com.example.tennislabspring.controllers
 
-import exception.*
+import com.example.tennislabspring.exception.*
+import com.example.tennislabspring.model.machines.Customizer
+import com.example.tennislabspring.model.machines.Stringer
+import com.example.tennislabspring.repositories.machines.CustomizerRepository
+import com.example.tennislabspring.repositories.machines.StringerRepository
 import kotlinx.coroutines.flow.Flow
-import model.machines.Customizer
-import model.machines.Stringer
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Single
-import repositories.machines.CustomizerRepository
-import repositories.machines.StringerRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Controller
 
 /**
  * Controlador de Maquinas
  */
-@Single
-class MachineController(
+@Controller
+class MachineController
+    @Autowired constructor(
     private var stringerRepo: StringerRepository,
     private var customizerRepo: CustomizerRepository
 ) {
@@ -24,7 +25,7 @@ class MachineController(
      * @param item encordadora a añadir.
      * @return Result dependiendo de como se haya realizado la accion.
      */
-    suspend fun addStringer(item: Stringer): StringerResult<Stringer>{
+    suspend fun addStringer(item: Stringer): StringerResult<Stringer> {
         val find = stringerRepo.findById(item.id)
         find?.let {
             return StringerErrorExists("Ya existe una encordadora con este id")
@@ -55,7 +56,7 @@ class MachineController(
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateStringer(item: Stringer):StringerResult<Stringer>{
-        val update = stringerRepo.update(item)
+        val update = stringerRepo.save(item)
         return StringerSuccess(200, update)
     }
 
@@ -76,8 +77,8 @@ class MachineController(
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteStringer(stringer: Stringer):StringerResult<Boolean> {
-        val delete = stringerRepo.delete(stringer)
-        return StringerSuccess(200, delete)
+        stringerRepo.delete(stringer)
+        return StringerSuccess(200, true)
     }
 
 
@@ -118,7 +119,7 @@ class MachineController(
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateCustomizer(item: Customizer):CustomizerResult<Customizer>{
-        val update = customizerRepo.update(item)
+        val update = customizerRepo.save(item)
         return CustomizerSuccess(200, update)
     }
 
@@ -139,8 +140,8 @@ class MachineController(
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteCustomizer(customizer: Customizer):CustomizerResult<Boolean> {
-        val delete = customizerRepo.delete(customizer)
-        return CustomizerSuccess(200, delete)
+        customizerRepo.delete(customizer)
+        return CustomizerSuccess(200, true)
     }
 
 

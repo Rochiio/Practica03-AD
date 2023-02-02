@@ -4,11 +4,14 @@ package com.example.tennislabspring.controllers
 import com.example.tennislabspring.exception.*
 import com.example.tennislabspring.model.orders.tasks.Task
 import com.example.tennislabspring.repositories.orders.TaskRepository
+import com.example.tennislabspring.repositories.orders.TasksApiRepository
 import kotlinx.coroutines.flow.Flow
+import org.springframework.stereotype.Controller
 
 /**
  * Controlador de tareas.
  */
+@Controller
 class TaskController(private var repository: TaskRepository, private var api: TasksApiRepository) {
 
     /**
@@ -41,7 +44,7 @@ class TaskController(private var repository: TaskRepository, private var api: Ta
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateTask(tarea: Task): TaskResult<Task> {
-        val update = repository.update(tarea)
+        val update = repository.save(tarea)
         api.update(tarea)
         return TaskSuccess(200, update)
     }

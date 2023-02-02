@@ -1,33 +1,31 @@
-package view
+package com.example.tennislabspring.view
 
+import com.example.tennislabspring.controllers.*
+import com.example.tennislabspring.exception.*
+import com.example.tennislabspring.model.*
+import com.example.tennislabspring.model.lists.StringerAssignments
+import com.example.tennislabspring.model.machines.Customizer
+import com.example.tennislabspring.model.machines.Stringer
+import com.example.tennislabspring.model.orders.Order
+import com.example.tennislabspring.model.orders.tasks.Customization
+import com.example.tennislabspring.model.orders.tasks.Purchase
+import com.example.tennislabspring.model.orders.tasks.Stringing
+import com.example.tennislabspring.model.orders.tasks.Task
+import com.example.tennislabspring.model.users.*
+import com.example.tennislabspring.repositories.users.CustomerApiRepository
+import com.example.tennislabspring.service.PasswordParser
+import com.example.tennislabspring.util.Data
+import com.example.tennislabspring.util.mappers.fromDto
 import com.github.ajalt.mordant.rendering.TextAlign
 import com.github.ajalt.mordant.rendering.TextColors.*
 import com.github.ajalt.mordant.table.table
 import com.github.ajalt.mordant.terminal.Terminal
-import controller.*
-import controllers.*
-import exception.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import model.*
-import model.lists.StringerAssignments
-import model.machines.Customizer
-import model.machines.Stringer
-import model.orders.Order
-import model.orders.tasks.Customization
-import model.orders.tasks.Purchase
-import model.orders.tasks.Stringing
-import model.orders.tasks.Task
-import model.users.Customer
-import model.users.Employee
-import org.koin.core.annotation.Single
-import repositories.users.CustomerApiRepository
-import util.Data
-import service.PasswordParser
-import util.mappers.fromDto
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.collections.ArrayList
@@ -35,17 +33,23 @@ import kotlin.collections.ArrayList
 /**
  * Vista del usuario.
  */
-@Single
-class Vista(
-    private var employeeController: EmployeeController,
-    private var machineController: MachineController,
-    private var customerController: CustomerController,
-    private var orderController: OrderController,
-    private var taskController: TaskController,
-    private var productController: ProductController,
-    private var racketController: RacketController,
+@Component
+class Vista{
+    @Autowired
+    private lateinit var employeeController: EmployeeController
+    @Autowired
+    private lateinit var machineController: MachineController
+    @Autowired
+    private lateinit var customerController: CustomerController
+    @Autowired
+    private lateinit var orderController: OrderController
+    @Autowired
+    private lateinit var taskController: TaskController
+    @Autowired
+    private lateinit var productController: ProductController
+    @Autowired
+    private lateinit var racketController: RacketController
 
-    ) {
     private var terminal = Terminal(width = 150)
     private var loggedEmployee: Employee? = null
     private var loggedCustomer: Customer? = null
@@ -307,7 +311,7 @@ class Vista(
                             launch {
                                 pedido.state = Status.EN_PROCESO
 
-                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id }
+                                pedido.tasks!!.forEach { it.idEmployee = loggedEmployee }
 
                                 orderController.updateOrder(pedido)
                             }
@@ -456,7 +460,7 @@ class Vista(
                 hString = cH,
                 nKnots = nudos,
                 price = precio.toLong(),
-                racketId = loggedCustomer!!.tennisRacketsList[racket]
+                racketId = loggedCustomer!!.tennisRacketsList!![racket].id
             )
         )
 
@@ -495,7 +499,7 @@ class Vista(
             Customization(
                 weight = peso,
                 balance = balance, stiffness = rigidez,
-                racket_id = loggedCustomer!!.tennisRacketsList[racket],
+                racket_id = loggedCustomer!!.tennisRacketsList!![racket],
                 price = precio
             )
         )
@@ -1665,7 +1669,7 @@ class Vista(
             is RacketSuccess -> {
                 terminal.println("✅${result.code}: ${result.data}")
                 val list = loggedCustomer?.tennisRacketsList?.toMutableList()
-                list?.add(result.data.id)
+                list?.add(result.data)
                 loggedCustomer?.tennisRacketsList = list!!
                 customerController.updateCustomer(loggedCustomer!!)
             }
@@ -1728,7 +1732,7 @@ class Vista(
             is RacketError -> terminal.println(red("❌${result.code}: ${result.message}"))
             is RacketSuccess -> {
                 listRacketsCustomer?.forEach {
-                    when (val find = racketController.findById(it)) {
+                    when (val find = racketController.findById(it.id)) {
                         is RacketError -> TODO()
                         is RacketSuccess -> list.add(find.data)
                     }

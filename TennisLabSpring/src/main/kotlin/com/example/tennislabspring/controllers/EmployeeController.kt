@@ -1,20 +1,20 @@
-package controllers
+package com.example.tennislabspring.controllers
 
-import exception.EmployeeErrorExists
-import exception.EmployeeErrorNotFound
-import exception.EmployeeResult
-import exception.EmployeeSuccess
+import com.example.tennislabspring.exception.*
+import com.example.tennislabspring.model.users.Employee
+import com.example.tennislabspring.repositories.users.EmployeeRepository
 import kotlinx.coroutines.flow.Flow
-import model.users.Employee
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Single
-import repositories.users.EmployeeRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Controller
 
 /**
  * Controlador de empleados.
  */
-class EmployeeController(
-    private var repository: EmployeeRepository) {
+@Controller
+class EmployeeController
+    @Autowired constructor(
+    private var repository: EmployeeRepository
+) {
 
 
     /**
@@ -23,8 +23,8 @@ class EmployeeController(
      * @param password a ver si es correcta
      * @return trabajador dependiendo de si existe
      */
-    suspend fun getEmployeeByEmailAndPassword(email: String, password: String): EmployeeResult<Employee>{
-        val find = repository.findByEmail(email)
+    suspend fun getEmployeeByEmailAndPassword(email: String, password: String): EmployeeResult<Employee> {
+        val find = repository.findEmployeeByEmail(email)
         find?.let {
             if (find.password != password){
                 return EmployeeErrorNotFound("Usuario o contraseña incorrecto")
@@ -56,7 +56,7 @@ class EmployeeController(
      * @return Result dependiendo de la accion.
      */
     suspend fun addEmployee(employee: Employee): EmployeeResult<Employee>{
-        val existe = repository.findByEmail(employee.email)
+        val existe = repository.findEmployeeByEmail(employee.email)
         existe?.let {
             return EmployeeErrorExists("Ya existe un trabajador con este email")
         }?: run{
@@ -82,7 +82,7 @@ class EmployeeController(
      * @return Result de la accion realizada.
      */
     suspend fun updateEmployee(employee:Employee):EmployeeResult<Employee>{
-        var update = repository.update(employee)
+        var update = repository.save(employee)
         return EmployeeSuccess(200, update)
     }
 
@@ -93,8 +93,8 @@ class EmployeeController(
      * @return Result dependiendo de si se ha eliminado correctamente el empleado.
      */
     suspend fun deleteEmployee(employee:Employee):EmployeeResult<Boolean>{
-        var correcto =repository.delete(employee)
-        return EmployeeSuccess(200, correcto)
+        repository.delete(employee)
+        return EmployeeSuccess(200, true)
     }
 
 

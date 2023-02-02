@@ -18,5 +18,5 @@ data class Purchase(
     var uuid: UUID = UUID.randomUUID(),
     var price: Float,
     @DocumentReference
-    var product: List<Product>
+    var product: List<Product>?
 )

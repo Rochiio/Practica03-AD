@@ -1,5 +1,6 @@
 package com.example.tennislabspring.model.orders.tasks
 
+import com.example.tennislabspring.model.Product
 import com.example.tennislabspring.model.TypeTask
 import com.example.tennislabspring.model.machines.Customizer
 import com.example.tennislabspring.model.machines.Stringer
@@ -18,22 +19,13 @@ import java.util.*
 data class Stringing(
     @Id
     var id:String = ObjectId.get().toString(),
-    var nId: Int = 0,
     @Serializable(with = UUIDSerializer::class)
     var uuid: UUID = UUID.randomUUID(),
-    //trabajador y maquina referenciados
-    @Contextual
-    @DocumentReference
-    var idEmployee: Employee?,
-    @Contextual
-    @DocumentReference
-    var idStringer: Stringer?,
-    @Contextual
-    @DocumentReference
-    var idCustomizer: Customizer?,
-    var price: Float,
-    //datos de la tarea embedidos
-    var description: String,
-    var taskType: TypeTask,
-    var available: Boolean,
+    var hTension : Int,
+    var vTension : Int,
+    var vString : Product,
+    var hString : Product,
+    var nKnots : Int,
+    var price : Long,
+    var racketId : String
 )

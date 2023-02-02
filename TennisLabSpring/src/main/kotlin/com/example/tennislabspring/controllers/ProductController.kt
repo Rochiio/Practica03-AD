@@ -1,20 +1,20 @@
-package controllers
+package com.example.tennislabspring.controllers
 
-import exception.ProductErrorExists
-import exception.ProductErrorNotFound
-import exception.ProductResult
-import exception.ProductSuccess
+import com.example.tennislabspring.exception.*
+import com.example.tennislabspring.model.Product
+import com.example.tennislabspring.repositories.orders.ProductRepository
 import kotlinx.coroutines.flow.Flow
-import model.Product
-import org.koin.core.annotation.Single
-import repositories.orders.ProductRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Controller
+
 
 /**
  * Controlador de productos
  */
-@Single
-
-class ProductController(private var repository: ProductRepository) {
+@Controller
+class ProductController
+    @Autowired constructor(
+        private var repository: ProductRepository) {
 
     /**
      * Añadir un producto.
@@ -51,7 +51,7 @@ class ProductController(private var repository: ProductRepository) {
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateProduct(item: Product):  ProductResult<Product> {
-        val update = repository.update(item)
+        val update = repository.save(item)
         return ProductSuccess(200, update)
     }
 
@@ -72,7 +72,7 @@ class ProductController(private var repository: ProductRepository) {
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteProduct(item: Product): ProductResult<Boolean> {
-        val delete = repository.delete(item)
-        return ProductSuccess(200, delete)
+        repository.delete(item)
+        return ProductSuccess(200, true)
     }
 }

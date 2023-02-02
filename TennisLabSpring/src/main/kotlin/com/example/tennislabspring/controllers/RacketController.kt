@@ -1,19 +1,18 @@
-package controllers
+package com.example.tennislabspring.controllers
 
-import exception.RacketErrorExists
-import exception.RacketErrorNotFound
-import exception.RacketResult
-import exception.RacketSuccess
+import com.example.tennislabspring.exception.*
+import com.example.tennislabspring.model.Racket
+import com.example.tennislabspring.repositories.rackets.RacketRepository
 import kotlinx.coroutines.flow.Flow
-import model.Racket
-import org.koin.core.annotation.Single
-import repositories.rackets.RacketRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Controller
 
 /**
  * Controlador de raquetas.
  */
-@Single
-class RacketController(
+@Controller
+class RacketController
+    @Autowired constructor(
     private var repository: RacketRepository
 ) {
 
@@ -22,7 +21,7 @@ class RacketController(
      * @param item raqueta a salvar.
      * @return Result dependiendo del resultado de la accion.
      */
-    suspend fun saveRacket(item: Racket): RacketResult<Racket>{
+    suspend fun saveRacket(item: Racket): RacketResult<Racket> {
         val find = repository.findById(item.id)
         find?.let {
             return RacketErrorExists("Ya existe una raqueta con este id: ${item.id}")
@@ -53,7 +52,7 @@ class RacketController(
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun updateRacket(item: Racket): RacketResult<Racket>{
-        repository.update(item)
+        repository.save(item)
         return RacketSuccess(200, item)
     }
 
@@ -74,7 +73,7 @@ class RacketController(
      * @return Result dependiendo del resultado de la accion.
      */
     suspend fun deleteRacket(item: Racket):RacketResult<Boolean>{
-        val delete = repository.delete(item)
-        return RacketSuccess(200, delete)
+        repository.delete(item)
+        return RacketSuccess(200, true)
     }
 }

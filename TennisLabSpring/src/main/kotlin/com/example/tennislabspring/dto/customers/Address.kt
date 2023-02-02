@@ -1,6 +1,5 @@
 package com.example.tennislabspring.dto.customers
 
-import dto.customers.Geo
 import kotlinx.serialization.Serializable
 
 @Serializable
