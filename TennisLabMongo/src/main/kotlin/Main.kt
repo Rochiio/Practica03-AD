@@ -49,45 +49,13 @@ class KoinApp : KoinComponent {
                 } while ((!salir))
             }
             val w = launch {
-
-                launch {
-                    watchers.watchCustomers()
-                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-                }
-                launch {
-                    watchers.watchEmployee()
-                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-                }
                 launch {
                     watchers.watchOrder()
                         .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
                 }
-                launch {
-                    watchers.watchProduct()
-                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-                }
-                launch {
-                    watchers.watchTask()
-                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-                }
-                launch {
-                    watchers.watchCustomizer()
-                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-                }
-                launch {
-                    watchers.watchRacket()
-                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-                }
-                launch {
-                    watchers.watchStringer()
-                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-                }
             }
 
 
-            launch {
-                watchers.watchCustomers().collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-            }
             launch {
                 vista.runVista()
                 salir = true
@@ -95,6 +63,7 @@ class KoinApp : KoinComponent {
                 w.cancel()
             }
         }
+
         //makeJsonListas()
         exitProcess(0)
     }

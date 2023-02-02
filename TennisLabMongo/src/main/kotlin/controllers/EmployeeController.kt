@@ -102,8 +102,4 @@ class EmployeeController(
     }
 
 
-    fun watchEmployees() : ChangeStreamPublisher<Employee>{
-        return watchers.watchEmployee()
-    }
-
 }

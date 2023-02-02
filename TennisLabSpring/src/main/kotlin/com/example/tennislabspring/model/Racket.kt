@@ -1,5 +1,6 @@
 package com.example.tennislabspring.model
 
+import com.example.tennislabspring.model.orders.tasks.Customization
 import com.example.tennislabspring.model.users.Customer
 import com.example.tennislabspring.serializer.UUIDSerializer
 import kotlinx.serialization.Serializable
@@ -26,5 +27,9 @@ data class Racket(
     @ReadOnlyProperty
     @DocumentReference(lookup = "{'customer':?#{#self._id} }")
     var customer: Customer? = null
+
+    @ReadOnlyProperty
+    @DocumentReference(lookup = "{'customization':?#{#self._id} }")
+    var customizations: List<Customization>? = null
 
 }

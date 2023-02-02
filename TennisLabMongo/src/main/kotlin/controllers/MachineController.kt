@@ -147,12 +147,4 @@ class MachineController(
     }
 
 
-    fun watchStringers() : ChangeStreamPublisher<Stringer>{
-        return watchers.watchStringer()
-    }
-
-    fun watchCustomizer() : ChangeStreamPublisher<Customizer>{
-        return watchers.watchCustomizer()
-    }
-
 }

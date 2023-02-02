@@ -154,10 +154,6 @@ class CustomerController(
         return CustomerSuccess<Customer>(200, update)
     }
 
-    suspend fun watchCustomers(): ChangeStreamPublisher<Customer> {
-        logger.info{ "Leyendo cambios en tiempo real de : Clientes" }
-        return watchers.watchCustomers()
-    }
 
     /**
      * Eliminar un cliente
