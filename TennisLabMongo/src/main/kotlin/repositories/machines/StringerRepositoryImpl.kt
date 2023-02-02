@@ -25,7 +25,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @return encordadora si ha sido encontrada.
      */
     override suspend fun findById(id: String): Stringer? {
-        logger.debug { "Buscando encordadora por id: $id" }
+        logger.info { "Buscando encordadora por id: $id" }
         return dbMongo.getCollection<Stringer>()
             .findOneById(id)
     }
@@ -37,7 +37,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @return la encordadora salvada.
      */
     override suspend fun save(item: Stringer): Stringer {
-        logger.debug { "Salvando encordadora: $item" }
+        logger.info { "Salvando encordadora: $item" }
         return dbMongo.getCollection<Stringer>()
             .save(item).let { item }
     }
@@ -49,7 +49,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @return encordadora actualizada.
      */
     override suspend fun update(item: Stringer): Stringer {
-        logger.debug { "Actualizando encordadora: $item" }
+        logger.info { "Actualizando encordadora: $item" }
         return dbMongo.getCollection<Stringer>()
             .updateOneById(item.id, item).wasAcknowledged().let { item }
     }
@@ -61,7 +61,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @return si ha sido eliminada correctamente.
      */
     override suspend fun delete(item: Stringer): Boolean {
-        logger.debug { "Eliminando encordadora: $item" }
+        logger.info { "Eliminando encordadora: $item" }
         return dbMongo.getCollection<Stringer>()
             .deleteOneById(item.id).wasAcknowledged()
     }
@@ -72,7 +72,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @return flujo con las encordadoras.
      */
     override suspend fun findAll(): Flow<Stringer> {
-        logger.debug { "Buscando todas las encordadoras" }
+        logger.info { "Buscando todas las encordadoras" }
         return dbMongo.getCollection<Stringer>().find().publisher.asFlow()
     }
 
@@ -83,7 +83,7 @@ class StringerRepositoryImpl : StringerRepository {
      * @return si han sido eliminadas con éxito.
      */
     override suspend fun deleteAll(): Boolean {
-        logger.debug { "Eliminando todas las encordadoras" }
+        logger.info { "Eliminando todas las encordadoras" }
         return dbMongo.getCollection<Stringer>()
             .deleteMany("{}").wasAcknowledged()
     }

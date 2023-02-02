@@ -14,36 +14,36 @@ private var logger = KotlinLogging.logger {}
 class OrderRepositoryImpl : OrderRepository {
     val dbMongo = MongoDbManager.database
     override suspend fun findById(id: String): Order? {
-        logger.debug { "Buscando tarea con id: $id" }
+        logger.info { "Buscando tarea con id: $id" }
         return dbMongo.getCollection<Order>().findOneById(id)
     }
 
     override suspend fun save(item: Order): Order {
-        logger.debug { "Guardando tarea: $item" }
+        logger.info { "Guardando tarea: $item" }
         return dbMongo.getCollection<Order>()
             .save(item).let { item }
     }
 
     override suspend fun update(item: Order): Order {
-        logger.debug { "Actualizando tarea: $item" }
+        logger.info { "Actualizando tarea: $item" }
         return dbMongo.getCollection<Order>()
             .updateOneById(item.id, item)
             .wasAcknowledged().let { item }
     }
 
     override suspend fun delete(item: Order): Boolean {
-        logger.debug { "Eliminando tarea: $item" }
+        logger.info { "Eliminando tarea: $item" }
         return dbMongo.getCollection<Order>()
             .updateOneById(item.id, "{${MongoOperator.set}:{'available' : false}}").wasAcknowledged()
     }
 
     override suspend fun findAll(): Flow<Order> {
-        logger.debug { "Recuperando todas las tareas " }
+        logger.info { "Recuperando todas las tareas " }
         return dbMongo.getCollection<Order>().find().toFlow()
     }
 
     override suspend fun deleteAll(): Boolean {
-        logger.debug { "Eliminando todas las tareas" }
+        logger.info { "Eliminando todas las tareas" }
         return dbMongo.getCollection<Order>().deleteMany("{}").wasAcknowledged()
     }
 }

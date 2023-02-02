@@ -38,17 +38,17 @@ class CustomerController(
      * @return Result dependiendo de si ha sido correcta o no la acción.
      */
     suspend fun addCustomer(cliente: Customer): CustomerResult<Customer> {
-        logger.debug { "Buscamos en la caché si existe el usuario" }
+        logger.info { "Buscamos en la caché si existe el usuario" }
         val existeInCache = cache.findById(cliente.id)
         existeInCache?.let {
             return CustomerErrorExists("Ya existe un cliente con el id: ${it.id}")
         } ?: run {
-            logger.debug { "Buscamos en el mongo si existe el usuario" }
+            logger.info { "Buscamos en el mongo si existe el usuario" }
             val existe = repository.findById(cliente.id)
             existe?.let {
                 return CustomerErrorExists("Ya existe un cliente con el id: ${it.id}")
             } ?: run {
-                logger.debug { "El usuario no existe --> creando y añadiendo a DB y Cache" }
+                logger.info { "El usuario no existe --> creando y añadiendo a DB y Cache" }
                 withContext(Dispatchers.IO) {
                     launch {
                         repository.save(cliente)
@@ -88,7 +88,7 @@ class CustomerController(
      * @return Result dependiendo de si se ha realizado la accion correctamente.
      */
     suspend fun getCustomerById(id: String): CustomerResult<Customer> {
-        logger.debug { "Buscando en la caché" }
+        logger.info { "Buscando en la caché" }
         val findCache = cache.findById(id)
         findCache?.let {
             return CustomerSuccess(200, it)
@@ -107,12 +107,12 @@ class CustomerController(
 //     * Buscar un usuario por su uuid
 //     */
 //    suspend fun getCustomerByUuid(uuid: UUID): CustomerResult<Customer>{
-//        logger.debug { "Buscamos en la cache si existe el usuario por su uuid" }
+//        logger.info{ "Buscamos en la cache si existe el usuario por su uuid" }
 //        val findCache = UsersCache.cache.get(uuid)
 //        findCache?.let {
 //            return CustomerSuccess(200, it)
 //        }?: run{
-//            logger.debug { "Buscamos en la base de datos si existe el usuario por su id" }
+//            logger.info{ "Buscamos en la base de datos si existe el usuario por su id" }
 //            val findDb = repository.findByUuid(uuid)
 //            findDb?.let {
 //                withContext(Dispatchers.IO){
@@ -155,7 +155,7 @@ class CustomerController(
     }
 
     suspend fun watchCustomers(): ChangeStreamPublisher<Customer> {
-        logger.debug { "Leyendo cambios en tiempo real de : Clientes" }
+        logger.info{ "Leyendo cambios en tiempo real de : Clientes" }
         return watchers.watchCustomers()
     }
 
