@@ -1,20 +1,23 @@
 package controllers
 
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import exception.OrderErrorExists
 import exception.OrderErrorNotFound
 import exception.OrderResult
 import exception.OrderSuccess
 import kotlinx.coroutines.flow.Flow
+import model.machines.Customizer
 import model.orders.Order
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import repositories.orders.OrderRepository
+import service.reactive.Watchers
 
 /**
  * Controlador de pedidos.
  */
 @Single
-class OrderController(private var repository: OrderRepository) {
+class OrderController(private var repository: OrderRepository, private var watchers: Watchers) {
 
 
     /**
@@ -78,5 +81,7 @@ class OrderController(private var repository: OrderRepository) {
         return OrderErrorNotFound("No existe el pedido con este id")
     }
 
-
+    fun watchOrder() : ChangeStreamPublisher<Order> {
+        return watchers.watchOrder()
+    }
 }

@@ -1,0 +1,35 @@
+Index: ../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/controller/CustomerController.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/controller/CustomerController.kt b/../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/controller/CustomerController.kt
+new file mode 100644
+--- /dev/null	
++++ b/../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/controller/CustomerController.kt	
+@@ -0,0 +1,24 @@
++package com.example.tennislabspring.controller
++
++import com.example.tennislabspring.model.users.Customer
++import com.example.tennislabspring.repositories.users.CustomerRepository
++import kotlinx.coroutines.flow.toList
++import org.springframework.beans.factory.annotation.Autowired
++import org.springframework.stereotype.Controller
++
++@Controller
++class CustomerController
++@Autowired constructor(
++    private val repository : CustomerRepository
++){
++    suspend fun getByEmail(email : String) : List<Customer>{
++        println("Buscando $email")
++        val find = repository.findByEmail(email)
++//        println(find.toList())
++        return find.toList()
++    }
++
++    suspend fun save(c : Customer) : Customer?{
++        return repository.save(c)
++    }
++}
+\ No newline at end of file

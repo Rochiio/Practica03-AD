@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
 import repositories.users.EmployeeRepositoryImpl
+import service.reactive.Watchers
 import java.time.LocalDateTime
 
 @DelicateCoroutinesApi
@@ -29,11 +30,14 @@ import java.time.LocalDateTime
 class EmployeeControllerTest {
     @MockK
     private lateinit var repository: EmployeeRepositoryImpl
+    @MockK
+    private lateinit var watchers: Watchers
     @InjectMockKs
     private lateinit var controller: EmployeeController
 
     private var employee = Employee(name="Empleado", surname = "Test", email = "test", password ="1234", available = true,
-        isAdmin = true, entryTime = LocalDateTime.now(), departureTime = LocalDateTime.now(), orderList = emptyList())
+        isAdmin = true, entryTime = LocalDateTime.now(), departureTime = LocalDateTime.now(), orderList = mutableListOf()
+    )
 
     init {
         MockKAnnotations.init(this)

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
 import repositories.rackets.RacketRepositoryImpl
+import service.reactive.Watchers
 
 @DelicateCoroutinesApi
 @ExperimentalCoroutinesApi
@@ -28,6 +29,8 @@ import repositories.rackets.RacketRepositoryImpl
 class RacketControllerTest {
     @MockK
     private lateinit var repository: RacketRepositoryImpl
+    @MockK
+    private lateinit var watchers: Watchers
     @InjectMockKs
     private lateinit var controller: RacketController
 

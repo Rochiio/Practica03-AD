@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
 import repositories.users.CustomerCacheRepositoryImpl
 import repositories.users.CustomerRepositoryImpl
+import service.reactive.Watchers
 
 @DelicateCoroutinesApi
 @ExperimentalCoroutinesApi
@@ -31,6 +32,8 @@ class CustomerControllerTest  {
     private lateinit var repository: CustomerRepositoryImpl
     @MockK
     private lateinit var cache: CustomerCacheRepositoryImpl
+    @MockK
+    private lateinit var watchers: Watchers
     @InjectMockKs
     private lateinit var controller: CustomerController
 

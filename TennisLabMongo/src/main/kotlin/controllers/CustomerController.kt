@@ -1,5 +1,7 @@
 package controllers
 
+import com.mongodb.client.model.changestream.ChangeStreamDocument
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import exception.CustomerErrorExists
 import exception.CustomerErrorNotFound
 import exception.CustomerResult
@@ -16,6 +18,7 @@ import org.koin.core.annotation.Single
 import repositories.users.CustomerCacheRepository
 import repositories.users.CustomerRepository
 import service.PasswordParser
+import service.reactive.Watchers
 
 /**
  * Controlador de los Clientes.
@@ -23,7 +26,8 @@ import service.PasswordParser
 @Single
 class CustomerController(
     private var repository: CustomerRepository,
-    private var cache: CustomerCacheRepository
+    private var cache: CustomerCacheRepository,
+    private var watchers: Watchers
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -150,6 +154,10 @@ class CustomerController(
         return CustomerSuccess<Customer>(200, update)
     }
 
+    fun watchCustomers() : ChangeStreamPublisher<Customer>{
+        logger.debug { "Leyendo cambios en tiempo real de : Clientes" }
+        return watchers.watchCustomers()
+    }
 
     /**
      * Eliminar un cliente

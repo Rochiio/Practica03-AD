@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
 import repositories.orders.OrderRepository
 import repositories.orders.OrderRepositoryImpl
+import service.reactive.Watchers
 import java.time.LocalDate
 
 @DelicateCoroutinesApi
@@ -32,7 +33,8 @@ import java.time.LocalDate
 class OrderControllerTest {
     @MockK
     private lateinit var repository: OrderRepository
-
+    @MockK
+    private lateinit var watchers: Watchers
     @InjectMockKs
     private lateinit var controller: OrderController
 

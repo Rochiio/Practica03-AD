@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 
 import repositories.orders.ProductRepositoryImpl
+import service.reactive.Watchers
 import kotlin.test.assertEquals
 
 @DelicateCoroutinesApi
@@ -32,7 +33,8 @@ internal class ProductControllerTest {
         )
     @MockK
     private lateinit var repository : ProductRepositoryImpl
-
+    @MockK
+    private lateinit var watchers: Watchers
     @InjectMockKs
     private lateinit var controller : ProductController
 
