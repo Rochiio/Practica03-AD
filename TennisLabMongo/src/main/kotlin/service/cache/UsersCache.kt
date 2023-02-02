@@ -25,7 +25,6 @@ object UsersCache {
                 logger.info { "Limpiando caché 🗑" }
                 cache.invalidateAll()
                 delay(STOP)
-
             }
         }
     }

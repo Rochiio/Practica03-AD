@@ -742,7 +742,7 @@ class Vista(
      * Actualizar producto
      */
     private suspend fun actuProducto() {
-        print("Dime el ID del producto a actualizar: ")
+        print("Dime el indice del producto a actualizar: ")
         val id = readln()
 
         when (val result = productController.getProductById(id)) {
@@ -791,14 +791,14 @@ class Vista(
                 align = TextAlign.CENTER
                 header {
                     style(blue, bold = true)
-                    row("INDEX", "ID", "TIPO", "MARCA", "MODELO", "PRECIO", "STOCK")
+                    row("INDEX", "ID", "TIPO", "MARCA","MODELO", "PRECIO", "STOCK")
                 }
                 for (prod in lista) {
                     body {
                         rowStyles(cyan, brightCyan)
 
                         row(
-                            index, prod.id, prod.type, prod.brand, prod.model, prod.price, prod.stock
+                            index, prod.id, prod.type, prod.brand, prod.model.take(10), prod.price, prod.stock
                         )
                     }
                     index++

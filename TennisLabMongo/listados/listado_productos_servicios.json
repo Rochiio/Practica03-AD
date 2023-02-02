@@ -1,0 +1,11 @@
+{
+    "servicios": [
+        "Personalizacion",
+        "Encordado"
+    ],
+    "productos": [
+        "RAQUETA",
+        "CORDAJE",
+        "COMPLEMENTO"
+    ]
+}
