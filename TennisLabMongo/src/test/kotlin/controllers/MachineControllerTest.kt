@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
 import repositories.machines.CustomizerRepositoryImpl
 import repositories.machines.StringerRepositoryImpl
+import service.reactive.Watchers
 import java.time.LocalDate
 
 @DelicateCoroutinesApi
@@ -33,6 +34,8 @@ class MachineControllerTest {
     private lateinit var stringerRepo: StringerRepositoryImpl
     @MockK
     private lateinit var customizerRepo: CustomizerRepositoryImpl
+    @MockK
+    private lateinit var watchers: Watchers
     @InjectMockKs
     private lateinit var controller: MachineController
 

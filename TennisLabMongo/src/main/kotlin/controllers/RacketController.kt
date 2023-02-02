@@ -1,5 +1,6 @@
 package controllers
 
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import exception.RacketErrorExists
 import exception.RacketErrorNotFound
 import exception.RacketResult
@@ -8,13 +9,14 @@ import kotlinx.coroutines.flow.Flow
 import model.Racket
 import org.koin.core.annotation.Single
 import repositories.rackets.RacketRepository
+import service.reactive.Watchers
 
 /**
  * Controlador de raquetas.
  */
 @Single
 class RacketController(
-    private var repository: RacketRepository
+    private var repository: RacketRepository, private var watchers: Watchers
 ) {
 
     /**
@@ -76,5 +78,9 @@ class RacketController(
     suspend fun deleteRacket(item: Racket):RacketResult<Boolean>{
         val delete = repository.delete(item)
         return RacketSuccess(200, delete)
+    }
+
+    fun watchRackets() : ChangeStreamPublisher<Racket>{
+        return watchers.watchRacket()
     }
 }

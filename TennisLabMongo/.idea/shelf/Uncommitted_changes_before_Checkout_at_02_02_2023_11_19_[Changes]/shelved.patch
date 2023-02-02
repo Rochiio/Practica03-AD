@@ -1,0 +1,35 @@
+Index: ../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/model/users/Customer.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.tennislabspring.model.users\r\n\r\nimport com.example.tennislabspring.model.Racket\r\nimport kotlinx.serialization.Serializable\r\nimport org.bson.types.ObjectId\r\nimport org.springframework.data.annotation.Id\r\nimport org.springframework.data.mongodb.core.mapping.Document\r\nimport org.springframework.data.mongodb.core.mapping.DocumentReference\r\nimport com.example.tennislabspring.serializer.UUIDSerializer\r\nimport java.util.*\r\n\r\n@Serializable\r\n@Document(\"customer\")\r\ndata class Customer(\r\n    @Id\r\n    var id:String= ObjectId.get().toString(),\r\n    @Serializable(with = UUIDSerializer::class)\r\n    var uuid: UUID = UUID.randomUUID(),\r\n    var nId : Int = 0,\r\n    var name: String,\r\n    var username:String,\r\n    var email:String,\r\n    var password:String,\r\n    var available: Boolean,\r\n    //Lista de pedidos del cliente\r\n    //TODO Revisar\r\n    @DocumentReference\r\n    var orderList: List<String>,\r\n    @DocumentReference\r\n    var tennisRacketsList: List<Racket>\r\n)\r\n
+===================================================================
+diff --git a/../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/model/users/Customer.kt b/../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/model/users/Customer.kt
+--- a/../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/model/users/Customer.kt	
++++ b/../TennisLabSpring/src/main/kotlin/com/example/tennislabspring/model/users/Customer.kt	
+@@ -25,7 +25,7 @@
+     //Lista de pedidos del cliente
+     //TODO Revisar
+     @DocumentReference
+-    var orderList: List<String>,
++    var orderList: List<String?>?,
+     @DocumentReference
+     var tennisRacketsList: List<Racket>
+ )
+Index: ../TennisLabSpring/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.jetbrains.kotlin.gradle.tasks.KotlinCompile\r\nval mockkVersion: String = \"1.13.2\"\r\n\r\nplugins {\r\n\tid(\"org.springframework.boot\") version \"3.0.2\"\r\n\tid(\"io.spring.dependency-management\") version \"1.1.0\"\r\n\tkotlin(\"plugin.serialization\") version \"1.7.21\"\r\n\tid(\"com.google.devtools.ksp\") version \"1.7.21-1.0.8\"\r\n\tkotlin(\"jvm\") version \"1.7.22\"\r\n\tkotlin(\"plugin.spring\") version \"1.7.22\"\r\n}\r\n\r\ngroup = \"com.example\"\r\nversion = \"0.0.1-SNAPSHOT\"\r\njava.sourceCompatibility = JavaVersion.VERSION_17\r\n\r\nrepositories {\r\n\tmavenCentral()\r\n}\r\n\r\ndependencies {\r\n\timplementation(\"org.springframework.boot:spring-boot-starter-data-mongodb-reactive\")\r\n\timplementation(\"io.projectreactor.kotlin:reactor-kotlin-extensions\")\r\n\timplementation(\"org.jetbrains.kotlin:kotlin-reflect\")\r\n\timplementation(\"org.jetbrains.kotlin:kotlin-stdlib-jdk8\")\r\n\timplementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-reactor\")\r\n\ttestImplementation(\"org.springframework.boot:spring-boot-starter-test\")\r\n\ttestImplementation(\"io.projectreactor:reactor-test\")\r\n\t// Corrutinas Mongo\r\n\timplementation(\"org.litote.kmongo:kmongo-coroutine:4.7.2\")\r\n\r\n\t// Corrutinas\r\n\timplementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4\")\r\n\r\n\t// Logger\r\n\timplementation(\"io.github.microutils:kotlin-logging-jvm:3.0.4\")\r\n\timplementation(\"ch.qos.logback:logback-classic:1.4.4\")\r\n\r\n\t// Serializacion JSON\r\n\timplementation(\"org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1\")\r\n\timplementation(\"junit:junit:4.13.1\")\r\n\timplementation(\"org.junit.jupiter:junit-jupiter:5.8.1\")\r\n\r\n\t//SHA-512\r\n\timplementation(\"com.google.guava:guava:31.1-jre\")\r\n\r\n\t//Cache\r\n\timplementation(\"io.github.reactivecircus.cache4k:cache4k:0.9.0\")\r\n\r\n\t//Terminal\r\n\timplementation(\"com.github.ajalt.mordant:mordant:2.0.0-beta8\")\r\n\r\n\r\n\t//ktorfit\r\n\tksp(\"de.jensklingenberg.ktorfit:ktorfit-ksp:1.0.0-beta16\")\r\n\timplementation(\"de.jensklingenberg.ktorfit:ktorfit-lib:1.0.0-beta16\")\r\n\r\n\t// Para serializar en Json con Ktor\r\n\timplementation(\"io.ktor:ktor-client-serialization:2.1.3\")\r\n\timplementation(\"io.ktor:ktor-client-content-negotiation:2.1.3\")\r\n\timplementation(\"io.ktor:ktor-serialization-kotlinx-json:2.1.3\")\r\n\r\n\t//MOCKK\r\n\ttestImplementation(\"io.mockk:mockk:${mockkVersion}\")\r\n\ttestImplementation(kotlin(\"test\"))\r\n\ttestImplementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4\")\r\n}\r\n\r\ntasks.withType<KotlinCompile> {\r\n\tkotlinOptions {\r\n\t\tfreeCompilerArgs = listOf(\"-Xjsr305=strict\")\r\n\t\tjvmTarget = \"17\"\r\n\t}\r\n}\r\n\r\ntasks.withType<Test> {\r\n\tuseJUnitPlatform()\r\n}\r\n
+===================================================================
+diff --git a/../TennisLabSpring/build.gradle.kts b/../TennisLabSpring/build.gradle.kts
+--- a/../TennisLabSpring/build.gradle.kts	
++++ b/../TennisLabSpring/build.gradle.kts	
+@@ -24,7 +24,8 @@
+ 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+ 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+ 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+-	testImplementation("org.springframework.boot:spring-boot-starter-test")
++    implementation("org.springframework.boot:spring-boot-starter-actuator")
++    testImplementation("org.springframework.boot:spring-boot-starter-test")
+ 	testImplementation("io.projectreactor:reactor-test")
+ 	// Corrutinas Mongo
+ 	implementation("org.litote.kmongo:kmongo-coroutine:4.7.2")

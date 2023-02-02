@@ -1,20 +1,23 @@
 package controllers
 
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import exception.ProductErrorExists
 import exception.ProductErrorNotFound
 import exception.ProductResult
 import exception.ProductSuccess
 import kotlinx.coroutines.flow.Flow
 import model.Product
+import model.orders.Order
 import org.koin.core.annotation.Single
 import repositories.orders.ProductRepository
+import service.reactive.Watchers
 
 /**
  * Controlador de productos
  */
 @Single
 
-class ProductController(private var repository: ProductRepository) {
+class ProductController(private var repository: ProductRepository, private var watchers: Watchers) {
 
     /**
      * Añadir un producto.
@@ -74,5 +77,9 @@ class ProductController(private var repository: ProductRepository) {
     suspend fun deleteProduct(item: Product): ProductResult<Boolean> {
         val delete = repository.delete(item)
         return ProductSuccess(200, delete)
+    }
+
+    fun watchProduct() : ChangeStreamPublisher<Product> {
+        return watchers.watchProduct()
     }
 }
