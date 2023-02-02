@@ -86,6 +86,9 @@ class KoinApp : KoinComponent {
 
 
             launch {
+                watchers.watchCustomers().collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+            }
+            launch {
                 vista.runVista()
                 salir = true
                 cache.cancel()
