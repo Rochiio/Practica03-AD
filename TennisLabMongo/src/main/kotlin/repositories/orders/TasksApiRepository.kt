@@ -23,7 +23,7 @@ class TasksApiRepository {
     suspend fun findAll(page: Int, per_page: Int): List<TaskDTO> {
         val call = client.getAll(page, per_page)
         return try {
-            logger.debug { "TasksApiRepository - findall - OK" }
+            logger.info { "TasksApiRepository - findall - OK" }
             call
         } catch (e: Exception) {
             logger.error { "TasksApiRepository - findAll - ERROR - ${e.message}" }
@@ -37,11 +37,11 @@ class TasksApiRepository {
      * @return tarea con el id buscado o null si no existe
      */
     suspend fun findBYId(id: Int): TaskDTO? {
-        logger.debug { "buscando tarea con id : $id" }
+        logger.info { "buscando tarea con id : $id" }
         val call = client.getById(id)
 
         return try {
-            logger.debug { "TasksApiRepository - findById - OK" }
+            logger.info { "TasksApiRepository - findById - OK" }
             call
         } catch (e: Exception) {
             logger.error { "TasksApiRepository - findBYId - ERROR - ${e.message}" }
@@ -55,11 +55,11 @@ class TasksApiRepository {
      * @return la tarea con el usuario con el id o null si no existe
      */
     suspend fun findByUserId(id: Int): TaskDTO? {
-        logger.debug { "buscando tarea con id de usuario : $id" }
+        logger.info { "buscando tarea con id de usuario : $id" }
         val call = client.getByUserId(id)
 
         return try {
-            logger.debug { "TasksApiRepository - findByUserId - OK" }
+            logger.info { "TasksApiRepository - findByUserId - OK" }
             call
         } catch (e: Exception) {
             logger.error { "TasksApiRepository - findByUserId - ERROR - ${e.message}" }
@@ -91,11 +91,11 @@ class TasksApiRepository {
      * @return la tarea actualizada
      */
     suspend fun update(task: Task): Task {
-        logger.debug { "actualizando tarea : $task" }
+        logger.info { "actualizando tarea : $task" }
         try {
 
             val res = client.update(task.nId, task.toDto())
-            logger.debug { "CustomerApiRepository - update - OK" }
+            logger.info { "CustomerApiRepository - update - OK" }
             return task
 
         } catch (e: Exception) {

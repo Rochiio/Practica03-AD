@@ -22,7 +22,7 @@ class RacketRepositoryImpl: RacketRepository {
      * @return la raqueta si ha sido encontrada.
      */
     override suspend fun findById(id: String): Racket? {
-        logger.debug { "Buscando raqueta con id: $id"}
+        logger.info { "Buscando raqueta con id: $id"}
         return dbMongo.getCollection<Racket>()
             .findOneById(id)
     }
@@ -34,7 +34,7 @@ class RacketRepositoryImpl: RacketRepository {
      * @return raqueta que ha sido salvada.
      */
     override suspend fun save(item: Racket): Racket {
-        logger.debug { "Salvando raqueta: $item" }
+        logger.info { "Salvando raqueta: $item" }
         return dbMongo.getCollection<Racket>()
             .save(item).let { item }
     }
@@ -46,7 +46,7 @@ class RacketRepositoryImpl: RacketRepository {
      * @return la raqueta actualizada.
      */
     override suspend fun update(item: Racket): Racket {
-        logger.debug { "Actualizando raqueta: $item" }
+        logger.info { "Actualizando raqueta: $item" }
         return dbMongo.getCollection<Racket>()
             .updateOneById(item.id, item).wasAcknowledged().let { item }
     }
@@ -58,7 +58,7 @@ class RacketRepositoryImpl: RacketRepository {
      * @return si la raqueta ha sido eliminada.
      */
     override suspend fun delete(item: Racket): Boolean {
-        logger.debug { "Eliminando raqueta: $item" }
+        logger.info { "Eliminando raqueta: $item" }
         return dbMongo.getCollection<Racket>()
             .deleteOneById(item.id).wasAcknowledged()
     }
@@ -69,7 +69,7 @@ class RacketRepositoryImpl: RacketRepository {
      * @return flujo de raquetas.
      */
     override suspend fun findAll(): Flow<Racket> {
-        logger.debug { "Buscando rauqetas" }
+        logger.info { "Buscando rauqetas" }
         return dbMongo.getCollection<Racket>().find().publisher.asFlow()
     }
 
@@ -79,7 +79,7 @@ class RacketRepositoryImpl: RacketRepository {
      * @return si han sido eliminadas con éxito.
      */
     override suspend fun deleteAll(): Boolean {
-        logger.debug { "Elminando todas las raquetas" }
+        logger.info { "Elminando todas las raquetas" }
         return dbMongo.getCollection<Racket>()
             .deleteMany("{}").wasAcknowledged()
     }

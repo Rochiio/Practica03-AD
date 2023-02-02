@@ -21,7 +21,7 @@ class CustomizerRepositoryImpl : CustomizerRepository {
      * @return personalizadora si ha sido encontrada.
      */
     override suspend fun findById(id: String): Customizer? {
-        logger.debug { "Buscando personalizadora por id: $id" }
+        logger.info { "Buscando personalizadora por id: $id" }
         return dbMongo.getCollection<Customizer>()
             .findOneById(id)
     }
@@ -33,7 +33,7 @@ class CustomizerRepositoryImpl : CustomizerRepository {
      * @return la personalizadora salvada.
      */
     override suspend fun save(item: Customizer): Customizer {
-        logger.debug { "Salvando personalizadora: $item" }
+        logger.info { "Salvando personalizadora: $item" }
         return dbMongo.getCollection<Customizer>()
             .save(item).let { item }
     }
@@ -45,7 +45,7 @@ class CustomizerRepositoryImpl : CustomizerRepository {
      * @return personalizadora actualizada.
      */
     override suspend fun update(item: Customizer): Customizer {
-        logger.debug { "Actualizando personalizadora: $item" }
+        logger.info { "Actualizando personalizadora: $item" }
         return dbMongo.getCollection<Customizer>()
             .updateOneById(item.id, item).wasAcknowledged().let { item }
     }
@@ -57,7 +57,7 @@ class CustomizerRepositoryImpl : CustomizerRepository {
      * @return si ha sido eliminada correctamente.
      */
     override suspend fun delete(item: Customizer): Boolean {
-        logger.debug { "Eliminando personalizadora: $item" }
+        logger.info { "Eliminando personalizadora: $item" }
         return dbMongo.getCollection<Customizer>()
             .deleteOneById(item.id).wasAcknowledged()
     }
@@ -68,7 +68,7 @@ class CustomizerRepositoryImpl : CustomizerRepository {
      * @return flujo con las personalizadoras.
      */
     override suspend fun findAll(): Flow<Customizer> {
-        logger.debug { "Buscando todas las personalizadoras" }
+        logger.info { "Buscando todas las personalizadoras" }
         return dbMongo.getCollection<Customizer>().find().publisher.asFlow()
     }
 
@@ -79,7 +79,7 @@ class CustomizerRepositoryImpl : CustomizerRepository {
      * @return si han sido eliminadas con éxito.
      */
     override suspend fun deleteAll(): Boolean {
-        logger.debug { "Eliminando todas las personalizadoras" }
+        logger.info { "Eliminando todas las personalizadoras" }
         return dbMongo.getCollection<Customizer>()
             .deleteMany("{}").wasAcknowledged()
     }

@@ -25,7 +25,7 @@ class EmployeeRepositoryImpl: EmployeeRepository {
      * @return el empleado si ha sido encontrado.
      */
     override suspend fun findByEmail(email: String): Employee? {
-        logger.debug { "Buscando empleado por email: $email"}
+        logger.info { "Buscando empleado por email: $email"}
         return dbMongo.getCollection<Employee>()
             .findOne(Employee::email eq email)
     }
@@ -37,7 +37,7 @@ class EmployeeRepositoryImpl: EmployeeRepository {
      * @return el empleado si ha sido encontrado.
      */
     override suspend fun findById(id: String): Employee? {
-        logger.debug { "Buscando empleado por id: $id" }
+        logger.info { "Buscando empleado por id: $id" }
         return dbMongo.getCollection<Employee>()
             .findOneById(id)
     }
@@ -49,7 +49,7 @@ class EmployeeRepositoryImpl: EmployeeRepository {
      * @return empleado que ha sido salvado.
      */
     override suspend fun save(item: Employee): Employee {
-        logger.debug { "Salvando empleado: $item"}
+        logger.info { "Salvando empleado: $item"}
         return dbMongo.getCollection<Employee>()
             .save(item).let {item}
     }
@@ -61,7 +61,7 @@ class EmployeeRepositoryImpl: EmployeeRepository {
      * @return el empleado actualizado.
      */
     override suspend fun update(item: Employee): Employee {
-        logger.debug { "Actualizando empleado: $item"}
+        logger.info { "Actualizando empleado: $item"}
         return dbMongo.getCollection<Employee>()
             .updateOneById(item.id, item).wasAcknowledged().let { item }
     }
@@ -74,7 +74,7 @@ class EmployeeRepositoryImpl: EmployeeRepository {
      * @return si el empleado ha sido eliminado.
      */
     override suspend fun delete(item: Employee): Boolean {
-        logger.debug { "Eliminando empleado: $item"}
+        logger.info { "Eliminando empleado: $item"}
         return dbMongo.getCollection<Employee>()
             .updateOneById(item.id, "{${MongoOperator.set}:{'available' : false}}").wasAcknowledged()
     }
@@ -85,7 +85,7 @@ class EmployeeRepositoryImpl: EmployeeRepository {
      * @return flujo de empleados.
      */
     override suspend fun findAll(): Flow<Employee> {
-        logger.debug { "Buscando todos los empleados."}
+        logger.info { "Buscando todos los empleados."}
         return dbMongo.getCollection<Employee>().find().publisher.asFlow()
     }
 
@@ -96,7 +96,7 @@ class EmployeeRepositoryImpl: EmployeeRepository {
      * @return si han sido eliminados con éxito.
      */
     override suspend fun deleteAll(): Boolean {
-        logger.debug { "Eliminando todos los empleados." }
+        logger.info { "Eliminando todos los empleados." }
         return dbMongo.getCollection<Employee>()
             .deleteMany("{}").wasAcknowledged()
     }

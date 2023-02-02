@@ -48,6 +48,43 @@ class KoinApp : KoinComponent {
                     UsersCache.refresh()
                 } while ((!salir))
             }
+            val w = launch {
+
+                launch {
+                    watchers.watchCustomers()
+                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                }
+                launch {
+                    watchers.watchEmployee()
+                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                }
+                launch {
+                    watchers.watchOrder()
+                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                }
+                launch {
+                    watchers.watchProduct()
+                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                }
+                launch {
+                    watchers.watchTask()
+                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                }
+                launch {
+                    watchers.watchCustomizer()
+                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                }
+                launch {
+                    watchers.watchRacket()
+                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                }
+                launch {
+                    watchers.watchStringer()
+                        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
+                }
+            }
+
+
             launch {
                 watchers.watchCustomers().collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
             }
@@ -55,6 +92,7 @@ class KoinApp : KoinComponent {
                 vista.runVista()
                 salir = true
                 cache.cancel()
+                w.cancel()
             }
         }
         //makeJsonListas()
@@ -78,13 +116,14 @@ suspend fun clearData() {
     }
 }
 
-suspend fun sampleData(){
+suspend fun sampleData() {
     var sample = properties.getProperty("database.sample").toBoolean()
-    if (sample){
+    if (sample) {
         t.println(TextColors.green("🤖🔋 CARGANDO DATOS DE PRUEBA"))
         //TODO("SAmple data")
     }
 }
+
 /**
  * Hacer los ficheros con json
  */

@@ -21,7 +21,7 @@ class CustomerApiRepository {
     suspend fun findAll(page: Int, per_page: Int): List<CustomerDTO> {
         val call = client.getAll(page, per_page)
         try {
-            logger.debug { "CustomerApiRepository - findAll - OK" }
+            logger.info { "CustomerApiRepository - findAll - OK" }
             return call
         } catch (e: Exception) {
             logger.error { "Customer - findAll - ERROR - ${e.message}" }
@@ -36,11 +36,11 @@ class CustomerApiRepository {
      */
     suspend fun findById(id: Int): CustomerDTO? {
 
-        logger.debug { "buscando cliente con id : $id" }
+        logger.info { "buscando cliente con id : $id" }
         val call = client.getById(id)
 
         return try {
-            logger.debug { "CustomerApiRepository - findById - OK" }
+            logger.info { "CustomerApiRepository - findById - OK" }
             call
         } catch (e: Exception) {
             logger.error { "CustomerApiRepository - findById - ERROR - ${e.message}" }
@@ -54,10 +54,10 @@ class CustomerApiRepository {
      * @return una lista con los usuario que comparten el email
      */
     suspend fun findByEmail(email: String): List<CustomerDTO>? {
-        logger.debug { "buscando cliente con email : $email" }
+        logger.info { "buscando cliente con email : $email" }
         val call = client.findByEmail(email)
         return try {
-            logger.debug { "CustomerApiRepository - findByEmail - OK " }
+            logger.info { "CustomerApiRepository - findByEmail - OK " }
             call
         } catch (e: Exception) {
             logger.error { "CustomerApiRepository - findByEmail - ERROR - ${e.message}" }
@@ -71,10 +71,10 @@ class CustomerApiRepository {
      * @return la usuario guardada
      */
     suspend fun save(customer: CustomerDTO): Customer {
-        logger.debug { "guardando cliente : $customer" }
+        logger.info { "guardando cliente : $customer" }
         try {
             val res = client.create(customer)
-            logger.debug { "CustomerApiRepository - save - OK" }
+            logger.info { "CustomerApiRepository - save - OK" }
             return res.fromDto()
         } catch (e: Exception) {
             logger.error { "CustomerApiRepository - save - ERROR - ${e.message}" }
@@ -88,11 +88,11 @@ class CustomerApiRepository {
      * @return la usuario actualizada
      */
     suspend fun update(customer: CustomerDTO): Customer {
-        logger.debug { "actualizando cliente : $customer" }
+        logger.info { "actualizando cliente : $customer" }
         try {
 
             val res = client.update(customer.id, customer)
-            logger.debug { "CustomerApiRepository - update - OK" }
+            logger.info { "CustomerApiRepository - update - OK" }
             return res
 
         } catch (e: Exception) {
@@ -106,12 +106,12 @@ class CustomerApiRepository {
      * @param id id del usuario que vamos a eliminar
      */
     suspend fun delete(id: Int) {
-        logger.debug { "eliminando cliente con id : $id" }
+        logger.info { "eliminando cliente con id : $id" }
         try {
-            logger.debug { "CustomerApiRepository - delete - OK" }
+            logger.info { "CustomerApiRepository - delete - OK" }
             client.delete(id)
         } catch (e: Exception) {
-            logger.debug { "CustomerApiRepository - delete - ERROR - ${e.message}" }
+            logger.info { "CustomerApiRepository - delete - ERROR - ${e.message}" }
         }
     }
 

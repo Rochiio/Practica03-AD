@@ -13,7 +13,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 
-private val logger = KotlinLogging.logger {}
+private val logger = KotlinLogging.logger {  }
 
 object MongoDbManager {
     private lateinit var mongoClient: CoroutineClient
@@ -23,7 +23,7 @@ object MongoDbManager {
 
     init {
 
-        logger.debug("Inicializando conexion a MongoDB")
+        logger.info("Inicializando conexion a MongoDB")
         properties.load(javaClass.classLoader.getResourceAsStream("application.properties"))
         if (properties.getProperty("mongo.local").toBoolean()) {
             println(
