@@ -1,5 +1,7 @@
 package controllers
 
+import com.mongodb.client.model.changestream.ChangeStreamDocument
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import exception.CustomerErrorExists
 import exception.CustomerErrorNotFound
 import exception.CustomerResult
@@ -16,6 +18,7 @@ import org.koin.core.annotation.Single
 import repositories.users.CustomerCacheRepository
 import repositories.users.CustomerRepository
 import service.PasswordParser
+import service.reactive.Watchers
 
 /**
  * Controlador de los Clientes.
@@ -23,7 +26,8 @@ import service.PasswordParser
 @Single
 class CustomerController(
     private var repository: CustomerRepository,
-    private var cache: CustomerCacheRepository
+    private var cache: CustomerCacheRepository,
+    private var watchers: Watchers
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -34,17 +38,17 @@ class CustomerController(
      * @return Result dependiendo de si ha sido correcta o no la acción.
      */
     suspend fun addCustomer(cliente: Customer): CustomerResult<Customer> {
-        logger.debug { "Buscamos en la caché si existe el usuario" }
+        logger.info { "Buscamos en la caché si existe el usuario" }
         val existeInCache = cache.findById(cliente.id)
         existeInCache?.let {
-            return  CustomerErrorExists("Ya existe un cliente con el id: ${it.id}")
-        }?: run{
-            logger.debug { "Buscamos en el mongo si existe el usuario" }
+            return CustomerErrorExists("Ya existe un cliente con el id: ${it.id}")
+        } ?: run {
+            logger.info { "Buscamos en el mongo si existe el usuario" }
             val existe = repository.findById(cliente.id)
             existe?.let {
-                return  CustomerErrorExists("Ya existe un cliente con el id: ${it.id}")
-            }?: run{
-                logger.debug { "El usuario no existe --> creando y añadiendo a DB y Cache" }
+                return CustomerErrorExists("Ya existe un cliente con el id: ${it.id}")
+            } ?: run {
+                logger.info { "El usuario no existe --> creando y añadiendo a DB y Cache" }
                 withContext(Dispatchers.IO) {
                     launch {
                         repository.save(cliente)
@@ -65,13 +69,13 @@ class CustomerController(
      * @param password contraseña del cliente.
      * @return Result dependiendo de si se ha realizado correctamente la accion.
      */
-    suspend fun getCustomerByEmailAndPassword(email: String, password: String): CustomerResult<Customer>{
+    suspend fun getCustomerByEmailAndPassword(email: String, password: String): CustomerResult<Customer> {
         val find = repository.findByEmail(email)
         find?.let {
-            if (find.password != PasswordParser.encriptar(password)){
+            if (find.password != PasswordParser.encriptar(password)) {
                 return CustomerErrorNotFound("Usuario o contraseña incorrecto")
             }
-        }?: run {
+        } ?: run {
             return CustomerErrorNotFound("Usuario o contraseña incorrecto")
         }
         return CustomerSuccess<Customer>(200, find)
@@ -83,12 +87,12 @@ class CustomerController(
      * @param id id del cliente a buscar.
      * @return Result dependiendo de si se ha realizado la accion correctamente.
      */
-    suspend fun getCustomerById(id: String): CustomerResult<Customer>{
-        logger.debug { "Buscando en la caché" }
+    suspend fun getCustomerById(id: String): CustomerResult<Customer> {
+        logger.info { "Buscando en la caché" }
         val findCache = cache.findById(id)
         findCache?.let {
             return CustomerSuccess(200, it)
-        }?: run{
+        } ?: run {
             val find = repository.findById(id)
             find?.let {
                 cache.addCache(it)
@@ -103,12 +107,12 @@ class CustomerController(
 //     * Buscar un usuario por su uuid
 //     */
 //    suspend fun getCustomerByUuid(uuid: UUID): CustomerResult<Customer>{
-//        logger.debug { "Buscamos en la cache si existe el usuario por su uuid" }
+//        logger.info{ "Buscamos en la cache si existe el usuario por su uuid" }
 //        val findCache = UsersCache.cache.get(uuid)
 //        findCache?.let {
 //            return CustomerSuccess(200, it)
 //        }?: run{
-//            logger.debug { "Buscamos en la base de datos si existe el usuario por su id" }
+//            logger.info{ "Buscamos en la base de datos si existe el usuario por su id" }
 //            val findDb = repository.findByUuid(uuid)
 //            findDb?.let {
 //                withContext(Dispatchers.IO){
@@ -128,7 +132,7 @@ class CustomerController(
      * Conseguir todos los clientes que existen.
      * @return Result de flujo con los clientes.
      */
-    suspend fun getAllCustomers():CustomerResult<Flow<Customer>>{
+    suspend fun getAllCustomers(): CustomerResult<Flow<Customer>> {
         val flow = repository.findAll()
         return CustomerSuccess<Flow<Customer>>(200, flow)
     }
@@ -139,8 +143,8 @@ class CustomerController(
      * @param cliente cliente a actualizar.
      * @return Result dependiendo del resultado de la operacion.
      */
-    suspend fun updateCustomer(cliente: Customer): CustomerResult<Customer>{
-        withContext(Dispatchers.IO){
+    suspend fun updateCustomer(cliente: Customer): CustomerResult<Customer> {
+        withContext(Dispatchers.IO) {
             launch {
                 cache.update(cliente)
             }
@@ -150,6 +154,10 @@ class CustomerController(
         return CustomerSuccess<Customer>(200, update)
     }
 
+    suspend fun watchCustomers(): ChangeStreamPublisher<Customer> {
+        logger.info{ "Leyendo cambios en tiempo real de : Clientes" }
+        return watchers.watchCustomers()
+    }
 
     /**
      * Eliminar un cliente

@@ -1,5 +1,6 @@
 package controllers
 
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import exception.*
 import kotlinx.coroutines.flow.Flow
 import model.machines.Customizer
@@ -8,6 +9,7 @@ import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import repositories.machines.CustomizerRepository
 import repositories.machines.StringerRepository
+import service.reactive.Watchers
 
 /**
  * Controlador de Maquinas
@@ -15,7 +17,8 @@ import repositories.machines.StringerRepository
 @Single
 class MachineController(
     private var stringerRepo: StringerRepository,
-    private var customizerRepo: CustomizerRepository
+    private var customizerRepo: CustomizerRepository,
+    private var watchers: Watchers
 ) {
 
 
@@ -144,5 +147,12 @@ class MachineController(
     }
 
 
+    fun watchStringers() : ChangeStreamPublisher<Stringer>{
+        return watchers.watchStringer()
+    }
+
+    fun watchCustomizer() : ChangeStreamPublisher<Customizer>{
+        return watchers.watchCustomizer()
+    }
 
 }

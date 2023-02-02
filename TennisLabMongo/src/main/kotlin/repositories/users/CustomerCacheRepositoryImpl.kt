@@ -22,24 +22,24 @@ class CustomerCacheRepositoryImpl:  CustomerCacheRepository{
 
 
     override suspend fun findById(id: String): Customer? {
-        logger.debug { "Cache --> Buscando por id en la caché" }
+        logger.info { "Cache --> Buscando por id en la caché" }
         return UsersCache.cache.get(id)
     }
 
     override suspend fun addCache(item: Customer): Customer {
-        logger.debug { "Cache --> Añadiendo cliente a la caché" }
+        logger.info { "Cache --> Añadiendo cliente a la caché" }
         UsersCache.cache.put(item.id, item)
         return item
     }
 
     override suspend fun delete(item: Customer): Boolean {
-        logger.debug { "Cache --> Eliminando cliente de la caché" }
+        logger.info { "Cache --> Eliminando cliente de la caché" }
         UsersCache.cache.invalidate(item.id)
         return true
     }
 
     override suspend fun update(item: Customer): Customer {
-        logger.debug { "Cache --> Actualizando cliente de la caché" }
+        logger.info { "Cache --> Actualizando cliente de la caché" }
         UsersCache.cache.put(item.id, item)
         return item
     }

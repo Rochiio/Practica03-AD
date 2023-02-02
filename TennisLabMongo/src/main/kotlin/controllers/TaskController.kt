@@ -1,6 +1,7 @@
 package controller
 
 
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import exception.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -9,12 +10,13 @@ import org.koin.core.annotation.Single
 import repositories.orders.TaskRepository
 import repositories.orders.TasksApiRepository
 import service.api.ApiClient
+import service.reactive.Watchers
 
 /**
  * Controlador de tareas.
  */
 @Single
-class TaskController(private var repository: TaskRepository, private var api: TasksApiRepository) {
+class TaskController(private var repository: TaskRepository, private var api: TasksApiRepository, private var watchers: Watchers) {
 
     /**
      * Añade una tarea.
@@ -100,5 +102,9 @@ class TaskController(private var repository: TaskRepository, private var api: Ta
         } catch (e: Exception) {
             TaskErrorExists("Ya existe una tarea con este id")
         }
+    }
+
+    fun watchTasks() : ChangeStreamPublisher<Task>{
+        return watchers.watchTask()
     }
 }

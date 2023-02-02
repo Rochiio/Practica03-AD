@@ -24,7 +24,7 @@ object UsersCache {
                 println("hola")
 
                 println("ACTUALIZANDO CACHE")
-                logger.debug { "Limpiando caché 🗑" }
+                logger.info { "Limpiando caché 🗑" }
                 cache.invalidateAll()
                 delay(STOP)
 

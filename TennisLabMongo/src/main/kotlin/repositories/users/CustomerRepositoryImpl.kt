@@ -25,7 +25,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @return el cliente si ha sido encontrado.
      */
     override suspend fun findByEmail(email: String): Customer? {
-        logger.debug { "Buscando cliente con email: $email" }
+        logger.info { "Buscando cliente con email: $email" }
         return dbMongo.getCollection<Customer>()
             .findOne(Customer::email eq email)
     }
@@ -37,7 +37,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @return el cliente si ha sido encontrado.
      */
     override suspend fun findByUuid(uuid: UUID): Customer? {
-        logger.debug { "Buscando cliente con uuid: $uuid" }
+        logger.info { "Buscando cliente con uuid: $uuid" }
         return dbMongo.getCollection<Customer>()
             .findOne(Customer::uuid eq uuid)
     }
@@ -49,7 +49,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @return el cliente si ha sido encontrado.
      */
     override suspend fun findById(id: String): Customer? {
-        logger.debug { "Buscando cliente con id: $id"}
+        logger.info { "Buscando cliente con id: $id"}
         return dbMongo.getCollection<Customer>()
             .findOneById(id)
     }
@@ -61,7 +61,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @return cliente que ha sido salvado.
      */
     override suspend fun save(item: Customer): Customer {
-        logger.debug { "Salvando cliente: $item" }
+        logger.info { "Salvando cliente: $item" }
         return dbMongo.getCollection<Customer>()
             .save(item).let { item }
     }
@@ -73,7 +73,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @return el cliente actualizado.
      */
     override suspend fun update(item: Customer): Customer {
-        logger.debug { "Actualizando cliente: $item" }
+        logger.info { "Actualizando cliente: $item" }
         return dbMongo.getCollection<Customer>()
             .updateOneById(item.id, item).wasAcknowledged().let { item }
     }
@@ -85,7 +85,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @return si el cliente ha sido eliminado.
      */
     override suspend fun delete(item: Customer): Boolean {
-        logger.debug { "Eliminando cliente: $item" }
+        logger.info { "Eliminando cliente: $item" }
         return dbMongo.getCollection<Customer>()
             .updateOneById(item.id, "{${MongoOperator.set}:{'available' : false}}").wasAcknowledged()
     }
@@ -96,7 +96,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @return flujo de clientes.
      */
     override suspend fun findAll(): Flow<Customer> {
-        logger.debug { "Buscando clientes" }
+        logger.info { "Buscando clientes" }
         return dbMongo.getCollection<Customer>().find().publisher.asFlow()
     }
 
@@ -106,7 +106,7 @@ class CustomerRepositoryImpl : CustomerRepository {
      * @return si han sido eliminados con éxito.
      */
     override suspend fun deleteAll(): Boolean {
-        logger.debug { "Elminando todos los clientes" }
+        logger.info { "Elminando todos los clientes" }
         return dbMongo.getCollection<Customer>()
             .deleteMany("{}").wasAcknowledged()
     }

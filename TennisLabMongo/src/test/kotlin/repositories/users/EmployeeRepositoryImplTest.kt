@@ -17,7 +17,8 @@ import java.time.LocalDateTime
 class EmployeeRepositoryImplTest {
     private var repo = EmployeeRepositoryImpl()
     private var employee = Employee(name="Empleado", surname = "Test", email = "test", password ="1234", available = true,
-        isAdmin = true, entryTime = LocalDateTime.now(), departureTime = LocalDateTime.now(), orderList = emptyList())
+        isAdmin = true, entryTime = LocalDateTime.now(), departureTime = LocalDateTime.now(), orderList = mutableListOf()
+    )
 
     @Before
     fun setUpEach() = runTest{

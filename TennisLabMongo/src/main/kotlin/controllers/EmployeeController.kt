@@ -1,5 +1,6 @@
 package controllers
 
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import exception.EmployeeErrorExists
 import exception.EmployeeErrorNotFound
 import exception.EmployeeResult
@@ -9,13 +10,15 @@ import model.users.Employee
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import repositories.users.EmployeeRepository
+import service.reactive.Watchers
 
 /**
  * Controlador de empleados.
  */
 @Single
 class EmployeeController(
-    private var repository: EmployeeRepository) {
+    private var repository: EmployeeRepository,
+    private var watchers: Watchers) {
 
 
     /**
@@ -99,5 +102,8 @@ class EmployeeController(
     }
 
 
+    fun watchEmployees() : ChangeStreamPublisher<Employee>{
+        return watchers.watchEmployee()
+    }
 
 }

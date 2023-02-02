@@ -7,10 +7,9 @@ import com.github.ajalt.mordant.terminal.Terminal
 import controller.*
 import controllers.*
 import exception.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.reactive.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import model.*
@@ -55,6 +54,7 @@ class Vista(
 
     suspend fun runVista() {
         initUsers()
+
         val opt = principal()
         opcionesPrincipal(opt)
     }
@@ -82,9 +82,13 @@ class Vista(
      * Funcion principal para el inicio
      */
 
-     fun principal(): Int {
-
-
+    suspend fun principal(): Int {
+        //ESTO ES PARA PROBAR EL TIEMPO REAL
+/*withContext(Dispatchers.Unconfined) {
+    launch {
+    customerController.watchCustomers()
+        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }}
+}*/
 
         var opcion: Int
         do {
@@ -104,6 +108,7 @@ class Vista(
      * Acciones a realizar dependiendo de la respuesta en la funcion principal
      */
     suspend fun opcionesPrincipal(num: Int) {
+
         when (num) {
             0 -> terminal.println(green.bg("Gracias por usar tennislab 🎾🎾"))
             1 -> loginBucle()
@@ -308,7 +313,7 @@ class Vista(
                             launch {
                                 pedido.state = Status.EN_PROCESO
 
-                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id}
+                                pedido.tasks.forEach { it.idEmployee = loggedEmployee?.id }
 
                                 orderController.updateOrder(pedido)
                             }
@@ -418,7 +423,7 @@ class Vista(
         val tH = readln().toIntOrNull() ?: -1
 
 
-        var id : Int
+        var id: Int
         val result = productController.getAllProducts()
         var products: List<Product> = mutableListOf()
         when (result) {
@@ -1086,7 +1091,7 @@ class Vista(
             is CustomizerSuccess -> {
                 if (loggedEmployee?.machine == null) {
                     terminal.println("Selecciona una personalizadora para utilizar")
-                    var opt : Int
+                    var opt: Int
                     do {
                         getPersonalizadoras()
                         opt = readln().toIntOrNull() ?: 0
@@ -1288,7 +1293,7 @@ class Vista(
             is StringerSuccess -> {
                 if (loggedEmployee?.machine == null) {
                     terminal.println("Selecciona una encordadora para utilizar")
-                    var opt : Int
+                    var opt: Int
                     do {
                         getEncordadoras()
                         opt = readln().toIntOrNull() ?: 0

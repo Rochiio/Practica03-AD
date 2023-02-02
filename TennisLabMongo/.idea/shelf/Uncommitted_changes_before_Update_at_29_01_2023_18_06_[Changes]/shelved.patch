@@ -1,0 +1,1050 @@
+Index: src/main/kotlin/repositories/orders/TasksApiRepository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package repositories.orders\r\n\r\nimport dto.TaskDTO\r\nimport exception.TaskResult\r\nimport exception.TaskSuccess\r\nimport model.orders.tasks.Task\r\nimport mu.KotlinLogging\r\nimport service.api.ApiClient\r\nimport util.mappers.toDto\r\n\r\nclass TasksApiRepository {\r\n    private val client by lazy { ApiClient.tasksInstance }\r\n    private val logger = KotlinLogging.logger { }\r\n\r\n    /**\r\n     * Recupera las tareas de la api\r\n     * @param page pagina de tareas\r\n     * @param per_page cuantas tareas queremos por página\r\n     * @return lista de tareas\r\n     */\r\n    suspend fun findAll(page: Int, per_page: Int): List<TaskDTO> {\r\n        val call = client.getAll(page, per_page)\r\n        return try {\r\n            logger.debug { \"TasksApiRepository - findall - OK\" }\r\n            call\r\n        } catch (e: Exception) {\r\n            logger.error { \"TasksApiRepository - findAll - ERROR - ${e.message}\" }\r\n            emptyList()\r\n        }\r\n    }\r\n\r\n    /**\r\n     * Busca una tarea por su id\r\n     * @param id id de la tarea\r\n     * @return tarea con el id buscado o null si no existe\r\n     */\r\n    suspend fun findBYId(id: Int): TaskDTO? {\r\n        logger.debug { \"buscando tarea con id : $id\" }\r\n        val call = client.getById(id)\r\n\r\n        return try {\r\n            logger.debug { \"TasksApiRepository - findById - OK\" }\r\n            call\r\n        } catch (e: Exception) {\r\n            logger.error { \"TasksApiRepository - findBYId - ERROR - ${e.message}\" }\r\n            null\r\n        }\r\n    }\r\n\r\n    /**\r\n     * Busca una tarea por el id del usuario que tiene asociado\r\n     * @param id del usuario\r\n     * @return la tarea con el usuario con el id o null si no existe\r\n     */\r\n    suspend fun findByUserId(id: Int): TaskDTO? {\r\n        logger.debug { \"buscando tarea con id de usuario : $id\" }\r\n        val call = client.getByUserId(id)\r\n\r\n        return try {\r\n            logger.debug { \"TasksApiRepository - findByUserId - OK\" }\r\n            call\r\n        } catch (e: Exception) {\r\n            logger.error { \"TasksApiRepository - findByUserId - ERROR - ${e.message}\" }\r\n            null\r\n        }\r\n    }\r\n\r\n    /**\r\n     * Guarda una tarea en la api\r\n     * @param tarea a guardar\r\n     * @return la tarea guardada\r\n     */\r\n    suspend fun save(task: Task): Task {\r\n        return try {\r\n            val call = client.create(task.toDto())\r\n            task\r\n        } catch (e: Exception) {\r\n            logger.error { \"TasksApiRepository - findByUserId - ERROR - ${e.message}\" }\r\n            throw Exception(e.message)\r\n\r\n        }\r\n    }\r\n\r\n    /**\r\n     * Actualiza una tarea en la api\r\n     * @param tarea que hay que actualizar\r\n     * @return la tarea actualizada\r\n     */\r\n    suspend fun update(task: Task): Task {\r\n        logger.debug { \"actualizando tarea : $task\" }\r\n        try {\r\n\r\n            val res = client.update(task._id, task.toDto())\r\n            logger.debug { \"CustomerApiRepository - update - OK\" }\r\n            return task\r\n\r\n        } catch (e: Exception) {\r\n            logger.error { \"CustomerApiRepository - update - ERROR - ${e.message}\" }\r\n            throw Exception(e.message)\r\n        }\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/repositories/orders/TasksApiRepository.kt b/src/main/kotlin/repositories/orders/TasksApiRepository.kt
+--- a/src/main/kotlin/repositories/orders/TasksApiRepository.kt	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/src/main/kotlin/repositories/orders/TasksApiRepository.kt	(date 1675005868429)
+@@ -1,8 +1,6 @@
+ package repositories.orders
+ 
+ import dto.TaskDTO
+-import exception.TaskResult
+-import exception.TaskSuccess
+ import model.orders.tasks.Task
+ import mu.KotlinLogging
+ import service.api.ApiClient
+@@ -90,7 +88,7 @@
+         logger.debug { "actualizando tarea : $task" }
+         try {
+ 
+-            val res = client.update(task._id, task.toDto())
++            val res = client.update(task.nId, task.toDto())
+             logger.debug { "CustomerApiRepository - update - OK" }
+             return task
+ 
+Index: src/main/kotlin/model/orders/Order.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model.orders\r\n\r\nimport kotlinx.serialization.Serializable\r\nimport model.Status\r\nimport model.orders.tasks.Task\r\nimport model.users.Customer\r\nimport org.bson.codecs.pojo.annotations.BsonId\r\nimport org.litote.kmongo.newId\r\nimport util.serializer.LocalDateSerializer\r\nimport util.serializer.UUIDSerializer\r\nimport java.time.LocalDate\r\nimport java.util.*\r\nimport kotlin.collections.ArrayList\r\n\r\n@Serializable\r\ndata class Order(\r\n    @BsonId\r\n    var id: String = newId<Order>().toString(),\r\n    @Serializable(with = UUIDSerializer::class)\r\n    var uuid: UUID = UUID.randomUUID(),\r\n    var state: Status,\r\n    @Serializable(with = LocalDateSerializer::class)\r\n    val entryDate: LocalDate?,\r\n    @Serializable(with = LocalDateSerializer::class)\r\n    var exitDate: LocalDate?,\r\n    @Serializable(with = LocalDateSerializer::class)\r\n    var finalDate: LocalDate?,\r\n    @Serializable(with = LocalDateSerializer::class)\r\n    val maxDate: LocalDate?,\r\n    var totalPrice: Float,\r\n    val client: Customer,\r\n    var tasks: ArrayList<Task>\r\n)\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/model/orders/Order.kt b/src/main/kotlin/model/orders/Order.kt
+--- a/src/main/kotlin/model/orders/Order.kt	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/src/main/kotlin/model/orders/Order.kt	(date 1675005801961)
+@@ -10,7 +10,6 @@
+ import util.serializer.UUIDSerializer
+ import java.time.LocalDate
+ import java.util.*
+-import kotlin.collections.ArrayList
+ 
+ @Serializable
+ data class Order(
+@@ -29,6 +28,6 @@
+     val maxDate: LocalDate?,
+     var totalPrice: Float,
+     val client: Customer,
+-    var tasks: ArrayList<Task>
++    var tasks: List<Task>
+ )
+ 
+Index: src/main/kotlin/model/Product.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model\r\n\r\nimport kotlinx.serialization.Contextual\r\nimport kotlinx.serialization.Serializable\r\nimport org.bson.codecs.pojo.annotations.BsonId\r\nimport org.litote.kmongo.Id\r\nimport org.litote.kmongo.newId\r\nimport util.serializer.UUIDSerializer\r\nimport java.util.*\r\n\r\n@Serializable\r\ndata class Product(\r\n    @BsonId\r\n    var id : String = newId<Product>().toString(),\r\n    @Serializable(with = UUIDSerializer::class)\r\n    var uuid: UUID = UUID.randomUUID(),\r\n    val type : TypeProduct,\r\n    val brand : String,\r\n    val model : String,\r\n    var price : Float,\r\n    var stock : Int\r\n)\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/model/Product.kt b/src/main/kotlin/model/Product.kt
+--- a/src/main/kotlin/model/Product.kt	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/src/main/kotlin/model/Product.kt	(date 1675010548225)
+@@ -1,9 +1,7 @@
+ package model
+ 
+-import kotlinx.serialization.Contextual
+ import kotlinx.serialization.Serializable
+ import org.bson.codecs.pojo.annotations.BsonId
+-import org.litote.kmongo.Id
+ import org.litote.kmongo.newId
+ import util.serializer.UUIDSerializer
+ import java.util.*
+@@ -11,14 +9,14 @@
+ @Serializable
+ data class Product(
+     @BsonId
+-    var id : String = newId<Product>().toString(),
++    var id: String = newId<Product>().toString(),
+     @Serializable(with = UUIDSerializer::class)
+     var uuid: UUID = UUID.randomUUID(),
+-    val type : TypeProduct,
+-    val brand : String,
+-    val model : String,
+-    var price : Float,
+-    var stock : Int
++    val type: TypeProduct,
++    var brand: String,
++    var model: String,
++    var price: Float,
++    var stock: Int
+ )
+ 
+ 
+Index: src/main/kotlin/model/orders/tasks/Task.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model.orders.tasks\r\n\r\nimport kotlinx.serialization.Contextual\r\nimport kotlinx.serialization.Serializable\r\nimport model.TypeTask\r\nimport model.machines.Customizer\r\nimport model.machines.Stringer\r\nimport model.users.Employee\r\nimport org.bson.codecs.pojo.annotations.BsonId\r\nimport org.litote.kmongo.Id\r\nimport org.litote.kmongo.newId\r\nimport util.serializer.UUIDSerializer\r\nimport java.util.*\r\n\r\n@Serializable\r\ndata class Task(\r\n    @BsonId\r\n    var id : String = newId<Task>().toString(),\r\n    var _id : Int,\r\n    @Serializable(with = UUIDSerializer::class)\r\n    var uuid: UUID = UUID.randomUUID(),\r\n    //trabajador y maquina referenciados\r\n    @Contextual\r\n    var idTrabajador : Id<Employee>?,\r\n    @Contextual\r\n    var idStringer : Id<Stringer>?,\r\n    @Contextual\r\n    var idCustomizer : Id<Customizer>?,\r\n    //datos de la tarea embedidos\r\n    var description : String,\r\n    var taskType : TypeTask,\r\n    var available : Boolean\r\n)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/model/orders/tasks/Task.kt b/src/main/kotlin/model/orders/tasks/Task.kt
+--- a/src/main/kotlin/model/orders/tasks/Task.kt	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/src/main/kotlin/model/orders/tasks/Task.kt	(date 1675011186135)
+@@ -3,11 +3,7 @@
+ import kotlinx.serialization.Contextual
+ import kotlinx.serialization.Serializable
+ import model.TypeTask
+-import model.machines.Customizer
+-import model.machines.Stringer
+-import model.users.Employee
+ import org.bson.codecs.pojo.annotations.BsonId
+-import org.litote.kmongo.Id
+ import org.litote.kmongo.newId
+ import util.serializer.UUIDSerializer
+ import java.util.*
+@@ -15,19 +11,19 @@
+ @Serializable
+ data class Task(
+     @BsonId
+-    var id : String = newId<Task>().toString(),
+-    var _id : Int,
++    var id: String = newId<Task>().toString(),
++    var nId: Int,
+     @Serializable(with = UUIDSerializer::class)
+     var uuid: UUID = UUID.randomUUID(),
+     //trabajador y maquina referenciados
+     @Contextual
+-    var idTrabajador : Id<Employee>?,
++    var idTrabajador: String?,
+     @Contextual
+-    var idStringer : Id<Stringer>?,
++    var idStringer: String?,
+     @Contextual
+-    var idCustomizer : Id<Customizer>?,
++    var idCustomizer: String?,
+     //datos de la tarea embedidos
+-    var description : String,
+-    var taskType : TypeTask,
+-    var available : Boolean
++    var description: String,
++    var taskType: TypeTask,
++    var available: Boolean
+ )
+Index: src/test/kotlin/repositories/orders/OrderRepositoryImplTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package repositories.orders\r\n\r\nimport org.junit.jupiter.api.Test\r\n\r\nimport org.junit.jupiter.api.Assertions.*\r\n\r\ninternal class OrderRepositoryImplTest {\r\n\r\n    @Test\r\n    fun findById() {\r\n    }\r\n\r\n    @Test\r\n    fun save() {\r\n    }\r\n\r\n    @Test\r\n    fun update() {\r\n    }\r\n\r\n    @Test\r\n    fun delete() {\r\n    }\r\n\r\n    @Test\r\n    fun findAll() {\r\n    }\r\n\r\n    @Test\r\n    fun deleteAll() {\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/kotlin/repositories/orders/OrderRepositoryImplTest.kt b/src/test/kotlin/repositories/orders/OrderRepositoryImplTest.kt
+--- a/src/test/kotlin/repositories/orders/OrderRepositoryImplTest.kt	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/src/test/kotlin/repositories/orders/OrderRepositoryImplTest.kt	(date 1675010188617)
+@@ -1,32 +1,142 @@
+ package repositories.orders
+ 
++import kotlinx.coroutines.DelicateCoroutinesApi
++import kotlinx.coroutines.ExperimentalCoroutinesApi
++import kotlinx.coroutines.flow.toList
++import kotlinx.coroutines.test.runTest
++import model.Status
++import model.orders.Order
++import model.orders.tasks.Task
++import model.users.Customer
++import org.junit.Before
++import org.junit.jupiter.api.AfterEach
+ import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertAll
++import java.time.LocalDate
++import kotlin.test.assertEquals
++import kotlin.test.assertNotNull
++import kotlin.test.assertNull
++import kotlin.test.assertTrue
++
++@DelicateCoroutinesApi
++@ExperimentalCoroutinesApi
++class OrderRepositoryImplTest {
++    private val repo = OrderRepositoryImpl()
++    private var customer = Customer(
++        name = "Cliente", username = "Test", email = "email", password = "123456", available = true,
++        orderList = emptyList(), nId = 0, tennisRacketsList = emptyList()
++    )
+ 
+-import org.junit.jupiter.api.Assertions.*
++    private var order = Order(
++        state = Status.EN_PROCESO,
++        entryDate = LocalDate.now(),
++        exitDate = null,
++        finalDate = null,
++        maxDate = LocalDate.now().plusDays(14),
++        totalPrice = 10f,
++        client = customer,
++        tasks = emptyList<Task>()
++    )
+ 
+-internal class OrderRepositoryImplTest {
++    @Before
++    fun setUp() = runTest {
++        repo.deleteAll()
++    }
++
++    @AfterEach
++    fun tearDown() = runTest {
++        repo.deleteAll()
++    }
+ 
+     @Test
+-    fun findById() {
++    fun findById() = runTest {
++        repo.save(order)
++        val res = repo.findById(order.id)
++
++        assertAll(
++            { assertNotNull(res) },
++            { assertEquals(res?.id, order.id) },
++            { assertEquals(res?.uuid, order.uuid) },
++            { assertEquals(res?.state, order.state) },
++            { assertEquals(res?.entryDate, order.entryDate) },
++            { assertNull(res?.exitDate) },
++            { assertNull(res?.finalDate) },
++            { assertEquals(res?.maxDate, order.maxDate) },
++            { assertEquals(res?.totalPrice, order.totalPrice) },
++            { assertEquals(res?.client, order.client) },
++            { assertEquals(res?.tasks, order.tasks) }
++        )
+     }
+ 
+     @Test
+-    fun save() {
++    fun save() = runTest {
++        val res = repo.save(order)
++        assertAll(
++            { assertEquals(res.id, order.id) },
++            { assertEquals(res.uuid, order.uuid) },
++            { assertEquals(res.state, order.state) },
++            { assertEquals(res.entryDate, order.entryDate) },
++            { assertNull(res.exitDate) },
++            { assertNull(res.finalDate) },
++            { assertEquals(res.maxDate, order.maxDate) },
++            { assertEquals(res.totalPrice, order.totalPrice) },
++            { assertEquals(res.client, order.client) },
++            { assertEquals(res.tasks, order.tasks) }
++        )
++
++
+     }
+ 
+     @Test
+-    fun update() {
++    fun update() = runTest {
++        val save = repo.save(order)
++        save.state = Status.TERMINADO
++        val update = repo.update(save)
++        assertAll(
++            { assertEquals(update.id, save.id) },
++            { assertEquals(update.uuid, save.uuid) },
++            { assertEquals(update.state, save.state) },
++            { assertEquals(update.entryDate, save.entryDate) },
++            { assertNull(update.exitDate) },
++            { assertNull(update.finalDate) },
++            { assertEquals(update.maxDate, save.maxDate) },
++            { assertEquals(update.totalPrice, save.totalPrice) },
++            { assertEquals(update.client, save.client) },
++            { assertEquals(update.tasks, save.tasks) }
++        )
+     }
+ 
+     @Test
+-    fun delete() {
++    fun delete() = runTest {
++        val save = repo.save(order)
++        val res = repo.delete(order)
++        assertTrue(res)
+     }
+ 
+     @Test
+-    fun findAll() {
++    fun findAll() = runTest {
++        repo.save(order)
++        val res = repo.findAll().toList()
++        assertAll(
++            { assertTrue(res.isNotEmpty()) },
++            { assertEquals(res.size, 1) },
++            { assertEquals(res[0].id, order.id) },
++            { assertEquals(res[0].uuid, order.uuid) },
++            { assertEquals(res[0].state, order.state) },
++            { assertEquals(res[0].entryDate, order.entryDate) },
++            { assertNull(res[0].exitDate) },
++            { assertNull(res[0].finalDate) },
++            { assertEquals(res[0].maxDate, order.maxDate) },
++            { assertEquals(res[0].totalPrice, order.totalPrice) },
++            { assertEquals(res[0].client, order.client) },
++            { assertEquals(res[0].tasks, order.tasks) }
++        )
+     }
+ 
+     @Test
+-    fun deleteAll() {
++    fun deleteAll() = runTest {
++        repo.save(order)
++        val res = repo.deleteAll()
++        assertTrue(res)
+     }
+ }
+\ No newline at end of file
+Index: build/reports/tests/test/classes/controllers.RacketControllerTest.html
+===================================================================
+diff --git a/build/reports/tests/test/classes/controllers.RacketControllerTest.html b/build/reports/tests/test/classes/controllers.RacketControllerTest.html
+deleted file mode 100644
+--- a/build/reports/tests/test/classes/controllers.RacketControllerTest.html	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ /dev/null	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
+@@ -1,126 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+-<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+-<title>Test results - RacketControllerTest</title>
+-<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+-<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+-<script src="../js/report.js" type="text/javascript"></script>
+-</head>
+-<body>
+-<div id="content">
+-<h1>RacketControllerTest</h1>
+-<div class="breadcrumbs">
+-<a href="../index.html">all</a> &gt; 
+-<a href="../packages/controllers.html">controllers</a> &gt; RacketControllerTest</div>
+-<div id="summary">
+-<table>
+-<tr>
+-<td>
+-<div class="summaryGroup">
+-<table>
+-<tr>
+-<td>
+-<div class="infoBox" id="tests">
+-<div class="counter">7</div>
+-<p>tests</p>
+-</div>
+-</td>
+-<td>
+-<div class="infoBox" id="failures">
+-<div class="counter">0</div>
+-<p>failures</p>
+-</div>
+-</td>
+-<td>
+-<div class="infoBox" id="ignored">
+-<div class="counter">0</div>
+-<p>ignored</p>
+-</div>
+-</td>
+-<td>
+-<div class="infoBox" id="duration">
+-<div class="counter">1.256s</div>
+-<p>duration</p>
+-</div>
+-</td>
+-</tr>
+-</table>
+-</div>
+-</td>
+-<td>
+-<div class="infoBox success" id="successRate">
+-<div class="percent">100%</div>
+-<p>successful</p>
+-</div>
+-</td>
+-</tr>
+-</table>
+-</div>
+-<div id="tabs">
+-<ul class="tabLinks">
+-<li>
+-<a href="#tab0">Tests</a>
+-</li>
+-</ul>
+-<div id="tab0" class="tab">
+-<h2>Tests</h2>
+-<table>
+-<thead>
+-<tr>
+-<th>Test</th>
+-<th>Duration</th>
+-<th>Result</th>
+-</tr>
+-</thead>
+-<tr>
+-<td class="success">deleteRacket()</td>
+-<td class="success">0.028s</td>
+-<td class="success">passed</td>
+-</tr>
+-<tr>
+-<td class="success">findById()</td>
+-<td class="success">0.031s</td>
+-<td class="success">passed</td>
+-</tr>
+-<tr>
+-<td class="success">findByIdError()</td>
+-<td class="success">0.024s</td>
+-<td class="success">passed</td>
+-</tr>
+-<tr>
+-<td class="success">getAllRackets()</td>
+-<td class="success">0.433s</td>
+-<td class="success">passed</td>
+-</tr>
+-<tr>
+-<td class="success">saveRacket()</td>
+-<td class="success">0.033s</td>
+-<td class="success">passed</td>
+-</tr>
+-<tr>
+-<td class="success">saveRacketError()</td>
+-<td class="success">0.673s</td>
+-<td class="success">passed</td>
+-</tr>
+-<tr>
+-<td class="success">updateRacket()</td>
+-<td class="success">0.034s</td>
+-<td class="success">passed</td>
+-</tr>
+-</table>
+-</div>
+-</div>
+-<div id="footer">
+-<p>
+-<div>
+-<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+-<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+-</label>
+-</div>Generated by 
+-<a href="http://www.gradle.org">Gradle 7.4.2</a> at 26 ene 2023 17:48:53</p>
+-</div>
+-</div>
+-</body>
+-</html>
+Index: build/test-results/test/TEST-controllers.RacketControllerTest.xml
+===================================================================
+diff --git a/build/test-results/test/TEST-controllers.RacketControllerTest.xml b/build/test-results/test/TEST-controllers.RacketControllerTest.xml
+deleted file mode 100644
+--- a/build/test-results/test/TEST-controllers.RacketControllerTest.xml	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ /dev/null	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
+@@ -1,13 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<testsuite name="controllers.RacketControllerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2023-01-26T16:48:52" hostname="RO-PC" time="1.277">
+-  <properties/>
+-  <testcase name="saveRacketError()" classname="controllers.RacketControllerTest" time="0.673"/>
+-  <testcase name="findByIdError()" classname="controllers.RacketControllerTest" time="0.024"/>
+-  <testcase name="updateRacket()" classname="controllers.RacketControllerTest" time="0.034"/>
+-  <testcase name="deleteRacket()" classname="controllers.RacketControllerTest" time="0.028"/>
+-  <testcase name="findById()" classname="controllers.RacketControllerTest" time="0.031"/>
+-  <testcase name="saveRacket()" classname="controllers.RacketControllerTest" time="0.033"/>
+-  <testcase name="getAllRackets()" classname="controllers.RacketControllerTest" time="0.433"/>
+-  <system-out><![CDATA[]]></system-out>
+-  <system-err><![CDATA[]]></system-err>
+-</testsuite>
+Index: build/reports/tests/test/packages/controllers.html
+===================================================================
+diff --git a/build/reports/tests/test/packages/controllers.html b/build/reports/tests/test/packages/controllers.html
+deleted file mode 100644
+--- a/build/reports/tests/test/packages/controllers.html	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ /dev/null	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
+@@ -1,103 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+-<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+-<title>Test results - Package controllers</title>
+-<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+-<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+-<script src="../js/report.js" type="text/javascript"></script>
+-</head>
+-<body>
+-<div id="content">
+-<h1>Package controllers</h1>
+-<div class="breadcrumbs">
+-<a href="../index.html">all</a> &gt; controllers</div>
+-<div id="summary">
+-<table>
+-<tr>
+-<td>
+-<div class="summaryGroup">
+-<table>
+-<tr>
+-<td>
+-<div class="infoBox" id="tests">
+-<div class="counter">7</div>
+-<p>tests</p>
+-</div>
+-</td>
+-<td>
+-<div class="infoBox" id="failures">
+-<div class="counter">0</div>
+-<p>failures</p>
+-</div>
+-</td>
+-<td>
+-<div class="infoBox" id="ignored">
+-<div class="counter">0</div>
+-<p>ignored</p>
+-</div>
+-</td>
+-<td>
+-<div class="infoBox" id="duration">
+-<div class="counter">1.256s</div>
+-<p>duration</p>
+-</div>
+-</td>
+-</tr>
+-</table>
+-</div>
+-</td>
+-<td>
+-<div class="infoBox success" id="successRate">
+-<div class="percent">100%</div>
+-<p>successful</p>
+-</div>
+-</td>
+-</tr>
+-</table>
+-</div>
+-<div id="tabs">
+-<ul class="tabLinks">
+-<li>
+-<a href="#tab0">Classes</a>
+-</li>
+-</ul>
+-<div id="tab0" class="tab">
+-<h2>Classes</h2>
+-<table>
+-<thread>
+-<tr>
+-<th>Class</th>
+-<th>Tests</th>
+-<th>Failures</th>
+-<th>Ignored</th>
+-<th>Duration</th>
+-<th>Success rate</th>
+-</tr>
+-</thread>
+-<tr>
+-<td class="success">
+-<a href="../classes/controllers.RacketControllerTest.html">RacketControllerTest</a>
+-</td>
+-<td>7</td>
+-<td>0</td>
+-<td>0</td>
+-<td>1.256s</td>
+-<td class="success">100%</td>
+-</tr>
+-</table>
+-</div>
+-</div>
+-<div id="footer">
+-<p>
+-<div>
+-<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+-<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+-</label>
+-</div>Generated by 
+-<a href="http://www.gradle.org">Gradle 7.4.2</a> at 26 ene 2023 17:48:53</p>
+-</div>
+-</div>
+-</body>
+-</html>
+Index: src/test/kotlin/repositories/orders/TasksApiRepositoryTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/kotlin/repositories/orders/TasksApiRepositoryTest.kt b/src/test/kotlin/repositories/orders/TasksApiRepositoryTest.kt
+new file mode 100644
+--- /dev/null	(date 1675011966893)
++++ b/src/test/kotlin/repositories/orders/TasksApiRepositoryTest.kt	(date 1675011966893)
+@@ -0,0 +1,31 @@
++package repositories.orders
++
++import io.mockk.impl.annotations.MockK
++import org.junit.jupiter.api.Test
++
++class TasksApiRepositoryTest {
++
++    @MockK
++    private val api = TasksApiRepository()
++
++
++    @Test
++    fun findAll() {
++    }
++
++    @Test
++    fun findBYId() {
++    }
++
++    @Test
++    fun findByUserId() {
++    }
++
++    @Test
++    fun save() {
++    }
++
++    @Test
++    fun update() {
++    }
++}
+\ No newline at end of file
+Index: build/reports/tests/test/index.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!DOCTYPE html>\r\n<html>\r\n<head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>\r\n<meta http-equiv=\"x-ua-compatible\" content=\"IE=edge\"/>\r\n<title>Test results - Test Summary</title>\r\n<link href=\"css/base-style.css\" rel=\"stylesheet\" type=\"text/css\"/>\r\n<link href=\"css/style.css\" rel=\"stylesheet\" type=\"text/css\"/>\r\n<script src=\"js/report.js\" type=\"text/javascript\"></script>\r\n</head>\r\n<body>\r\n<div id=\"content\">\r\n<h1>Test Summary</h1>\r\n<div id=\"summary\">\r\n<table>\r\n<tr>\r\n<td>\r\n<div class=\"summaryGroup\">\r\n<table>\r\n<tr>\r\n<td>\r\n<div class=\"infoBox\" id=\"tests\">\r\n<div class=\"counter\">7</div>\r\n<p>tests</p>\r\n</div>\r\n</td>\r\n<td>\r\n<div class=\"infoBox\" id=\"failures\">\r\n<div class=\"counter\">0</div>\r\n<p>failures</p>\r\n</div>\r\n</td>\r\n<td>\r\n<div class=\"infoBox\" id=\"ignored\">\r\n<div class=\"counter\">0</div>\r\n<p>ignored</p>\r\n</div>\r\n</td>\r\n<td>\r\n<div class=\"infoBox\" id=\"duration\">\r\n<div class=\"counter\">1.256s</div>\r\n<p>duration</p>\r\n</div>\r\n</td>\r\n</tr>\r\n</table>\r\n</div>\r\n</td>\r\n<td>\r\n<div class=\"infoBox success\" id=\"successRate\">\r\n<div class=\"percent\">100%</div>\r\n<p>successful</p>\r\n</div>\r\n</td>\r\n</tr>\r\n</table>\r\n</div>\r\n<div id=\"tabs\">\r\n<ul class=\"tabLinks\">\r\n<li>\r\n<a href=\"#tab0\">Packages</a>\r\n</li>\r\n<li>\r\n<a href=\"#tab1\">Classes</a>\r\n</li>\r\n</ul>\r\n<div id=\"tab0\" class=\"tab\">\r\n<h2>Packages</h2>\r\n<table>\r\n<thead>\r\n<tr>\r\n<th>Package</th>\r\n<th>Tests</th>\r\n<th>Failures</th>\r\n<th>Ignored</th>\r\n<th>Duration</th>\r\n<th>Success rate</th>\r\n</tr>\r\n</thead>\r\n<tbody>\r\n<tr>\r\n<td class=\"success\">\r\n<a href=\"packages/controllers.html\">controllers</a>\r\n</td>\r\n<td>7</td>\r\n<td>0</td>\r\n<td>0</td>\r\n<td>1.256s</td>\r\n<td class=\"success\">100%</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</div>\r\n<div id=\"tab1\" class=\"tab\">\r\n<h2>Classes</h2>\r\n<table>\r\n<thead>\r\n<tr>\r\n<th>Class</th>\r\n<th>Tests</th>\r\n<th>Failures</th>\r\n<th>Ignored</th>\r\n<th>Duration</th>\r\n<th>Success rate</th>\r\n</tr>\r\n</thead>\r\n<tbody>\r\n<tr>\r\n<td class=\"success\">\r\n<a href=\"classes/controllers.RacketControllerTest.html\">controllers.RacketControllerTest</a>\r\n</td>\r\n<td>7</td>\r\n<td>0</td>\r\n<td>0</td>\r\n<td>1.256s</td>\r\n<td class=\"success\">100%</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</div>\r\n</div>\r\n<div id=\"footer\">\r\n<p>\r\n<div>\r\n<label class=\"hidden\" id=\"label-for-line-wrapping-toggle\" for=\"line-wrapping-toggle\">Wrap lines\r\n<input id=\"line-wrapping-toggle\" type=\"checkbox\" autocomplete=\"off\"/>\r\n</label>\r\n</div>Generated by \r\n<a href=\"http://www.gradle.org\">Gradle 7.4.2</a> at 26 ene 2023 17:48:53</p>\r\n</div>\r\n</div>\r\n</body>\r\n</html>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build/reports/tests/test/index.html b/build/reports/tests/test/index.html
+--- a/build/reports/tests/test/index.html	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/build/reports/tests/test/index.html	(date 1675011545395)
+@@ -20,7 +20,7 @@
+ <tr>
+ <td>
+ <div class="infoBox" id="tests">
+-<div class="counter">7</div>
++<div class="counter">6</div>
+ <p>tests</p>
+ </div>
+ </td>
+@@ -38,7 +38,7 @@
+ </td>
+ <td>
+ <div class="infoBox" id="duration">
+-<div class="counter">1.256s</div>
++<div class="counter">1.451s</div>
+ <p>duration</p>
+ </div>
+ </td>
+@@ -80,12 +80,12 @@
+ <tbody>
+ <tr>
+ <td class="success">
+-<a href="packages/controllers.html">controllers</a>
++<a href="packages/repositories.orders.html">repositories.orders</a>
+ </td>
+-<td>7</td>
++<td>6</td>
+ <td>0</td>
+ <td>0</td>
+-<td>1.256s</td>
++<td>1.451s</td>
+ <td class="success">100%</td>
+ </tr>
+ </tbody>
+@@ -107,12 +107,12 @@
+ <tbody>
+ <tr>
+ <td class="success">
+-<a href="classes/controllers.RacketControllerTest.html">controllers.RacketControllerTest</a>
++<a href="classes/repositories.orders.TaskRepositoryImplTest.html">repositories.orders.TaskRepositoryImplTest</a>
+ </td>
+-<td>7</td>
++<td>6</td>
+ <td>0</td>
+ <td>0</td>
+-<td>1.256s</td>
++<td>1.451s</td>
+ <td class="success">100%</td>
+ </tr>
+ </tbody>
+@@ -126,7 +126,7 @@
+ <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+ </label>
+ </div>Generated by 
+-<a href="http://www.gradle.org">Gradle 7.4.2</a> at 26 ene 2023 17:48:53</p>
++<a href="http://www.gradle.org">Gradle 7.4.2</a> at 29 ene 2023 17:59:05</p>
+ </div>
+ </div>
+ </body>
+Index: build/kspCaches/test/symbolLookups/counters.tab
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>9\r\n0
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build/kspCaches/test/symbolLookups/counters.tab b/build/kspCaches/test/symbolLookups/counters.tab
+--- a/build/kspCaches/test/symbolLookups/counters.tab	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/build/kspCaches/test/symbolLookups/counters.tab	(date 1675011540117)
+@@ -1,2 +1,2 @@
+-9
++12
+ 0
+\ No newline at end of file
+Index: src/main/kotlin/util/mappers/Mappers.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\r\npackage util.mappers\r\n\r\nimport dto.TaskDTO\r\nimport dto.customers.CustomerDTO\r\nimport model.orders.tasks.Task\r\nimport model.users.Customer\r\n\r\nfun CustomerDTO.fromDto(): Customer {\r\n    return Customer(\r\n        name = this.name,\r\n        username = this.name,\r\n        email = this.email,\r\n        orderList = emptyList(),\r\n        tennisRacketsList = emptyList(),\r\n        available = true,\r\n        nId = id\r\n    )\r\n}\r\n\r\nfun Task.toDto() : TaskDTO = TaskDTO(\r\n    id = this._id,\r\n    title = this.description,\r\n    userId = 0,\r\n    completed = available\r\n)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/util/mappers/Mappers.kt b/src/main/kotlin/util/mappers/Mappers.kt
+--- a/src/main/kotlin/util/mappers/Mappers.kt	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/src/main/kotlin/util/mappers/Mappers.kt	(date 1675005869193)
+@@ -1,4 +1,3 @@
+-
+ package util.mappers
+ 
+ import dto.TaskDTO
+@@ -18,8 +17,8 @@
+     )
+ }
+ 
+-fun Task.toDto() : TaskDTO = TaskDTO(
+-    id = this._id,
++fun Task.toDto(): TaskDTO = TaskDTO(
++    id = this.nId,
+     title = this.description,
+     userId = 0,
+     completed = available
+Index: build/kotlin/TennisLabMongo10SNAPSHOTjar-classes.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\MainKt$main$1$refresh$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\MainKt$main$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\MainKt.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controller\\TaskController$addTask$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controller\\TaskController$addTaskToOrder$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controller\\TaskController$deleteTask$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controller\\TaskController$getAllTasks$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controller\\TaskController$getTaskById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controller\\TaskController$updateTask$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controller\\TaskController.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$addCustomer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$addCustomer$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$addCustomer$4$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$addCustomer$4$3$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$addCustomer$4$3$2$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$addCustomer$4$3$2$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$addCustomer$4$3$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$deleteCustomer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$deleteCustomer$2$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$deleteCustomer$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$getAllCustomers$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$getCustomerByEmailAndPassword$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$getCustomerById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$getCustomerById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$updateCustomer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$updateCustomer$2$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController$updateCustomer$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\CustomerController.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\EmployeeController$addEmployee$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\EmployeeController$deleteEmployee$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\EmployeeController$getAllEmployees$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\EmployeeController$getEmployeeByEmailAndPassword$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\EmployeeController$getEmployeeById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\EmployeeController$updateEmployee$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\EmployeeController.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$addCustomizer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$addStringer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$deleteCustomizer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$deleteStringer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$getAllCustomizers$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$getAllStringers$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$getCustomizerById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$getStringerById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$updateCustomizer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController$updateStringer$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\MachineController.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\OrderController$addOrder$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\OrderController$deleteOrder$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\OrderController$getOrderById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\OrderController$getOrders$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\OrderController$updateOrder$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\OrderController.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\ProductController$addProduct$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\ProductController$deleteProduct$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\ProductController$getAllProducts$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\ProductController$getProductById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\ProductController$updateProduct$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\ProductController.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\RacketController$deleteRacket$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\RacketController$findById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\RacketController$getAllRackets$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\RacketController$saveRacket$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\RacketController$updateRacket$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\controllers\\RacketController.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\db\\MongoDbManager.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\db\\MongoDbManagerKt$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\db\\MongoDbManagerKt.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\de\\jensklingenberg\\ktorfit\\KtorfitExtKt.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\GetAllDto$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\GetAllDto$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\GetAllDto.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\SupportDto$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\SupportDto$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\SupportDto.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\TaskDTO.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Address$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Address$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Address.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Company$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Company$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Company.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\CustomerDTO$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\CustomerDTO$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\CustomerDTO.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Geo$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Geo$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\Geo.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\UserDTO$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\UserDTO$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\dto\\customers\\UserDTO.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomerError.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomerErrorBadRequest.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomerErrorExists.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomerErrorNotFound.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomerInternalException.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomerResult.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomerSuccess.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomizerError.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomizerErrorBadRequest.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomizerErrorExists.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomizerErrorNotFound.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomizerInternalException.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomizerResult.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\CustomizerSuccess.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\EmployeeError.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\EmployeeErrorBadRequest.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\EmployeeErrorExists.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\EmployeeErrorNotFound.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\EmployeeInternalException.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\EmployeeResult.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\EmployeeSuccess.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\OrderError.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\OrderErrorBadRequest.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\OrderErrorExists.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\OrderErrorNotFound.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\OrderInternalException.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\OrderResult.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\OrderSuccess.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\ProductError.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\ProductErrorBadRequest.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\ProductErrorExists.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\ProductErrorNotFound.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\ProductInternalException.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\ProductResult.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\ProductSuccess.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\RacketError.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\RacketErrorBadRequest.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\RacketErrorExists.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\RacketErrorNotFound.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\RacketInternalException.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\RacketResult.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\RacketSuccess.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\StringerError.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\StringerErrorBadRequest.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\StringerErrorExists.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\StringerErrorNotFound.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\StringerInternalException.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\StringerResult.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\StringerSuccess.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\TaskError.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\TaskErrorBadRequest.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\TaskErrorExists.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\TaskErrorNotFound.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\TaskInternalException.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\TaskResult.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\exception\\TaskSuccess.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\Product$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\Product$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\Product.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\Racket$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\Racket$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\Racket.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\Status.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\TypeMachine.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\TypeProduct.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\TypeTask.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\machines\\Customizer$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\machines\\Customizer$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\machines\\Customizer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\machines\\Stringer$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\machines\\Stringer$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\machines\\Stringer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\Order$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\Order$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\Order.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Customization$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Customization$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Customization.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Purchase$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Purchase$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Purchase.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Stringing.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Task$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Task$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\orders\\tasks\\Task.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\users\\Customer$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\users\\Customer$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\users\\Customer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\users\\Employee$$serializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\users\\Employee$Companion.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\model\\users\\Employee.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\ICRUD.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$deleteAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$deleteAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\CustomizerRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$deleteAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$deleteAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\machines\\StringerRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$deleteAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$deleteAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\OrderRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$deleteAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$deleteAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\ProductRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$deleteAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$deleteAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TaskRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$client$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findAll$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findBYId$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findBYId$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findBYId$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findBYId$4.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findByUserId$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findByUserId$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findByUserId$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$findByUserId$4.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\orders\\TasksApiRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$deleteAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$deleteAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\rackets\\RacketRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$client$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$delete$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$delete$4.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findAll$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findByEmail$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findByEmail$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findByEmail$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findByEmail$4.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findById$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$findById$4.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$save$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$save$4.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$update$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository$update$4.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerApiRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerCacheRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerCacheRepositoryImpl$addCache$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerCacheRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerCacheRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerCacheRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerCacheRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerCacheRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$deleteAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$deleteAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$findByEmail$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$findByEmail$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$findByUuid$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$findByUuid$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\CustomerRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepository.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$delete$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$deleteAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$deleteAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$findAll$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$findByEmail$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$findByEmail$3.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$findById$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$save$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$save$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl$update$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\repositories\\users\\EmployeeRepositoryImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\PasswordParser.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiClient$ktorfit$2$1$1$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiClient$ktorfit$2$1$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiClient$ktorfit$2$1$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiClient$ktorfit$2$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiClient$ktorfit$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiClient$tasksInstance$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiClient$usersInstance$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiClient.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiTasks$DefaultImpls.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiTasks.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiUsers$DefaultImpls.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\ApiUsers.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$create$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$create$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$delete$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$getAll$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$getAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$getById$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$getById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$getByUserId$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$getByUserId$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$update$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiTasksImplKt.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$create$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$create$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$delete$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$delete$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$findByEmail$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$findByEmail$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$getAll$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$getAll$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$getById$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$getById$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$update$$inlined$suspendRequest$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl$update$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImpl.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\api\\_ApiUsersImplKt.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\cache\\UsersCache$refresh$2$1$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\cache\\UsersCache$refresh$2$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\cache\\UsersCache$refresh$2.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\cache\\UsersCache.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\cache\\UsersCacheKt$logger$1.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\service\\cache\\UsersCacheKt.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\util\\mappers\\MappersKt.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\util\\serializer\\LocalDateSerializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\util\\serializer\\LocalDateTimeSerializer.class;C:\\Users\\rpala\\Documents\\Practica03-AD\\TennisLabMongo\\build\\classes\\kotlin\\main\\util\\serializer\\UUIDSerializer.class
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build/kotlin/TennisLabMongo10SNAPSHOTjar-classes.txt b/build/kotlin/TennisLabMongo10SNAPSHOTjar-classes.txt
+--- a/build/kotlin/TennisLabMongo10SNAPSHOTjar-classes.txt	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/build/kotlin/TennisLabMongo10SNAPSHOTjar-classes.txt	(date 1675011539703)
+@@ -1,1 +1,1 @@
+-C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\MainKt$main$1$refresh$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\MainKt$main$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\MainKt.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$addTask$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$addTaskToOrder$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$deleteTask$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$getAllTasks$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$getTaskById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$updateTask$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$3$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$3$2$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$3$2$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$3$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$deleteCustomer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$deleteCustomer$2$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$deleteCustomer$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$getAllCustomers$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$getCustomerByEmailAndPassword$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$getCustomerById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$getCustomerById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$updateCustomer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$updateCustomer$2$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$updateCustomer$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$addEmployee$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$deleteEmployee$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$getAllEmployees$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$getEmployeeByEmailAndPassword$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$getEmployeeById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$updateEmployee$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$addCustomizer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$addStringer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$deleteCustomizer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$deleteStringer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$getAllCustomizers$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$getAllStringers$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$getCustomizerById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$getStringerById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$updateCustomizer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$updateStringer$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$addOrder$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$deleteOrder$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$getOrderById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$getOrders$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$updateOrder$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$addProduct$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$deleteProduct$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$getAllProducts$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$getProductById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$updateProduct$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$deleteRacket$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$findById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$getAllRackets$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$saveRacket$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$updateRacket$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\db\MongoDbManager.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\db\MongoDbManagerKt$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\db\MongoDbManagerKt.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\de\jensklingenberg\ktorfit\KtorfitExtKt.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\GetAllDto$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\GetAllDto$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\GetAllDto.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\SupportDto$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\SupportDto$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\SupportDto.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\TaskDTO.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Address$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Address$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Address.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Company$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Company$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Company.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\CustomerDTO$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\CustomerDTO$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\CustomerDTO.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Geo$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Geo$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Geo.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\UserDTO$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\UserDTO$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\UserDTO.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerError.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerErrorBadRequest.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerErrorExists.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerErrorNotFound.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerInternalException.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerResult.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerSuccess.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerError.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerErrorBadRequest.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerErrorExists.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerErrorNotFound.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerInternalException.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerResult.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerSuccess.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeError.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeErrorBadRequest.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeErrorExists.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeErrorNotFound.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeInternalException.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeResult.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeSuccess.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderError.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderErrorBadRequest.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderErrorExists.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderErrorNotFound.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderInternalException.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderResult.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderSuccess.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductError.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductErrorBadRequest.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductErrorExists.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductErrorNotFound.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductInternalException.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductResult.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductSuccess.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketError.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketErrorBadRequest.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketErrorExists.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketErrorNotFound.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketInternalException.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketResult.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketSuccess.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerError.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerErrorBadRequest.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerErrorExists.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerErrorNotFound.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerInternalException.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerResult.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerSuccess.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskError.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskErrorBadRequest.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskErrorExists.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskErrorNotFound.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskInternalException.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskResult.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskSuccess.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Product$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Product$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Product.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Racket$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Racket$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Racket.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Status.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\TypeMachine.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\TypeProduct.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\TypeTask.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Customizer$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Customizer$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Customizer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Stringer$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Stringer$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Stringer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\Order$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\Order$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\Order.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Customization$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Customization$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Customization.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Purchase$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Purchase$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Purchase.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Stringing.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Task$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Task$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Task.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Customer$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Customer$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Customer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Employee$$serializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Employee$Companion.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Employee.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\ICRUD.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$deleteAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$deleteAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$deleteAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$deleteAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$deleteAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$deleteAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$deleteAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$deleteAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$deleteAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$deleteAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$client$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findAll$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findBYId$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findBYId$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findBYId$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findBYId$4.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findByUserId$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findByUserId$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findByUserId$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findByUserId$4.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$deleteAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$deleteAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$client$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$delete$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$delete$4.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findAll$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findByEmail$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findByEmail$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findByEmail$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findByEmail$4.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findById$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findById$4.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$save$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$save$4.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$update$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$update$4.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$addCache$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$deleteAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$deleteAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findByEmail$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findByEmail$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findByUuid$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findByUuid$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepository.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$delete$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$deleteAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$deleteAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$findAll$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$findByEmail$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$findByEmail$3.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$findById$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$save$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$save$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$update$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\PasswordParser.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2$1$1$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2$1$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2$1$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$tasksInstance$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$usersInstance$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiTasks$DefaultImpls.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiTasks.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiUsers$DefaultImpls.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiUsers.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$create$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$create$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$delete$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getAll$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getById$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getByUserId$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getByUserId$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$update$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImplKt.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$create$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$create$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$delete$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$delete$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$findByEmail$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$findByEmail$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$getAll$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$getAll$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$getById$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$getById$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$update$$inlined$suspendRequest$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$update$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImplKt.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCache$refresh$2$1$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCache$refresh$2$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCache$refresh$2.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCache.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCacheKt$logger$1.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCacheKt.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\mappers\MappersKt.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\serializer\LocalDateSerializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\serializer\LocalDateTimeSerializer.class;C:\Users\rpala\Documents\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\serializer\UUIDSerializer.class
+\ No newline at end of file
++D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\MainKt$main$1$refresh$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\MainKt$main$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\MainKt.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$addTask$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$addTaskToOrder$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$deleteTask$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$getAllTasks$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$getTaskById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$saveTaskToRemote$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController$updateTask$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controller\TaskController.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$3$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$3$2$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$3$2$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$addCustomer$4$3$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$deleteCustomer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$deleteCustomer$2$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$deleteCustomer$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$getAllCustomers$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$getCustomerByEmailAndPassword$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$getCustomerById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$getCustomerById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$updateCustomer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$updateCustomer$2$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController$updateCustomer$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\CustomerController.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$addEmployee$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$deleteEmployee$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$getAllEmployees$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$getEmployeeByEmailAndPassword$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$getEmployeeById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController$updateEmployee$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\EmployeeController.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$addCustomizer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$addStringer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$deleteCustomizer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$deleteStringer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$getAllCustomizers$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$getAllStringers$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$getCustomizerById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$getStringerById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$updateCustomizer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController$updateStringer$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\MachineController.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$addOrder$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$deleteOrder$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$getOrderById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$getOrders$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController$updateOrder$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\OrderController.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$addProduct$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$deleteProduct$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$getAllProducts$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$getProductById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController$updateProduct$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\ProductController.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$deleteRacket$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$findById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$getAllRackets$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$saveRacket$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController$updateRacket$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\controllers\RacketController.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\db\MongoDbManager.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\db\MongoDbManagerKt$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\db\MongoDbManagerKt.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\de\jensklingenberg\ktorfit\KtorfitExtKt.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\GetAllDto$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\GetAllDto$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\GetAllDto.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\SupportDto$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\SupportDto$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\SupportDto.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\TaskDTO.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Address$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Address$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Address.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Company$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Company$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Company.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\CustomerDTO$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\CustomerDTO$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\CustomerDTO.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Geo$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Geo$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\Geo.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\UserDTO$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\UserDTO$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\dto\customers\UserDTO.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerError.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerErrorBadRequest.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerErrorExists.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerErrorNotFound.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerInternalException.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerResult.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomerSuccess.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerError.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerErrorBadRequest.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerErrorExists.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerErrorNotFound.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerInternalException.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerResult.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\CustomizerSuccess.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeError.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeErrorBadRequest.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeErrorExists.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeErrorNotFound.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeInternalException.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeResult.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\EmployeeSuccess.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderError.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderErrorBadRequest.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderErrorExists.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderErrorNotFound.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderInternalException.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderResult.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\OrderSuccess.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductError.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductErrorBadRequest.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductErrorExists.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductErrorNotFound.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductInternalException.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductResult.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\ProductSuccess.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketError.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketErrorBadRequest.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketErrorExists.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketErrorNotFound.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketInternalException.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketResult.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\RacketSuccess.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerError.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerErrorBadRequest.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerErrorExists.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerErrorNotFound.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerInternalException.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerResult.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\StringerSuccess.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskError.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskErrorBadRequest.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskErrorExists.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskErrorNotFound.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskInternalException.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskResult.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\exception\TaskSuccess.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Product$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Product$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Product.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Racket$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Racket$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Racket.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\Status.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\TypeMachine.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\TypeProduct.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\TypeTask.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\CompleteOrdersList$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\CompleteOrdersList$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\CompleteOrdersList.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\ListProductsServices$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\ListProductsServices$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\ListProductsServices.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\PendingOrdersList$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\PendingOrdersList$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\PendingOrdersList.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\StringerAssignments$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\StringerAssignments$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\StringerAssignments.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\StringerAssignmentsList$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\StringerAssignmentsList$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\lists\StringerAssignmentsList.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Customizer$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Customizer$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Customizer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Stringer$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Stringer$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\machines\Stringer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\Order$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\Order$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\Order.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Customization$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Customization$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Customization.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Purchase$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Purchase$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Purchase.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Stringing.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Task$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Task$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\orders\tasks\Task.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Customer$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Customer$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Customer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Employee$$serializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Employee$Companion.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\model\users\Employee.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\ICRUD.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$deleteAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$deleteAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\CustomizerRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$deleteAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$deleteAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\machines\StringerRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$deleteAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$deleteAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\OrderRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$deleteAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$deleteAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\ProductRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$deleteAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$deleteAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TaskRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$client$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findAll$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findBYId$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findBYId$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findBYId$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findBYId$4.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findByUserId$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findByUserId$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findByUserId$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$findByUserId$4.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$update$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository$update$4.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\orders\TasksApiRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$deleteAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$deleteAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\rackets\RacketRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$client$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$delete$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$delete$4.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findAll$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findByEmail$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findByEmail$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findByEmail$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findByEmail$4.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findById$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$findById$4.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$save$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$save$4.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$update$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository$update$4.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerApiRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$addCache$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerCacheRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$deleteAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$deleteAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findByEmail$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findByEmail$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findByUuid$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$findByUuid$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\CustomerRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepository.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$delete$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$deleteAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$deleteAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$findAll$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$findByEmail$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$findByEmail$3.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$findById$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$save$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$save$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl$update$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\repositories\users\EmployeeRepositoryImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\PasswordParser.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2$1$1$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2$1$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2$1$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$ktorfit$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$tasksInstance$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient$usersInstance$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiClient.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiTasks$DefaultImpls.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiTasks.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiUsers$DefaultImpls.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\ApiUsers.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$create$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$create$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$delete$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getAll$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getById$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getByUserId$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$getByUserId$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$update$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiTasksImplKt.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$create$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$create$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$delete$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$delete$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$findByEmail$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$findByEmail$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$getAll$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$getAll$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$getById$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$getById$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$update$$inlined$suspendRequest$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl$update$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImpl.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\api\_ApiUsersImplKt.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCache$refresh$2$1$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCache$refresh$2$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCache$refresh$2.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCache.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCacheKt$logger$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\cache\UsersCacheKt.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFiles.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesAssignments$json$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesAssignments$writeFichero$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesAssignments.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesCompleteOrders$json$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesCompleteOrders$writeFichero$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesCompleteOrders.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesOrder$json$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesOrder$writeFichero$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesOrder.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesPendingOrders$json$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesPendingOrders$writeFichero$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesPendingOrders.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesProductsServices$json$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesProductsServices$writeFichero$1.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\service\files\JsonFilesProductsServices.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\Data.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\mappers\MappersKt.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\serializer\LocalDateSerializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\serializer\LocalDateTimeSerializer.class;D:\PracticasDAM\Practica03-AD\TennisLabMongo\build\classes\kotlin\main\util\serializer\UUIDSerializer.class
+\ No newline at end of file
+Index: build/kotlin/compileTestKotlin/cacheable/caches-jvm/lookups/counters.tab
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>9\r\n0
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build/kotlin/compileTestKotlin/cacheable/caches-jvm/lookups/counters.tab b/build/kotlin/compileTestKotlin/cacheable/caches-jvm/lookups/counters.tab
+--- a/build/kotlin/compileTestKotlin/cacheable/caches-jvm/lookups/counters.tab	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/build/kotlin/compileTestKotlin/cacheable/caches-jvm/lookups/counters.tab	(date 1675011541445)
+@@ -1,2 +1,2 @@
+-9
++21
+ 0
+\ No newline at end of file
+Index: src/test/kotlin/repositories/orders/TaskRepositoryImplTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/kotlin/repositories/orders/TaskRepositoryImplTest.kt b/src/test/kotlin/repositories/orders/TaskRepositoryImplTest.kt
+new file mode 100644
+--- /dev/null	(date 1675011535617)
++++ b/src/test/kotlin/repositories/orders/TaskRepositoryImplTest.kt	(date 1675011535617)
+@@ -0,0 +1,128 @@
++package repositories.orders
++
++import kotlinx.coroutines.DelicateCoroutinesApi
++import kotlinx.coroutines.ExperimentalCoroutinesApi
++import kotlinx.coroutines.flow.toList
++import kotlinx.coroutines.test.runTest
++import model.TypeTask
++import model.orders.tasks.Task
++import org.junit.Before
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertAll
++import kotlin.test.assertEquals
++import kotlin.test.assertNotNull
++import kotlin.test.assertTrue
++
++@DelicateCoroutinesApi
++@ExperimentalCoroutinesApi
++class TaskRepositoryImplTest {
++
++    private val repo = TaskRepositoryImpl()
++    private val task = Task(
++        nId = 1,
++        idTrabajador = null,
++        idStringer = null,
++        idCustomizer = null,
++        description = "description",
++        taskType = TypeTask.ADQUISICION,
++        available = true
++    )
++
++    @Before
++    fun setUp() = runTest {
++        repo.deleteAll()
++    }
++
++    @AfterEach
++    fun tearDown() = runTest {
++        repo.deleteAll()
++    }
++
++    @Test
++    fun findById() = runTest {
++        repo.save(task)
++        val res = repo.findById(task.id)
++        assertAll(
++            { assertNotNull(res) },
++            { assertEquals(res?.id, task.id) },
++            { assertEquals(res?.nId, task.nId) },
++            { assertEquals(res?.uuid, task.uuid) },
++            { assertEquals(res?.idTrabajador, task.idTrabajador) },
++            { assertEquals(res?.idStringer, task.idStringer) },
++            { assertEquals(res?.idCustomizer, task.idCustomizer) },
++            { assertEquals(res?.description, task.description) },
++            { assertEquals(res?.taskType, task.taskType) },
++            { assertEquals(res?.available, task.available) }
++        )
++    }
++
++    @Test
++    fun save() = runTest {
++        val res = repo.save(task)
++        assertAll(
++
++            { assertEquals(res.id, task.id) },
++            { assertEquals(res.nId, task.nId) },
++            { assertEquals(res.uuid, task.uuid) },
++            { assertEquals(res.idTrabajador, task.idTrabajador) },
++            { assertEquals(res.idStringer, task.idStringer) },
++            { assertEquals(res.idCustomizer, task.idCustomizer) },
++            { assertEquals(res.description, task.description) },
++            { assertEquals(res.taskType, task.taskType) },
++            { assertEquals(res.available, task.available) }
++        )
++    }
++
++    @Test
++    fun update() = runTest {
++        val save = repo.save(task)
++        save.taskType = TypeTask.ENCORDADO
++        val res = repo.update(save)
++        assertAll(
++
++            { assertEquals(res.id, save.id) },
++            { assertEquals(res.nId, save.nId) },
++            { assertEquals(res.uuid, save.uuid) },
++            { assertEquals(res.idTrabajador, save.idTrabajador) },
++            { assertEquals(res.idStringer, save.idStringer) },
++            { assertEquals(res.idCustomizer, save.idCustomizer) },
++            { assertEquals(res.description, save.description) },
++            { assertEquals(res.taskType, save.taskType) },
++            { assertEquals(res.available, save.available) }
++        )
++
++    }
++
++    @Test
++    fun delete() = runTest {
++        repo.save(task)
++        val res = repo.delete(task)
++        assertTrue(res)
++    }
++
++    @Test
++    fun findAll() = runTest {
++        repo.save(task)
++        val res = repo.findAll().toList()
++        assertAll(
++
++            { assertEquals(res[0].id, task.id) },
++            { assertEquals(res[0].nId, task.nId) },
++            { assertEquals(res[0].uuid, task.uuid) },
++            { assertEquals(res[0].idTrabajador, task.idTrabajador) },
++            { assertEquals(res[0].idStringer, task.idStringer) },
++            { assertEquals(res[0].idCustomizer, task.idCustomizer) },
++            { assertEquals(res[0].description, task.description) },
++            { assertEquals(res[0].taskType, task.taskType) },
++            { assertEquals(res[0].available, task.available) }
++        )
++    }
++
++    @Test
++    fun deleteAll() = runTest {
++        repo.save(task)
++        val res = repo.deleteAll()
++        assertTrue(res)
++    }
++}
+\ No newline at end of file
+Index: src/test/kotlin/repositories/orders/ProductRepositoryImplTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/kotlin/repositories/orders/ProductRepositoryImplTest.kt b/src/test/kotlin/repositories/orders/ProductRepositoryImplTest.kt
+new file mode 100644
+--- /dev/null	(date 1675010813741)
++++ b/src/test/kotlin/repositories/orders/ProductRepositoryImplTest.kt	(date 1675010813741)
+@@ -0,0 +1,119 @@
++package repositories.orders
++
++import kotlinx.coroutines.DelicateCoroutinesApi
++import kotlinx.coroutines.ExperimentalCoroutinesApi
++import kotlinx.coroutines.flow.toList
++import kotlinx.coroutines.test.runTest
++import model.Product
++import model.TypeProduct
++import org.junit.Before
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertAll
++import kotlin.test.assertEquals
++import kotlin.test.assertNotNull
++import kotlin.test.assertTrue
++
++@DelicateCoroutinesApi
++@ExperimentalCoroutinesApi
++class ProductRepositoryImplTest {
++
++    private var product =
++        Product(
++            type = TypeProduct.COMPLEMENTO,
++            brand = "test brand",
++            model = "test model",
++            price = 10f,
++            stock = 1
++        )
++    private val repo = ProductRepositoryImpl()
++
++    @Before
++    fun setUp() = runTest {
++        repo.deleteAll()
++    }
++
++    @AfterEach
++    fun tearDown() = runTest {
++        repo.deleteAll()
++    }
++
++    @Test
++    fun findById() = runTest {
++        repo.save(product)
++        val res = repo.findById(product.id)
++        assertAll(
++            { assertNotNull(res) },
++            { assertEquals(res?.id, product.id) },
++            { assertEquals(res?.uuid, product.uuid) },
++            { assertEquals(res?.type, product.type) },
++            { assertEquals(res?.brand, product.brand) },
++            { assertEquals(res?.model, product.model) },
++            { assertEquals(res?.price, product.price) },
++            { assertEquals(res?.stock, product.stock) }
++        )
++    }
++
++    @Test
++    fun save() = runTest {
++        val res = repo.save(product)
++        assertAll(
++            { assertNotNull(res) },
++            { assertEquals(res.id, product.id) },
++            { assertEquals(res.uuid, product.uuid) },
++            { assertEquals(res.type, product.type) },
++            { assertEquals(res.brand, product.brand) },
++            { assertEquals(res.model, product.model) },
++            { assertEquals(res.price, product.price) },
++            { assertEquals(res.stock, product.stock) }
++        )
++
++    }
++
++    @Test
++    fun update() = runTest {
++        val save = repo.save(product)
++        save.brand = "updated brand"
++        val update = repo.update(save)
++        assertAll(
++            { assertEquals(update.id, product.id) },
++            { assertEquals(update.uuid, product.uuid) },
++            { assertEquals(update.type, product.type) },
++            { assertEquals(update.brand, product.brand) },
++            { assertEquals(update.model, product.model) },
++            { assertEquals(update.price, product.price) },
++            { assertEquals(update.stock, product.stock) }
++        )
++
++    }
++
++    @Test
++    fun delete() = runTest {
++        repo.save(product)
++        val res = repo.delete(product)
++        assertTrue(res)
++    }
++
++    @Test
++    fun findAll() = runTest {
++        repo.save(product)
++        val res = repo.findAll().toList()
++        assertAll(
++            { assertTrue(res.isNotEmpty()) },
++            { assertEquals(res[0].id, product.id) },
++            { assertEquals(res[0].uuid, product.uuid) },
++            { assertEquals(res[0].type, product.type) },
++            { assertEquals(res[0].brand, product.brand) },
++            { assertEquals(res[0].model, product.model) },
++            { assertEquals(res[0].price, product.price) },
++            { assertEquals(res[0].stock, product.stock) }
++        )
++    }
++
++    @Test
++    fun deleteAll() = runTest {
++        repo.save(product)
++        val res = repo.deleteAll()
++        assertTrue(res)
++    }
++}
+\ No newline at end of file
+Index: build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/counters.tab
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>70\r\n0
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/counters.tab b/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/counters.tab
+--- a/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/counters.tab	(revision ebd807cb0d02f626a7b011cf0fe5299b6b1a74e0)
++++ b/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/counters.tab	(date 1675011538671)
+@@ -1,2 +1,2 @@
+-70
++109
+ 0
+\ No newline at end of file
+Index: .idea/dictionaries/pc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/dictionaries/pc.xml b/.idea/dictionaries/pc.xml
+new file mode 100644
+--- /dev/null	(date 1675005198484)
++++ b/.idea/dictionaries/pc.xml	(date 1675005198484)
+@@ -0,0 +1,3 @@
++<component name="ProjectDictionaryState">
++  <dictionary name="pc" />
++</component>
+\ No newline at end of file
