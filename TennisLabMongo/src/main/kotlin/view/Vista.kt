@@ -7,12 +7,9 @@ import com.github.ajalt.mordant.terminal.Terminal
 import controller.*
 import controllers.*
 import exception.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.reactive.collect
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import model.*
@@ -86,13 +83,13 @@ class Vista(
      */
 
     suspend fun principal(): Int {
-    //ESTO ES PARA PROBAR EL TIEMPO REAL
-        withContext(Dispatchers.Unconfined) {
-            launch {
-                customerController.watchCustomers()
-                    .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }
-            }
-        }
+        //ESTO ES PARA PROBAR EL TIEMPO REAL
+/*withContext(Dispatchers.Unconfined) {
+    launch {
+    customerController.watchCustomers()
+        .collect { println("\uD83D\uDC49 Evento: ${it.operationType.value} -> ${it.fullDocument}") }}
+}*/
+
         var opcion: Int
         do {
             terminal.println(brightBlue("------ Bienvenido a tennislab🎾🎾 ------ \nelija una opción."))
@@ -111,6 +108,7 @@ class Vista(
      * Acciones a realizar dependiendo de la respuesta en la funcion principal
      */
     suspend fun opcionesPrincipal(num: Int) {
+
         when (num) {
             0 -> terminal.println(green.bg("Gracias por usar tennislab 🎾🎾"))
             1 -> loginBucle()
