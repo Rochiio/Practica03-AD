@@ -53,8 +53,6 @@ dependencies {
     //Cache
     implementation("io.github.reactivecircus.cache4k:cache4k:0.9.0")
 
-    //SHA-512
-    implementation("com.google.guava:guava:31.1-jre")
 
     //Terminal
     implementation("com.github.ajalt.mordant:mordant:2.0.0-beta8")
