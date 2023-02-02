@@ -15,8 +15,7 @@ object ApiClient {
     private val url = "https://jsonplaceholder.typicode.com/"
 
     private val ktorfit by lazy {
-        // Podemos meterle flow directamente!!!
-        // ktorfit.responseConverter(FlowResponseConverter())
+
         Ktorfit.Builder()
             .httpClient {
                 install(ContentNegotiation) {

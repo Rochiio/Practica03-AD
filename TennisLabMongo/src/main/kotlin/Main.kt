@@ -68,7 +68,7 @@ class KoinApp : KoinComponent {
             }
         }
 
-        //makeJsonListas()
+        makeJsonListas()
         exitProcess(0)
     }
 }
@@ -130,15 +130,17 @@ suspend fun makeJsonListas() = withContext(Dispatchers.IO) {
  * Crear fichero de pedido completados.
  */
 suspend fun makePedido() = withContext(Dispatchers.IO) {
-    t.println(TextColors.cyan.bg("pedido.json ..."))
-    var job = async {
-        JsonFilesOrder().writeFichero(
-            Data.DIR_JSON + "pedido.json",
-            Data.completeOrders[0]
-        )
-    }
+    if(Data.completeOrders.isNotEmpty()) {
+        t.println(TextColors.cyan.bg("pedido.json ..."))
+        var job = async {
+            JsonFilesOrder().writeFichero(
+                Data.DIR_JSON + "pedido.json",
+                Data.completeOrders[0]
+            )
+        }
 
-    job.await()
+        job.await()
+    }
 }
 
 /**

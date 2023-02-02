@@ -13,15 +13,13 @@ interface ApiUsers {
     @GET("users/{id}")
     suspend fun getById(@Path("id") id: Int): CustomerDTO
 
-    //TODO(No está cogiendo los usuarios por email)
+
     @GET("users")
     suspend fun findByEmail(@Query("email") email: String): List<CustomerDTO>?
 
     @POST("users")
     suspend fun create(@Body user: CustomerDTO): CustomerDTO
 
-
-    //TODO(Excepcion illegal input) ?? no entiendo
     @PUT("users/{id}")
     suspend fun update(@Path("id") id: Int, @Body customer: CustomerDTO): Customer
 
