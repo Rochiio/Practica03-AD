@@ -21,8 +21,6 @@ object UsersCache {
     suspend fun refresh() {
         withContext(newSingleThreadContext("cache")) {
             launch {
-                println("hola")
-
                 println("ACTUALIZANDO CACHE")
                 logger.info { "Limpiando caché 🗑" }
                 cache.invalidateAll()
